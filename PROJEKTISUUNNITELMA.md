@@ -162,7 +162,7 @@
 
 ---
 
-#### Sprint 2.2: MSI Installer (4 päivää) ✅ VALMIS 27.12.2025
+#### Sprint 2.2: MSI Installer (4 päivää) ✅ VALMIS 28.12.2025
 
 **Tehtävät:**
 1. ✅ Asenna WiX Toolset 3.14
@@ -171,9 +171,14 @@
 4. ✅ Julkaise GitHub Release
 
 **Deliverables:**
-- ✅ MSI-asennusohjelma: `Tilitin 2.0-2.0.0.msi` (71.75 MB)
+
+- ✅ Build-skriptit valmiit ja testatut
+- ✅ Inno Setup installer: `Tilitin-2.0.0-setup.exe` (56.74 MB)
+- ✅ JAR-tiedosto: `tilitin-2.0.0.jar` (23.81 MB)
 - ✅ GitHub Release: https://github.com/priku/tilitin-modernized/releases/tag/v2.0.0
-- ✅ GPL v3 -lisenssi näkyy asennuksessa
+- ✅ GPL v3 -lisenssi sisällytetty asennusskripteihin
+
+**Huom:** MSI-asennusohjelma poistettu releasesta - Inno Setup on pienempi ja modernimpi
 
 **Päätös: Asennusohjelman ulkoasu**
 

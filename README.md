@@ -37,18 +37,14 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 2. Tuplaklikkaa asennusohjelmaa ja seuraa ohjeita
 3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
 
-**Vaihtoehtoisesti MSI-asennusohjelma:**
-
-1. Lataa **Tilitin 2.0-2.0.0.msi** GitHubin [releases-osiosta][releases]
-2. Tuplaklikkaa MSI-tiedostoa ja seuraa asennusohjeita
-
-**Huom:** Molemmat asennusohjelmat sisältävät Java-ajoympäristön, joten erillistä Java-asennusta ei tarvita.
+**Huom:** Asennusohjelma sisältää Java-ajoympäristön, joten erillistä Java-asennusta ei tarvita.
 
 **Ominaisuudet:**
 
-- ✨ Moderni käyttöliittymä (Inno Setup)
-- 🌍 Suomen- ja englanninkielinen
-- 📦 Pienempi tiedostokoko (~57 MB vs. 71.8 MB)
+- ✨ Moderni FlatLaf-käyttöliittymä
+- 🎨 Vaalea ja tumma teema (vaihda: Muokkaa → Ulkoasu...)
+- 🌍 Suomen- ja englanninkielinen asennusohjelma
+- 📦 Pieni tiedostokoko (~57 MB)
 - 🚀 Nopea asennus
 
 ### Jar-tiedostolla (kaikki alustat)

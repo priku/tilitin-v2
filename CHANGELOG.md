@@ -7,7 +7,7 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
-## [2.0.0] - 2025-12-27
+## [2.0.0] - 2025-12-28
 
 ### 🚀 Windows Modernization Release
 
@@ -16,12 +16,12 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 | Tiedosto | Koko | Kuvaus |
 |----------|------|--------|
 | `Tilitin-2.0.0-setup.exe` | 57 MB | ⭐ Suositus! Moderni asennusohjelma |
-| `Tilitin.2.0-2.0.0.msi` | 72 MB | Perinteinen MSI-asennus |
 | `tilitin-2.0.0.jar` | 24 MB | JAR (vaatii Java 21+) |
 
 ### Lisätty
 - **FlatLaf-teema** - Moderni käyttöliittymä FlatLaf 3.5.2 -kirjastolla
-- **Vaalea ja tumma teema** - Valittavissa `asetukset.properties`-tiedostosta
+- **Teemavaihtodialogi** - Vaihda teemaa kätevästi Muokkaa → Ulkoasu... -valikosta
+- **Vaalea ja tumma teema** - Vaihdettavissa lennossa ilman uudelleenkäynnistystä
 - **Windows natiivi-sovellus** - jPackage-paketointi (.exe)
 - **Windows MSI-asennusohjelma** - WiX Toolset 3.14
 - **Inno Setup -asennusohjelma** - Moderni ulkoasu, LZMA2-pakkaus (21% pienempi)
