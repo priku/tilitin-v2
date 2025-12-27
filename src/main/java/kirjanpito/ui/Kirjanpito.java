@@ -13,6 +13,9 @@ import java.util.logging.SimpleFormatter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 import kirjanpito.models.DocumentModel;
 import kirjanpito.util.AppSettings;
 import kirjanpito.util.Registry;
@@ -55,18 +58,15 @@ public class Kirjanpito implements Runnable {
 
 		configureLogging(settings.getDirectoryPath());
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
+		// Aseta moderni FlatLaf Look and Feel
+		setupLookAndFeel(settings);
+
 		String osName = System.getProperty("os.name").toLowerCase();
 
 		if (osName.startsWith("mac os x")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_NAME);
-
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 		else if (osName.startsWith("linux")) {
 			try {
@@ -104,6 +104,43 @@ public class Kirjanpito implements Runnable {
 		frame.create();
 		frame.setVisible(true);
 		frame.openDataSource();
+	}
+
+	/**
+	 * Asettaa modernin FlatLaf Look and Feel -teeman.
+	 * Tukee vaalean ja tumman teeman vaihtoa asetuksista.
+	 */
+	private void setupLookAndFeel(AppSettings settings) {
+		try {
+			// Lue teema-asetus (oletus: light)
+			String theme = settings.getString("ui.theme", "light");
+
+			if ("dark".equalsIgnoreCase(theme)) {
+				FlatDarkLaf.setup();
+			} else {
+				FlatLightLaf.setup();
+			}
+
+			// Aseta FlatLaf-spesifit asetukset
+			UIManager.put("Button.arc", 10);
+			UIManager.put("Component.arc", 10);
+			UIManager.put("ProgressBar.arc", 10);
+			UIManager.put("TextComponent.arc", 10);
+			UIManager.put("ScrollBar.showButtons", true);
+			UIManager.put("Table.showHorizontalLines", true);
+			UIManager.put("Table.showVerticalLines", true);
+
+		} catch (Exception e) {
+			System.err.println("FlatLaf-teeman asetus epäonnistui, käytetään oletusta");
+			e.printStackTrace();
+
+			// Fallback perinteiseen Look and Feeliin
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	private void configureLogging(String dirname) {
