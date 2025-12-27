@@ -2,3 +2,31 @@ bin
 dist
 target
 dependency-reduced-pom.xml
+
+# Windows build outputs
+*.msi
+*.msix
+*.exe
+Tilitin/
+
+# Code Signing
+*.pfx
+*.p12
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
