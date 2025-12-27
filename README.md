@@ -107,4 +107,4 @@ Komponenttien lisenssit ja niihin sisältyvät ehdot ovat tiedostossa LISENSSIT.
 Tilittimen lähdekoodin voit kloonata GitHubista tai ladata [releases-osiosta][releases],
 jossa ovat myös kirjastojen lähdekoodit.
 
-[releases]: https://github.com/jkseppan/tilitin/releases
+[releases]: https://github.com/priku/tilitin-modernized/releases

@@ -14,7 +14,7 @@
 | Kenttä | Arvo |
 |--------|------|
 | **Kohdealusta** | Windows 10/11 (64-bit) |
-| **Teknologia** | Java 21 + Swing + FlatLaf |
+| **Teknologia** | Java 25 + Swing + FlatLaf |
 | **Kokonaisaika** | 6-8 viikkoa |
 | **Resurssit** | 1 kehittäjä |
 | **Budjetti** | ~10,000-15,000 € (kehitystyö + sertifikaatit) |
@@ -419,7 +419,7 @@ Tutkittu vaihtoehdot asennusohjelman modernisointiin:
 ### Työkalut:
 - **IDE:** IntelliJ IDEA / Eclipse
 - **Build:** Maven 3.x
-- **Java:** JDK 21 (Temurin)
+- **Java:** JDK 25 (Temurin)
 - **MSIX Packaging Tool:** [Download](https://www.microsoft.com/store/productId/9N5LW3JBCXKF)
 - **ImageMagick:** [Download](https://imagemagick.org/script/download.php)
 

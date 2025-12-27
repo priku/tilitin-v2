@@ -56,7 +56,7 @@ mvn clean package
 
 **Jos näet virheen:**
 - Tarkista että Maven on asennettu: `mvn --version`
-- Tarkista että Java 21+ on asennettu: `java -version`
+- Tarkista että Java 25+ on asennettu: `java -version`
 - Jos Maven puuttuu, asenna: https://maven.apache.org/download.cgi
 
 ---

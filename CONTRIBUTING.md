@@ -27,7 +27,7 @@ tilitin/
 
 ### Vaatimukset
 
-- **JDK 21+** (suositus: [Eclipse Temurin](https://adoptium.net/))
+- **JDK 25+** (suositus: [Eclipse Temurin](https://adoptium.net/))
 - **Maven 3.x**
 - **Git**
 - **IDE** (IntelliJ IDEA, Eclipse tai VS Code + Java-lisäosa)

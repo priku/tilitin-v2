@@ -179,7 +179,7 @@ TILITIN 2.0.0 TESTAUSRAPORTTI
 
 Testaaja: _______________
 Päivämäärä: _______________
-Ympäristö: Windows 11 / JDK 21+ / Maven 3.x
+Ympäristö: Windows 11 / JDK 25+ / Maven 3.9.12+
 
 BUILDAUS:
 [ ] Maven build onnistui (BUILD SUCCESS)

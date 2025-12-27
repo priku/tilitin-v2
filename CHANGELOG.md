@@ -40,6 +40,11 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 - **Sovelluksen nimi** - "Tilitin" → "Tilitin 2.0"
 - **Käyttöliittymä** - Vanha Swing-teema → FlatLaf Light/Dark
 - **Java-versio** - Java 21 → Java 25 (LTS)
+- **Kirjastopäivitykset:**
+  - FlatLaf 3.5.2 → 3.7
+  - SQLite JDBC 3.46.0.1 → 3.51.1.0
+  - MySQL Connector 9.0.0 → 9.5.0
+  - PostgreSQL 42.7.3 → 42.7.8
 
 ### Korjattu
 - Native access -varoitukset poistettu jPackage-buildista
@@ -75,8 +80,8 @@ Jouni Seppäsen ylläpitämä versio (jkseppan/tilitin).
   - SLF4J 2.0.13
 
 ### Tekninen
-- Java 21 vaaditaan (aiemmin Java 8)
-- Maven 3.13.0
+- Java 25 vaaditaan (aiemmin Java 8)
+- Maven 3.9.12+
 
 ---
 

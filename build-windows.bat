@@ -13,7 +13,7 @@ echo.
 REM Tarkista että Java on asennettu
 java -version >nul 2>&1
 if errorlevel 1 (
-    echo [VIRHE] Java ei löydy! Asenna Java 21 tai uudempi.
+    echo [VIRHE] Java ei löydy! Asenna Java 25 tai uudempi.
     pause
     exit /b 1
 )
