@@ -19,7 +19,12 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 **Kehityshaara:** `feature/windows-modernization`
 **Tila:** 🟢 Aktiivinen kehitys (Sprint 2.2)
 
-Katso [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) ja [TESTAUS.md](TESTAUS.md)
+**Dokumentaatio:**
+
+- [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) - Kehityssuunnitelma ja sprintit
+- [TESTAUS.md](TESTAUS.md) - Testausraportit ja ohjeet
+- [BUILDING.md](BUILDING.md) - Build-ohjeet
+- [MSI-MODERNISOINTI.md](MSI-MODERNISOINTI.md) - MSI-asennusohjelman modernisointivaihtoehdot
 
 ## Asennus
 

@@ -421,3 +421,80 @@ HUOMIOT:
 - Käyttäjät voivat pitää molemmat versiot asennettuna rinnakkain
 - Sama tietokanta toimii molemmissa versioissa
 ```
+
+---
+
+## 📦 MSI-asennusohjelman testaus (27.12.2025)
+
+```
+================================
+MSI INSTALLER TESTAUSRAPORTTI
+================================
+
+Päivämäärä: 27.12.2025
+Testaaja: Käyttäjä + GitHub Copilot
+
+BUILD:
+[x] build-windows-installer.bat suoritettu
+[x] Maven build onnistui (BUILD SUCCESS)
+[x] jPackage MSI-paketointi onnistui
+[x] WiX Toolset 3.14 käytössä
+
+LUODUT TIEDOSTOT:
+[x] dist\installer\Tilitin 2.0-2.0.0.msi (71.8 MB)
+[x] MSI sisältää embedded JRE
+[x] MSI sisältää GPL-lisenssin (COPYING)
+
+MSI OMINAISUUDET:
+[x] Asennuswizard näkyy (perinteinen Windows Installer)
+[x] GPL-lisenssi näytetään asennuksen aikana
+[x] Käyttäjä voi valita asennushakemiston (--win-dir-chooser)
+[x] Luo pikakuvakkeen Start Menuun (--win-menu)
+[x] Luo työpöydän pikakuvakkeen (--win-shortcut)
+[x] Per-user asennus (--win-per-user-install)
+[x] Upgrade UUID asetettu (päivitysten toimivuus)
+
+TESTAUS:
+[x] MSI-tiedosto tuplaklikkaus toimii
+[x] Asennuswizard käynnistyy
+[x] Asennus onnistuu ilman virheitä
+[x] Start Menu -pikakuvake luotu: "Tilitin 2.0"
+[x] Sovellus käynnistyy asennuksen jälkeen
+[x] FlatLaf-teema näkyy oikein
+[x] Ei native access -varoituksia
+[x] Tietokanta toimii (sama kuin aiemmin)
+
+KÄYTTÖLIITTYMÄ:
+- Asennuswizard: Perinteinen Windows Installer -tyyli
+- Värimaailma: Harmaa/valkoinen (vanha tyyli)
+- Toiminnallisuus: Ammattimainen, toimiva
+- Moderniteetti: ⭐⭐ (perinteinen, mutta tuttu käyttäjille)
+
+MSI MODERNISOINTI:
+Käyttäjä kysyi: "Onko mitään muuta tapaa modernisoida msi paketin asennus prosessia?"
+
+ANALYYSI:
+- jPackage luo toimivan MSI:n, mutta wizardi näyttää vanhalta
+- jPackage ei tarjoa visuaalisen kustomoinnin parametreja
+- Modernisointivaihtoehdot dokumentoitu: MSI-MODERNISOINTI.md
+
+VAIHTOEHDOT:
+1. Advanced Installer - Nopein tapa, maksullinen ($499/v)
+2. WiX Custom UI - Ilmainen, vaatii XML-osaamista
+3. WiX Bootstrapper + WPF - Täysi kontrolli, vaatii C#-osaamista
+4. Pidä jPackage sellaisenaan - Wizardi tuttu käyttäjille
+
+PÄÄTÖS:
+[x] Dokumentoitu MSI-MODERNISOINTI.md
+[x] Suositus: Pidä jPackage MSI (keskity sovelluksen UI:hin)
+[ ] Vaihtoehtoisesti: Advanced Installer (jos halutaan moderni wizard)
+
+YHTEENVETO:
+[x] ✅ HYVÄKSYTTY - MSI-asennusohjelma toimii ammattimaisesti
+
+HUOMIOT:
+- MSI:n perinteinen ulkoasu on tuttu Windows-käyttäjille
+- Wizardi näkyy vain asennuksen aikana (kerran)
+- Sovelluksen FlatLaf-teema näkyy joka päivä (tärkeämpi)
+- Modernisointivaihtoehdot saatavilla tarvittaessa
+```

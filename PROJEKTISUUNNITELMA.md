@@ -162,18 +162,36 @@
 
 ---
 
-#### Sprint 2.2: MSI ja MSIX Installer (4 päivää)
+#### Sprint 2.2: MSI Installer (4 päivää) ✅ VALMIS 27.12.2025
 
 **Tehtävät:**
-1. Luo MSI-asennusohjelma
-2. Testaa MSI-asennus
-3. Luo MSIX-paketti (Store-yhteensopiva)
-4. Valmistele AppxManifest.xml
+1. ✅ Asenna WiX Toolset 3.14
+2. ✅ Luo MSI-asennusohjelma (`build-windows-installer.bat`)
+3. ✅ Testaa MSI-asennus (Welcome, License, Destination dialogit)
+4. ✅ Julkaise GitHub Release
 
 **Deliverables:**
-- ⏳ MSI-asennusohjelma toimii
-- ⏳ MSIX-paketti luotu
-- ⏳ AppxManifest.xml valmis
+- ✅ MSI-asennusohjelma: `Tilitin 2.0-2.0.0.msi` (71.75 MB)
+- ✅ GitHub Release: https://github.com/priku/tilitin-modernized/releases/tag/v2.0.0
+- ✅ GPL v3 -lisenssi näkyy asennuksessa
+
+**Päätös: MSI-asennusohjelman ulkoasu**
+
+Tutkittu vaihtoehdot MSI-asennusohjelman modernisointiin:
+
+| Vaihtoehto | Helppous | Tulos | Hinta |
+|------------|----------|-------|-------|
+| jPackage (nykyinen) | ⭐⭐⭐⭐⭐ | Perinteinen Windows-wizardi | Ilmainen |
+| Advanced Installer | ⭐⭐⭐⭐ | Moderni, ammattimainen | $499/v |
+| WiX Custom UI | ⭐⭐ | Täysi kontrolli | Ilmainen |
+
+**Valittu:** jPackage MSI sellaisenaan
+- Wizardi näkyy vain kerran asennuksessa
+- FlatLaf-teema näkyy joka päivä käytössä (tärkeämpää!)
+- Käyttäjät tunnistavat perinteisen Windows Installer -tyylin
+- Toimii hyvin, ei ylimääräistä työtä
+
+**MSIX-paketointi:** Siirretty myöhempään (vaatii Code Signing -sertifikaatin)
 
 ---
 
