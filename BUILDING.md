@@ -51,6 +51,29 @@ Tuottaa:
 
 **Huom:** Vaatii WiX Toolset 3.14+ -asennuksen.
 
+### Vaihtoehto 3: Inno Setup Installer (Suositus)
+
+Luo moderni Windows-asennusohjelma:
+
+```bash
+# 1. Luo ensin app-image
+build-windows.bat
+
+# 2. Luo Inno Setup -asennusohjelma
+build-inno-installer.bat
+```
+
+Tuottaa:
+- `dist/installer/Tilitin-2.0.0-setup.exe` (~57 MB)
+
+**Edut:**
+- Moderni ulkoasu (WizardStyle=modern)
+- Suomen- ja englanninkielinen
+- Pienempi tiedostokoko (LZMA2-pakkaus)
+- Pikakuvakkeet työpöydälle ja Käynnistä-valikkoon
+
+**Huom:** Vaatii [Inno Setup 6](https://jrsoftware.org/isinfo.php) -asennuksen.
+
 ## Code Signing (Allekirjoitus)
 
 Ennen julkaisua, allekirjoita MSI-paketti:

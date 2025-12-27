@@ -175,21 +175,23 @@
 - ✅ GitHub Release: https://github.com/priku/tilitin-modernized/releases/tag/v2.0.0
 - ✅ GPL v3 -lisenssi näkyy asennuksessa
 
-**Päätös: MSI-asennusohjelman ulkoasu**
+**Päätös: Asennusohjelman ulkoasu**
 
-Tutkittu vaihtoehdot MSI-asennusohjelman modernisointiin:
+Tutkittu vaihtoehdot asennusohjelman modernisointiin:
 
-| Vaihtoehto | Helppous | Tulos | Hinta |
-|------------|----------|-------|-------|
-| jPackage (nykyinen) | ⭐⭐⭐⭐⭐ | Perinteinen Windows-wizardi | Ilmainen |
-| Advanced Installer | ⭐⭐⭐⭐ | Moderni, ammattimainen | $499/v |
-| WiX Custom UI | ⭐⭐ | Täysi kontrolli | Ilmainen |
+| Vaihtoehto | Helppous | Tulos | Hinta | Koko |
+|------------|----------|-------|-------|------|
+| jPackage MSI | ⭐⭐⭐⭐⭐ | Perinteinen Windows-wizardi | Ilmainen | 71.75 MB |
+| Inno Setup | ⭐⭐⭐⭐ | Moderni wizardi | Ilmainen | 56.73 MB |
+| Advanced Installer | ⭐⭐⭐⭐ | Moderni, ammattimainen | $499/v | - |
+| WiX Custom UI | ⭐⭐ | Täysi kontrolli | Ilmainen | - |
 
-**Valittu:** jPackage MSI sellaisenaan
-- Wizardi näkyy vain kerran asennuksessa
-- FlatLaf-teema näkyy joka päivä käytössä (tärkeämpää!)
-- Käyttäjät tunnistavat perinteisen Windows Installer -tyylin
-- Toimii hyvin, ei ylimääräistä työtä
+**Valittu:** ✅ Inno Setup (27.12.2025)
+- Moderni ulkoasu (WizardStyle=modern)
+- Suomen- ja englanninkielinen
+- 21% pienempi tiedostokoko LZMA2-pakkauksella
+- Pikakuvakkeet työpöydälle ja Käynnistä-valikkoon
+- Ilmainen ja avoimen lähdekoodin
 
 **MSIX-paketointi:** Siirretty myöhempään (vaatii Code Signing -sertifikaatin)
 
