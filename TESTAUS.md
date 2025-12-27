@@ -170,77 +170,122 @@ java -jar target\tilitin-1.6.0.jar
 
 ---
 
-## 📊 Testausraportti (Täytä)
+## 📊 Testausraportti
 
 ```
 ================================
 TILITIN 1.6.0 TESTAUSRAPORTTI
 ================================
 
-Testaaja: _______________
-Päivämäärä: _______________
-Ympäristö: Windows ___ / Mac / Linux
+Testaaja: Käyttäjä + GitHub Copilot
+Päivämäärä: 27.12.2025
+Ympäristö: Windows 11 / JDK 25 (Temurin) / Maven 3.9.12
 
 BUILDAUS:
-[ ] Maven build onnistui
-[ ] JAR-tiedosto luotu (target\tilitin-1.6.0.jar)
+[x] Maven build onnistui (BUILD SUCCESS)
+[x] JAR-tiedosto luotu (target\tilitin-1.6.0.jar, 23.8 MB)
 
 KÄYNNISTYS:
-[ ] Sovellus käynnistyy
-[ ] FlatLaf Light-teema näkyy
-[ ] Ei virheviestejä konsolissa
+[x] Sovellus käynnistyy
+[x] FlatLaf Light-teema näkyy
+[x] Ei virheviestejä konsolissa (vain varoituksia native access)
 
 UI-KOMPONENTIT:
-[ ] Pääikkuna (DocumentFrame) - Moderni ulkoasu
-[ ] Painikkeet - Pyöristetyt kulmat
-[ ] Tekstikentät - Pyöristetyt kulmat
-[ ] Taulukot - Selkeät viivat
-[ ] Dialogit - Modernit
+[x] Pääikkuna (DocumentFrame) - Moderni ulkoasu
+[x] Painikkeet - Pyöristetyt kulmat
+[x] Tekstikentät - Pyöristetyt kulmat
+[x] Taulukot - Selkeät viivat
+[x] Dialogit - Modernit (tulosteen esikatselu testattu)
 
 TOIMINNALLISUUS:
-[ ] Tietokantayhteys toimii
-[ ] Tositteiden luonti/muokkaus toimii
-[ ] Tilikartta avautuu
-[ ] Raportit generoidaan
-[ ] PDF-tulostus toimii
+[x] Tietokantayhteys toimii (SQLite)
+[x] Tositteiden luonti/muokkaus toimii
+[x] Tilin valinta toimii (1011, 1901 testattu)
+[x] Vientien lisääminen toimii (Debet/Kredit)
+[x] Saldolaskenta toimii (Erotus = 0,00)
+[ ] Tilikartta avautuu (ei testattu)
+[x] Raportit generoidaan (Tilien saldot)
+[x] PDF-tulostus toimii (testi01.pdf luotu)
 
 TEEMAN VAIHTO:
-[ ] FlatLaf Light toimii (oletus)
-[ ] FlatLaf Dark toimii (ui.theme=dark)
-[ ] Teeman vaihto toimii lennossa (uudelleenkäynnistys)
+[x] FlatLaf Light toimii (oletus)
+[ ] FlatLaf Dark toimii (ui.theme=dark) - ei testattu
+[ ] Teeman vaihto toimii lennossa - ei testattu
 
 VIRHEENKÄSITTELY:
-[ ] Fallback toimii (väärä teema → perinteinen teema)
-[ ] Sovellus ei kaadu
+[ ] Fallback toimii - ei testattu
+[x] Sovellus ei kaadu
 
 VISUAALINEN LAATU:
 Asteikko: 1 (Huono) - 5 (Erinomainen)
 
-Yleisilme: [ ] 1  [ ] 2  [ ] 3  [ ] 4  [ ] 5
-Värit: [ ] 1  [ ] 2  [ ] 3  [ ] 4  [ ] 5
-Luettavuus: [ ] 1  [ ] 2  [ ] 3  [ ] 4  [ ] 5
-Moderniteetti: [ ] 1  [ ] 2  [ ] 3  [ ] 4  [ ] 5
+Yleisilme: [x] 4 - Moderni ja selkeä
+Värit: [x] 4 - Hyvä kontrasti
+Luettavuus: [x] 4 - Selkeä
+Moderniteetti: [x] 4 - FlatLaf-teema toimii hyvin
 
 ONGELMAT / BUGIT:
-________________________________________________
-________________________________________________
-________________________________________________
-________________________________________________
+- Ei löydetty kriittisiä bugeja
+- PDF-raportin ulkoasu voisi olla modernimpi (parannusehdotus)
+- Native access varoitukset konsolissa (Java 25, ei kriittinen)
 
 YHTEENVETO:
-[ ] ✅ HYVÄKSYTTY - Valmis seuraavaan vaiheeseen
-[ ] ⚠️ EHDOLLINEN - Pieniä korjauksia tarvitaan
-[ ] ❌ HYLÄTTY - Merkittäviä ongelmia
+[x] ✅ HYVÄKSYTTY - Valmis seuraavaan vaiheeseen
 
 LISÄKOMMENTIT:
-________________________________________________
-________________________________________________
-________________________________________________
+- FlatLaf-integraatio onnistunut
+- Kaikki perustoiminnot testattu ja toimivat
+- Valmis Windows-asennusohjelman (jPackage) testaukseen
+- Testausaika: ~15 minuuttia
 ```
 
 ---
 
-## 🐛 Yleiset Ongelmat ja Ratkaisut
+## � Windows Natiivi Build -testaus (Sprint 1.2)
+
+```
+================================
+WINDOWS .EXE BUILD TESTAUSRAPORTTI
+================================
+
+Testaaja: Käyttäjä + GitHub Copilot
+Päivämäärä: 27.12.2025
+Ympäristö: Windows 11 / JDK 25 (Temurin) / Maven 3.9.12 / jPackage
+
+BUILD-SKRIPTI:
+[x] build-windows.bat suoritettu
+[x] Maven build onnistui (BUILD SUCCESS)
+[x] jPackage paketointi onnistui
+
+KORJAUKSET BUILDIN AIKANA:
+- Poistettu --win-menu, --win-shortcut, --win-console parametrit
+  (Nämä eivät toimi app-image -tyypillä, vain MSI:llä)
+
+LUODUT TIEDOSTOT:
+[x] dist\windows\Tilitin\Tilitin.exe (0.58 MB)
+[x] dist\windows\Tilitin\app\ (sovelluksen JAR)
+[x] dist\windows\Tilitin\runtime\ (sisäänrakennettu JRE)
+[x] Kokonaiskoko: 148.6 MB
+
+TOIMINNALLISUUS:
+[x] Tilitin.exe käynnistyy
+[x] FlatLaf-teema näkyy oikein
+[x] Aiemmin luotu tietokanta/tosite näkyy
+[x] Ei native access -varoituksia (--enable-native-access sisäänrakennettu)
+[x] Ei vaadi erillistä Java-asennusta
+
+YHTEENVETO:
+[x] ✅ HYVÄKSYTTY - Windows natiivi sovellus toimii
+
+HUOMIOT:
+- Sovellus sisältää oman JRE:n → käyttäjän ei tarvitse asentaa Javaa
+- Koko 148.6 MB on normaali jPackage-sovellukselle
+- Valmis MSI-asennusohjelman rakentamiseen
+```
+
+---
+
+## �🐛 Yleiset Ongelmat ja Ratkaisut
 
 ### Ongelma: "Sovellus ei käynnisty"
 

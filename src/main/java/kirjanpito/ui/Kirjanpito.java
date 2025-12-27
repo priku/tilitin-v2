@@ -33,7 +33,8 @@ public class Kirjanpito implements Runnable {
 	private String username;
 	private String password;
 
-	public static final String APP_NAME = "Tilitin";
+	public static final String APP_NAME = "Tilitin 2.0";
+	public static final String APP_DATA_NAME = "Tilitin"; // Asetuskansion nimi (yhteensopivuus vanhan version kanssa)
 	public static final String APP_VERSION = Kirjanpito.class.getPackage().getImplementationVersion();
 	public static final String LOGGER_NAME = "kirjanpito";
 
@@ -47,7 +48,7 @@ public class Kirjanpito implements Runnable {
 		AppSettings settings = AppSettings.getInstance();
 
 		if (configFile == null) {
-			File file = new File(AppSettings.buildDirectoryPath(APP_NAME),
+			File file = new File(AppSettings.buildDirectoryPath(APP_DATA_NAME),
 				"asetukset.properties");
 
 			settings.load(file);

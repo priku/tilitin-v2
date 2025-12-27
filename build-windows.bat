@@ -38,20 +38,15 @@ if not exist "dist\windows" mkdir dist\windows
 REM Suorita jPackage
 jpackage ^
   --input target ^
-  --name Tilitin ^
-  --main-jar tilitin-1.6.0.jar ^
+  --name "Tilitin 2.0" ^
+  --main-jar tilitin-2.0.0.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type app-image ^
-  --app-version 1.6.0 ^
+  --app-version 2.0.0 ^
   --vendor "Tilitin Project" ^
   --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
   --icon src\main\resources\tilitin.ico ^
   --java-options "--enable-native-access=ALL-UNNAMED" ^
-  --win-console ^
-  --win-menu ^
-  --win-menu-group "Tilitin" ^
-  --win-shortcut ^
-  --win-dir-chooser ^
   --dest dist\windows
 
 if errorlevel 1 (

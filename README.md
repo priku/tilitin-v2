@@ -1,22 +1,23 @@
-# Tilitin
+# Tilitin 2.0
 
-Tilitin on ilmainen kirjanpito-ohjelma. Ohjelman teki Tommi Helineva, ja sen dokumentaatio on hänen
+Tilitin on ilmainen kirjanpito-ohjelma. Ohjelman teki alun perin Tommi Helineva, ja sen dokumentaatio on hänen
 sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
-## 🚀 Versio 1.6.0 - Windows Modernisointiprojekti (Kehityksessä)
+## 🚀 Versio 2.0.0 - Windows Modernisointiprojekti
 
-**Uutta versiossa 1.6.0:**
+**Uutta versiossa 2.0.0:**
 
 - ✨ **Moderni FlatLaf-teema** - Aikaisempaa hienompi käyttöliittymä
 - 🎨 **Vaalea ja tumma teema** - Valittavissa asetuksista
 - 📦 **Windows natiivi-asennusohjelma** - .exe ja .msi -paketit
 - 🏪 **Microsoft Store -tuki** (tulossa)
 - ⚡ Parannettu käytettävyys ja modernimpi ulkoasu
+- 🔄 **Rinnakkainen asennus** - Voit pitää vanhan Tilitin-version asennettuna
 
 **Kehityshaara:** `feature/windows-modernization`
-**Tila:** 🟡 Testausvaihe (Sprint 1.2)
+**Tila:** 🟢 Aktiivinen kehitys (Sprint 2.2)
 
 Katso [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) ja [TESTAUS.md](TESTAUS.md)
 

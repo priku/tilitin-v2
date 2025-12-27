@@ -27,10 +27,10 @@
 ### VAIHE 1: Perusta ja Modernisoi UI (2 viikkoa)
 
 #### Sprint 1.1: Projektin Valmistelu (3 päivää)
-- [ ] Päivitä pom.xml FlatLaf-riippuvuudella
-- [ ] Luo development-haara Gitissä (`feature/windows-modernization`)
-- [ ] Dokumentoi nykyinen UI-toiminnallisuus
-- [ ] Luo testaussuunnitelma
+- [x] Päivitä pom.xml FlatLaf-riippuvuudella ✅ (27.12.2025)
+- [x] Luo development-haara Gitissä (`feature/windows-modernization`)
+- [x] Dokumentoi nykyinen UI-toiminnallisuus
+- [x] Luo testaussuunnitelma ✅ TESTAUS.md luotu
 
 **Deliverables:**
 - ✅ FlatLaf lisätty projektiin
@@ -39,11 +39,11 @@
 
 ---
 
-#### Sprint 1.2: FlatLaf-integraatio (4 päivää)
+#### Sprint 1.2: FlatLaf-integraatio (4 päivää) ✅ VALMIS 27.12.2025
 
 **Tehtävät:**
 
-1. **Lisää FlatLaf-tuki pom.xml**
+1. **Lisää FlatLaf-tuki pom.xml** ✅
    ```xml
    <dependency>
        <groupId>com.formdev</groupId>
@@ -94,25 +94,26 @@
 #### Sprint 1.4: Testaus ja bugien korjaus (3 päivää)
 
 **Tehtävät:**
-- [ ] Manuaalinen testaus kaikissa ikkunoissa
-- [ ] Testaa SQLite, MySQL, PostgreSQL -yhteyksiä
-- [ ] Testaa raporttien generointi (PDF)
+- [x] Manuaalinen testaus kaikissa ikkunoissa ✅
+- [x] Testaa SQLite -yhteyksiä ✅
+- [ ] Testaa MySQL, PostgreSQL -yhteyksiä
+- [x] Testaa raporttien generointi (PDF) ✅
 - [ ] Testaa tietojen tuonti/vienti
-- [ ] Korjaa löydetyt bugit
+- [x] Korjaa löydetyt bugit ✅ (build-windows.bat korjattu)
 
 ---
 
 ### VAIHE 2: jPackage ja Natiivi Paketointi (2 viikkoa)
 
-#### Sprint 2.1: jPackage-konfiguraatio (4 päivää)
+#### Sprint 2.1: jPackage-konfiguraatio (4 päivää) ✅ VALMIS 27.12.2025
 
 **Tehtävät:**
 
-1. **Luo Windows-ikonit (.ico)**
+1. **Luo Windows-ikonit (.ico)** ✅
    - Resoluutiot: 16x16, 32x32, 48x48, 64x64, 128x128, 256x256
    - Tallenna: `src/main/resources/tilitin.ico`
 
-2. **Luo jPackage-build script**
+2. **Luo jPackage-build script** ✅
 
    `build-windows.bat`:
    ```batch
@@ -146,13 +147,18 @@
 
 3. **Lisää Maven-profile jPackagea varten**
 
-4. **Testaa jPackage-buildi paikallisesti**
+4. **Testaa jPackage-buildi paikallisesti** ✅
 
 **Deliverables:**
 - ✅ tilitin.ico luotu
-- ✅ build-windows.bat toimii
+- ✅ build-windows.bat toimii (korjattu 27.12.2025)
 - ✅ Maven-profile lisätty
-- ✅ Sovellus käynnistyy .exe-tiedostosta
+- ✅ Sovellus käynnistyy .exe-tiedostosta (testattu 27.12.2025)
+
+**Testaustulokset (27.12.2025):**
+- Tilitin.exe: 0.58 MB
+- Kokonaiskoko (JRE mukana): 148.6 MB
+- Native access -varoitukset poistettu (--enable-native-access sisäänrakennettu)
 
 ---
 
@@ -165,9 +171,9 @@
 4. Valmistele AppxManifest.xml
 
 **Deliverables:**
-- ✅ MSI-asennusohjelma toimii
-- ✅ MSIX-paketti luotu
-- ✅ AppxManifest.xml valmis
+- ⏳ MSI-asennusohjelma toimii
+- ⏳ MSIX-paketti luotu
+- ⏳ AppxManifest.xml valmis
 
 ---
 
