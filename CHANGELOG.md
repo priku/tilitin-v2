@@ -7,6 +7,35 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.0.1] - 2025-12-28
+
+### 🎨 UX Improvements Release
+
+**Lataukset:** https://github.com/priku/tilitin-modernized/releases/tag/v2.0.1
+
+| Tiedosto | Koko | Kuvaus |
+|----------|------|--------|
+| `Tilitin-2.0.1-setup.exe` | 57 MB | ⭐ Suositus! Moderni asennusohjelma |
+| `tilitin-2.0.1.jar` | 25 MB | JAR (vaatii Java 25+) |
+
+### Lisätty
+- **Splash screen** - Moderni käynnistysnäyttö progress-palkilla
+- **Viimeisimmät tietokannat** - Tiedosto-valikossa lista viimeksi avatuista tietokannoista (max 10)
+- **Uudet näppäinoikotiet:**
+  - `Ctrl+U` - Uusi tietokanta
+  - `Ctrl+D` - Tietokanta-asetukset
+  - `Ctrl+B` - Alkusaldot
+  - `Ctrl+P` - Perustiedot
+  - `Ctrl+E` - Vie tiedostoon
+  - `Ctrl+Shift+S` - Kirjausasetukset
+  - `Ctrl+Shift+A` - Ulkoasu
+  - `Shift+Delete` - Poista vienti
+
+### Muutettu
+- **Toolbar** - Paremmat välistykset ja näppäinoikotievihjeet tooltip-teksteissä
+
+---
+
 ## [2.0.0] - 2025-12-28
 
 ### 🚀 Windows Modernization Release

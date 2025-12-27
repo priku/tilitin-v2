@@ -122,6 +122,7 @@ import kirjanpito.reports.VATReportModel;
 import kirjanpito.reports.VATReportPrint;
 import kirjanpito.ui.resources.Resources;
 import kirjanpito.util.AppSettings;
+import kirjanpito.util.RecentDatabases;
 import kirjanpito.util.Registry;
 import kirjanpito.util.RegistryAdapter;
 
@@ -138,6 +139,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	protected JMenu gotoMenu;
 	protected JMenu reportsMenu;
 	protected JMenu toolsMenu;
+	protected JMenu recentMenu;
 	private JMenuItem newDatabaseMenuItem;
 	private JMenuItem openDatabaseMenuItem;
 	private JMenuItem newDocMenuItem;
@@ -284,7 +286,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
 		newDatabaseMenuItem = SwingUtils.createMenuItem("Uusi…",
-				null, 'U', null, newDatabaseListener);
+				null, 'U', KeyStroke.getKeyStroke('U', shortcutKeyMask), newDatabaseListener);
 
 		menu.add(newDatabaseMenuItem);
 
@@ -294,8 +296,14 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 
 		menu.add(openDatabaseMenuItem);
 
-		menu.add(SwingUtils.createMenuItem("Tietokanta-asetukset…", null, 'T', null,
-				databaseSettingsListener));
+		// Viimeisimmät tietokannat -alivalikko
+		recentMenu = new JMenu("Viimeisimmät");
+		recentMenu.setMnemonic('V');
+		updateRecentDatabasesMenu();
+		menu.add(recentMenu);
+
+		menu.add(SwingUtils.createMenuItem("Tietokanta-asetukset…", null, 'T', 
+				KeyStroke.getKeyStroke('D', shortcutKeyMask), databaseSettingsListener));
 
 		menu.addSeparator();
 		menu.add(SwingUtils.createMenuItem("Lopeta", "quit-16x16.png", 'L',
@@ -335,7 +343,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 
 		removeEntryMenuItem = SwingUtils.createMenuItem("Poista vienti",
 				"list-remove-16x16.png", 'o',
-				null, removeEntryListener);
+				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK), removeEntryListener);
 
 		entryTemplateMenu = new JMenu("Vientimallit");
 		editEntryTemplatesMenuItem = SwingUtils.createMenuItem("Muokkaa", null, 'M',
@@ -357,16 +365,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 						shortcutKeyMask), chartOfAccountsListener);
 
 		startingBalancesMenuItem = SwingUtils.createMenuItem("Alkusaldot…", null, 's',
-				null, startingBalancesListener);
+				KeyStroke.getKeyStroke('B', shortcutKeyMask), startingBalancesListener);
 
 		propertiesMenuItem = SwingUtils.createMenuItem("Perustiedot…", null, 'e',
-				null, propertiesListener);
+				KeyStroke.getKeyStroke('P', shortcutKeyMask), propertiesListener);
 
 		settingsMenuItem = SwingUtils.createMenuItem("Kirjausasetukset…", null, 'K',
-				null, settingsListener);
+				KeyStroke.getKeyStroke('S', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), settingsListener);
 
 		JMenuItem appearanceMenuItem = SwingUtils.createMenuItem("Ulkoasu…", null, 'U',
-				null, appearanceListener);
+				KeyStroke.getKeyStroke('A', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), appearanceListener);
 
 		menu.add(coaMenuItem);
 		menu.add(startingBalancesMenuItem);
@@ -519,7 +527,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 				null, vatChangeListener));
 
 		menu.add(SwingUtils.createMenuItem("Vie tiedostoon",
-				null, 'V', null, exportListener));
+				null, 'V', KeyStroke.getKeyStroke('E', shortcutKeyMask), exportListener));
 
 		/* Luodaan Ohje-valikko. */
 		menu = new JMenu("Ohje");
@@ -548,37 +556,43 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	protected void createToolBar() {
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
+		toolBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
+		// Navigointi-osio
 		prevButton = SwingUtils.createToolButton("go-previous-22x22.png",
-				"Edellinen tosite", prevDocListener, false);
+				"Edellinen tosite (Page Up)", prevDocListener, false);
 
 		nextButton = SwingUtils.createToolButton("go-next-22x22.png",
-				"Seuraava tosite", nextDocListener, false);
+				"Seuraava tosite (Page Down)", nextDocListener, false);
 
 		toolBar.add(prevButton);
 		toolBar.add(nextButton);
-		toolBar.addSeparator();
+		toolBar.addSeparator(new Dimension(16, 0));
 
+		// Tosite-osio
 		newDocButton = SwingUtils.createToolButton("document-new-22x22.png",
-				"Uusi tosite", newDocListener, true);
+				"Uusi tosite (Ctrl+N)", newDocListener, true);
 
+		toolBar.add(newDocButton);
+		toolBar.addSeparator(new Dimension(16, 0));
+
+		// Vienti-osio
 		addEntryButton = SwingUtils.createToolButton("list-add-22x22.png",
-				"Lisää vienti", addEntryListener, true);
+				"Lisää vienti (F8)", addEntryListener, true);
 
 		removeEntryButton = SwingUtils.createToolButton("list-remove-22x22.png",
 				"Poista vienti", removeEntryListener, true);
 
-		toolBar.add(newDocButton);
-		toolBar.addSeparator();
 		toolBar.add(addEntryButton);
 		toolBar.add(removeEntryButton);
-		toolBar.addSeparator();
+		toolBar.addSeparator(new Dimension(16, 0));
 
+		// Haku-osio
 		findByNumberButton = SwingUtils.createToolButton("jump-22x22.png",
-				"Hae numerolla", findDocumentByNumberListener, true);
+				"Hae numerolla (Ctrl+G)", findDocumentByNumberListener, true);
 
 		searchButton = SwingUtils.createToolButton("find-22x22.png",
-				"Etsi", searchListener, true);
+				"Etsi (Ctrl+F)", searchListener, true);
 
 		toolBar.add(findByNumberButton);
 		toolBar.add(searchButton);
@@ -2170,6 +2184,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		updateEntryTemplates();
 		updateDocumentTypes();
 		updateTableSettings();
+		
+		// Tallenna viimeisimpien tietokantojen listaan
+		String dbUrl = AppSettings.getInstance().getString("database.url", "");
+		if (!dbUrl.isEmpty()) {
+			RecentDatabases.getInstance().addDatabase(dbUrl);
+			updateRecentDatabasesMenu();
+		}
 	}
 
 	public void openSqliteDataSource(File file) {
@@ -2178,6 +2199,67 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 				file.getAbsolutePath().replace(File.pathSeparatorChar, '/')));
 		settings.set("database.username", "");
 		settings.set("database.password", "");
+		openDataSource();
+	}
+	
+	/**
+	 * Päivittää viimeisimpien tietokantojen valikon.
+	 */
+	protected void updateRecentDatabasesMenu() {
+		if (recentMenu == null) return;
+		
+		recentMenu.removeAll();
+		RecentDatabases recent = RecentDatabases.getInstance();
+		List<String> databases = recent.getRecentDatabases();
+		
+		if (databases.isEmpty()) {
+			JMenuItem emptyItem = new JMenuItem("(ei viimeisimpiä)");
+			emptyItem.setEnabled(false);
+			recentMenu.add(emptyItem);
+		} else {
+			int index = 1;
+			for (final String dbUrl : databases) {
+				String displayName = RecentDatabases.getDisplayName(dbUrl);
+				JMenuItem item = new JMenuItem(index + ". " + displayName);
+				if (index <= 9) {
+					item.setMnemonic(Character.forDigit(index, 10));
+				}
+				item.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						openRecentDatabase(dbUrl);
+					}
+				});
+				recentMenu.add(item);
+				index++;
+			}
+			
+			recentMenu.addSeparator();
+			JMenuItem clearItem = new JMenuItem("Tyhjennä lista");
+			clearItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					RecentDatabases.getInstance().clearAll();
+					updateRecentDatabasesMenu();
+				}
+			});
+			recentMenu.add(clearItem);
+		}
+	}
+	
+	/**
+	 * Avaa viimeisimmän tietokannan.
+	 */
+	private void openRecentDatabase(String dbUrl) {
+		AppSettings settings = AppSettings.getInstance();
+		settings.set("database.url", dbUrl);
+		
+		// Jos SQLite, tyhjennä käyttäjätunnus/salasana
+		if (dbUrl.startsWith("jdbc:sqlite:")) {
+			settings.set("database.username", "");
+			settings.set("database.password", "");
+		}
+		
 		openDataSource();
 	}
 

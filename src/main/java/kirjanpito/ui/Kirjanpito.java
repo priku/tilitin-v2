@@ -32,6 +32,7 @@ public class Kirjanpito implements Runnable {
 	private String jdbcUrl;
 	private String username;
 	private String password;
+	private SplashScreen splash;
 
 	public static final String APP_NAME = "Tilitin 2.0";
 	public static final String APP_DATA_NAME = "Tilitin"; // Asetuskansion nimi (yhteensopivuus vanhan version kanssa)
@@ -45,6 +46,12 @@ public class Kirjanpito implements Runnable {
 	 * Avaa tositteiden muokkausikkunan.
 	 */
 	public void run() {
+		// Näytä splash screen
+		splash = new SplashScreen();
+		splash.showSplash();
+		splash.setStatus("Ladataan asetuksia...");
+		splash.setProgress(10);
+		
 		AppSettings settings = AppSettings.getInstance();
 
 		if (configFile == null) {
@@ -59,6 +66,9 @@ public class Kirjanpito implements Runnable {
 
 		configureLogging(settings.getDirectoryPath());
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
+		splash.setStatus("Alustetaan käyttöliittymää...");
+		splash.setProgress(30);
 
 		// Aseta moderni FlatLaf Look and Feel
 		setupLookAndFeel(settings);
@@ -83,6 +93,9 @@ public class Kirjanpito implements Runnable {
 			}
 		}
 
+		splash.setStatus("Ladataan tietokanta-asetuksia...");
+		splash.setProgress(50);
+
 		if (jdbcUrl != null) {
 			if (!jdbcUrl.startsWith("jdbc:")) {
 				jdbcUrl = String.format("jdbc:sqlite:%s", jdbcUrl.replace(File.pathSeparatorChar, '/'));
@@ -99,10 +112,21 @@ public class Kirjanpito implements Runnable {
 			settings.set("database.password", password);
 		}
 
+		splash.setStatus("Luodaan pääikkunaa...");
+		splash.setProgress(70);
+
 		Registry registry = new Registry();
 		DocumentFrame frame = new DocumentFrame(registry,
 				new DocumentModel(registry));
+		
+		splash.setStatus("Viimeistellään...");
+		splash.setProgress(90);
+		
 		frame.create();
+		
+		splash.setProgress(100);
+		splash.hideSplash();
+		
 		frame.setVisible(true);
 		frame.openDataSource();
 	}

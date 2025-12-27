@@ -5,9 +5,16 @@ sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
-## 🚀 Versio 2.0.0 - Windows Modernisointiprojekti
+## 🚀 Versio 2.0.1 - UX Improvements
 
-**Uutta versiossa 2.0.0:**
+**Uutta versiossa 2.0.1:**
+
+- 🚀 **Splash screen** - Moderni käynnistysnäyttö
+- 📂 **Viimeisimmät tietokannat** - Nopea pääsy viimeksi avattuihin tietokantoihin
+- ⌨️ **Uudet näppäinoikotiet** - Ctrl+U, Ctrl+D, Ctrl+B, Ctrl+P, Ctrl+E
+- 🎨 **Parannettu toolbar** - Paremmat välistykset ja tooltip-vihjeet
+
+**Versiossa 2.0.0:**
 
 - ✨ **Moderni FlatLaf-teema** - Aikaisempaa hienompi käyttöliittymä
 - 🎨 **Vaalea ja tumma teema** - Valittavissa asetuksista
@@ -35,7 +42,7 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 
 **Moderni Inno Setup -asennusohjelma:**
 
-1. Lataa **Tilitin-2.0.0-setup.exe** GitHubin [releases-osiosta][releases]
+1. Lataa **Tilitin-2.0.1-setup.exe** GitHubin [releases-osiosta][releases]
 2. Tuplaklikkaa asennusohjelmaa ja seuraa ohjeita
 3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
 
