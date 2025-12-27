@@ -55,8 +55,8 @@ public class SplashScreen extends JWindow {
         ));
         
         // Otsikko
-        JLabel titleLabel = new JLabel("Tilitin 2.0", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 36));
+        JLabel titleLabel = new JLabel(Kirjanpito.APP_NAME, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
         titleLabel.setForeground(Color.WHITE);
         content.add(titleLabel, BorderLayout.NORTH);
         

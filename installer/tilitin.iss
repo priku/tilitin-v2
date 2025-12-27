@@ -1,8 +1,8 @@
 ; Tilitin 2.0 - Inno Setup Script
 ; Modern Windows installer for Tilitin accounting software
 
-#define MyAppName "Tilitin 2.0"
-#define MyAppVersion "2.0.1"
+#define MyAppName "Tilitin"
+#define MyAppVersion "2.0.2"
 #define MyAppPublisher "Tilitin Project"
 #define MyAppURL "https://github.com/priku/tilitin-modernized"
 #define MyAppExeName "Tilitin 2.0.exe"
@@ -25,7 +25,7 @@ AllowNoIcons=yes
 LicenseFile=..\COPYING
 ; Output settings
 OutputDir=..\dist\installer
-OutputBaseFilename=Tilitin-2.0.1-setup
+OutputBaseFilename=Tilitin-2.0.2-setup
 ; Compression
 Compression=lzma2/ultra64
 SolidCompression=yes
@@ -75,15 +75,62 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram}"; Flags: now
 [Code]
 // Custom code for additional functionality
 
+// Etsi ja poista aiempi Tilitin-asennus
+function GetUninstallString(): String;
+var
+  sUnInstPath: String;
+  sUnInstallString: String;
+begin
+  sUnInstPath := 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1';
+  sUnInstallString := '';
+  
+  // Tarkista HKCU (per-user asennus)
+  if not RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString) then
+    // Tarkista HKLM (kaikille käyttäjille)
+    RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString);
+  
+  Result := sUnInstallString;
+end;
+
+function IsUpgrade(): Boolean;
+begin
+  Result := (GetUninstallString() <> '');
+end;
+
+function UninstallOldVersion(): Integer;
+var
+  sUnInstallString: String;
+  iResultCode: Integer;
+begin
+  Result := 0;
+  sUnInstallString := GetUninstallString();
+  
+  if sUnInstallString <> '' then begin
+    sUnInstallString := RemoveQuotes(sUnInstallString);
+    if Exec(sUnInstallString, '/SILENT /NORESTART /SUPPRESSMSGBOXES', '', SW_HIDE, ewWaitUntilTerminated, iResultCode) then
+      Result := 3  // Onnistui
+    else
+      Result := 2; // Epäonnistui
+  end else
+    Result := 1;   // Ei löytynyt
+end;
+
 function InitializeSetup(): Boolean;
 begin
   Result := True;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  UninstallResult: Integer;
 begin
-  if CurStep = ssPostInstall then
+  if CurStep = ssInstall then
   begin
-    // Post-installation tasks can be added here
+    // Poista vanha versio ennen uuden asennusta
+    if IsUpgrade() then
+    begin
+      UninstallResult := UninstallOldVersion();
+      // Jatka asennusta riippumatta tuloksesta
+    end;
   end;
 end;

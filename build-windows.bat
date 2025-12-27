@@ -39,10 +39,10 @@ REM Suorita jPackage
 jpackage ^
   --input target ^
   --name "Tilitin 2.0" ^
-  --main-jar tilitin-2.0.1.jar ^
+  --main-jar tilitin-2.0.2.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type app-image ^
-  --app-version 2.0.1 ^
+  --app-version 2.0.2 ^
   --vendor "Tilitin Project" ^
   --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
   --icon src\main\resources\tilitin.ico ^

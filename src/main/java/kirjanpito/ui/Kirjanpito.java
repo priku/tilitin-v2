@@ -34,9 +34,17 @@ public class Kirjanpito implements Runnable {
 	private String password;
 	private SplashScreen splash;
 
-	public static final String APP_NAME = "Tilitin 2.0";
 	public static final String APP_DATA_NAME = "Tilitin"; // Asetuskansion nimi (yhteensopivuus vanhan version kanssa)
-	public static final String APP_VERSION = Kirjanpito.class.getPackage().getImplementationVersion();
+	public static final String APP_VERSION = getAppVersion();
+	public static final String APP_NAME = "Tilitin " + APP_VERSION;
+	
+	/**
+	 * Hakee sovelluksen version manifestista tai palauttaa oletusarvon.
+	 */
+	private static String getAppVersion() {
+		String version = Kirjanpito.class.getPackage().getImplementationVersion();
+		return version != null ? version : "2.0.2";
+	}
 	public static final String LOGGER_NAME = "kirjanpito";
 
 	private Kirjanpito() {

@@ -7,6 +7,38 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.0.2] - 2025-12-28
+
+### 🎨 Icon Modernization Release
+
+**Lataukset:** https://github.com/priku/tilitin-modernized/releases/tag/v2.0.2
+
+| Tiedosto | Koko | Kuvaus |
+|----------|------|--------|
+| `Tilitin-2.0.2-setup.exe` | ~57 MB | ⭐ Suositus! Moderni asennusohjelma |
+| `tilitin-2.0.2.jar` | ~25 MB | JAR (vaatii Java 25+) |
+
+### Lisätty
+- **Modernisoidut sovellusikonit** - "Evolution" -tyyli IKONI-MODERNISOINTI.md:n mukaan
+  - Tummansininen → sininen gradientti
+  - Pyöristetyt kulmat
+  - Hienovarainen varjo
+  - Euro-symboli (€) oikeassa yläkulmassa
+  - Turkoosi kynä glow-efektillä
+  - Grid-viivat (viittaa kirjanpitotaulukkoon)
+- **PowerShell-skripti** - `create-modern-icons.ps1` ikonien generointiin
+- **Multi-resolution .ico** - Kaikki koot: 16x16, 24x24, 32x32, 48x48, 64x64, 128x128, 256x256
+- **Dynaaminen versionumero** - Ikkunaotsikko näyttää nyt tarkan version (esim. "Tilitin 2.0.2")
+- **Automaattinen vanhan version poisto** - Asennusohjelma poistaa aiemman version automaattisesti
+
+### Muutettu
+- Väripaletti päivitetty:
+  - Primääri: #1E3A8A (tummansininen) → #3B82F6 (sininen)
+  - Aksentti: #14B8A6 (teal/turkoosi)
+  - Euro: #F59E0B (kulta)
+
+---
+
 ## [2.0.1] - 2025-12-28
 
 ### 🎨 UX Improvements Release
