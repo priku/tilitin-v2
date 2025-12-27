@@ -365,10 +365,14 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		settingsMenuItem = SwingUtils.createMenuItem("Kirjausasetukset…", null, 'K',
 				null, settingsListener);
 
+		JMenuItem appearanceMenuItem = SwingUtils.createMenuItem("Ulkoasu…", null, 'U',
+				null, appearanceListener);
+
 		menu.add(coaMenuItem);
 		menu.add(startingBalancesMenuItem);
 		menu.add(propertiesMenuItem);
 		menu.add(settingsMenuItem);
+		menu.add(appearanceMenuItem);
 
 		/* Luodaan Siirry-valikko. */
 		menu = gotoMenu = new JMenu("Siirry");
@@ -1412,6 +1416,15 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		}
 
 		SettingsDialog dialog = new SettingsDialog(this, registry);
+		dialog.create();
+		dialog.setVisible(true);
+	}
+
+	/**
+	 * Näyttää ulkoasun asetukset.
+	 */
+	public void showAppearanceDialog() {
+		AppearanceDialog dialog = new AppearanceDialog(this);
 		dialog.create();
 		dialog.setVisible(true);
 	}
@@ -3081,6 +3094,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	private ActionListener settingsListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			showSettings();
+		}
+	};
+
+	/* Ulkoasu */
+	private ActionListener appearanceListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			showAppearanceDialog();
 		}
 	};
 
