@@ -369,3 +369,55 @@ Kun FlatLaf-perusteema on testattu ja toimii:
 **Onnea testaukseen!** 🎯
 
 Jos löydät ongelmia, raportoi ne ja korjataan yhdessä.
+
+---
+
+## 🚀 Tilitin 2.0 -päivitys (27.12.2025)
+
+```
+================================
+TILITIN 2.0 PÄIVITYSRAPORTTI
+================================
+
+Päivämäärä: 27.12.2025
+Testaaja: Käyttäjä + GitHub Copilot
+
+MUUTOKSET:
+- Versio: 1.6.0 → 2.0.0 (major version bump)
+- APP_NAME: "Tilitin" → "Tilitin 2.0"
+- Lisätty APP_DATA_NAME = "Tilitin" (yhteensopivuus vanhan version kanssa)
+
+PÄIVITETYT TIEDOSTOT:
+[x] pom.xml - versio 2.0.0
+[x] Kirjanpito.java - APP_NAME, APP_DATA_NAME
+[x] build-windows.bat - versiot ja nimi
+[x] build-windows-installer.bat - versiot ja nimi
+[x] README.md - otsikko ja versiotiedot
+[x] PROJEKTISUUNNITELMA.md - sprint-tilat
+
+UUDET TIEDOSTONIMET:
+- JAR: tilitin-1.6.0.jar → tilitin-2.0.0.jar ✅
+- Windows-kansio: dist\windows\Tilitin → dist\windows\Tilitin 2.0 ✅
+- EXE: Tilitin.exe → Tilitin 2.0.exe ✅
+- MSI (tuleva): Tilitin-1.6.0.msi → Tilitin 2.0-2.0.0.msi
+
+YHTEENSOPIVUUS:
+[x] Asetuskansio säilyy: %APPDATA%\Tilitin\ (APP_DATA_NAME)
+[x] Vanhat tietokannat toimivat
+[x] Rinnakkainen asennus mahdollinen (eri Start Menu -nimi)
+
+TESTATTU:
+[x] JAR-tiedosto luotu (23.81 MB)
+[x] Windows .exe rakennettu (Tilitin 2.0.exe, 0.58 MB)
+[x] Sovellus käynnistyy
+[x] Ikkunan otsikko: "Tilitin 2.0" ✅
+[x] Tietokanta latautuu automaattisesti (sama kuin vanhassa)
+
+YHTEENVETO:
+[x] ✅ HYVÄKSYTTY - Tilitin 2.0 toimii oikein
+
+HUOMIOT:
+- APP_DATA_NAME säilyttää yhteensopivuuden vanhan version kanssa
+- Käyttäjät voivat pitää molemmat versiot asennettuna rinnakkain
+- Sama tietokanta toimii molemmissa versioissa
+```
