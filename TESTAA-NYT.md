@@ -248,14 +248,38 @@ Laita kuvat vierekkäin:
 
 ### Ongelma 1: "Maven ei löydy"
 
-**Ratkaisu:**
-1. Lataa Maven: https://maven.apache.org/download.cgi
-2. Pura zip-tiedosto (esim. `C:\Program Files\Apache\maven`)
-3. Lisää PATH:iin:
-   - Win + X → System → Advanced → Environment Variables
-   - System variables → Path → Edit
-   - Lisää: `C:\Program Files\Apache\maven\bin`
-4. Avaa uusi terminal ja testaa: `mvn --version`
+**Ratkaisu - Vaihtoehto A: Chocolatey (Nopein)** ⭐
+```powershell
+# Jos sinulla on Chocolatey
+choco install maven -y
+
+# Jos ei ole Chocolateyta, asenna ensin:
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+# Sitten:
+choco install maven -y
+```
+
+**Ratkaisu - Vaihtoehto B: Scoop (Kevyempi)** ⭐
+```powershell
+# Asenna Scoop
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# Asenna Maven
+scoop install maven
+```
+
+**Ratkaisu - Vaihtoehto C: WinGet (Microsoftin virallinen)**
+```powershell
+winget install Maven.Maven
+```
+
+**Ratkaisu - Vaihtoehto D: Manuaalinen**
+1. Lataa: https://maven.apache.org/download.cgi
+2. Pura zip: `C:\Program Files\Apache\maven`
+3. Lisää PATH:iin (Win + X → System → Advanced → Environment Variables)
+4. Avaa uusi terminal: `mvn --version`
 
 ### Ongelma 2: "Java ei löydy"
 
