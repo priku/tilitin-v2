@@ -1,4 +1,4 @@
-# Tilitin 1.6.0 - Testausohje
+# Tilitin 2.0.0 - Testausohje
 
 ## 🎯 Nopea Testaus (5 minuuttia)
 
@@ -11,18 +11,18 @@ mvn clean package
 
 **Odotettu tulos:**
 - ✅ BUILD SUCCESS
-- ✅ `target\tilitin-1.6.0.jar` luotu
+- ✅ `target\tilitin-2.0.0.jar` luotu
 
 ### Vaihe 2: Käynnistä sovellus
 
 ```bash
-java -jar target\tilitin-1.6.0.jar
+java -jar target\tilitin-2.0.0.jar
 ```
 
 **Mitä pitäisi tapahtua:**
 1. Sovellus käynnistyy
 2. Näet **modernin FlatLaf Light -teeman**
-3. UI näyttää paljon paremmalta kuin vanha versio!
+3. Ikkunan otsikossa lukee "Tilitin 2.0"
 
 ### Vaihe 3: Tarkista FlatLaf-teema
 
@@ -135,11 +135,11 @@ java -jar target\tilitin-1.5.0-jkseppan.1.jar
 ```
 → Ota kuvakaappaus
 
-**Uusi versio (1.6.0):**
+**Uusi versio (2.0.0):**
 ```bash
 git checkout feature/windows-modernization
 mvn clean package
-java -jar target\tilitin-1.6.0.jar
+java -jar target\tilitin-2.0.0.jar
 ```
 → Ota kuvakaappaus
 
@@ -174,69 +174,59 @@ java -jar target\tilitin-1.6.0.jar
 
 ```
 ================================
-TILITIN 1.6.0 TESTAUSRAPORTTI
+TILITIN 2.0.0 TESTAUSRAPORTTI
 ================================
 
-Testaaja: Käyttäjä + GitHub Copilot
-Päivämäärä: 27.12.2025
-Ympäristö: Windows 11 / JDK 25 (Temurin) / Maven 3.9.12
+Testaaja: _______________
+Päivämäärä: _______________
+Ympäristö: Windows 11 / JDK 21+ / Maven 3.x
 
 BUILDAUS:
-[x] Maven build onnistui (BUILD SUCCESS)
-[x] JAR-tiedosto luotu (target\tilitin-1.6.0.jar, 23.8 MB)
+[ ] Maven build onnistui (BUILD SUCCESS)
+[ ] JAR-tiedosto luotu (target\tilitin-2.0.0.jar, ~24 MB)
 
 KÄYNNISTYS:
-[x] Sovellus käynnistyy
-[x] FlatLaf Light-teema näkyy
-[x] Ei virheviestejä konsolissa (vain varoituksia native access)
+[ ] Sovellus käynnistyy
+[ ] FlatLaf Light-teema näkyy
+[ ] Ikkunan otsikko: "Tilitin 2.0"
 
 UI-KOMPONENTIT:
-[x] Pääikkuna (DocumentFrame) - Moderni ulkoasu
-[x] Painikkeet - Pyöristetyt kulmat
-[x] Tekstikentät - Pyöristetyt kulmat
-[x] Taulukot - Selkeät viivat
-[x] Dialogit - Modernit (tulosteen esikatselu testattu)
+[ ] Pääikkuna (DocumentFrame) - Moderni ulkoasu
+[ ] Painikkeet - Pyöristetyt kulmat
+[ ] Tekstikentät - Pyöristetyt kulmat
+[ ] Taulukot - Selkeät viivat
+[ ] Dialogit - Modernit
 
 TOIMINNALLISUUS:
-[x] Tietokantayhteys toimii (SQLite)
-[x] Tositteiden luonti/muokkaus toimii
-[x] Tilin valinta toimii (1011, 1901 testattu)
-[x] Vientien lisääminen toimii (Debet/Kredit)
-[x] Saldolaskenta toimii (Erotus = 0,00)
-[ ] Tilikartta avautuu (ei testattu)
-[x] Raportit generoidaan (Tilien saldot)
-[x] PDF-tulostus toimii (testi01.pdf luotu)
+[ ] Tietokantayhteys toimii (SQLite)
+[ ] Tositteiden luonti/muokkaus toimii
+[ ] Tilin valinta toimii
+[ ] Vientien lisääminen toimii (Debet/Kredit)
+[ ] Saldolaskenta toimii
+[ ] Tilikartta avautuu
+[ ] Raportit generoidaan
+[ ] PDF-tulostus toimii
 
 TEEMAN VAIHTO:
-[x] FlatLaf Light toimii (oletus)
-[ ] FlatLaf Dark toimii (ui.theme=dark) - ei testattu
-[ ] Teeman vaihto toimii lennossa - ei testattu
+[ ] FlatLaf Light toimii (oletus)
+[ ] FlatLaf Dark toimii (ui.theme=dark)
 
-VIRHEENKÄSITTELY:
-[ ] Fallback toimii - ei testattu
-[x] Sovellus ei kaadu
+YHTEENSOPIVUUS:
+[ ] Vanhat tietokannat toimivat
+[ ] Asetukset säilyvät (%APPDATA%\Tilitin)
 
-VISUAALINEN LAATU:
-Asteikko: 1 (Huono) - 5 (Erinomainen)
-
-Yleisilme: [x] 4 - Moderni ja selkeä
-Värit: [x] 4 - Hyvä kontrasti
-Luettavuus: [x] 4 - Selkeä
-Moderniteetti: [x] 4 - FlatLaf-teema toimii hyvin
-
-ONGELMAT / BUGIT:
-- Ei löydetty kriittisiä bugeja
-- PDF-raportin ulkoasu voisi olla modernimpi (parannusehdotus)
-- Native access varoitukset konsolissa (Java 25, ei kriittinen)
+WINDOWS-ASENNUS:
+[ ] Inno Setup -asennusohjelma toimii
+[ ] MSI-asennusohjelma toimii
+[ ] Pikakuvakkeet luodaan
+[ ] Ohjelma käynnistyy asennuksen jälkeen
 
 YHTEENVETO:
-[x] ✅ HYVÄKSYTTY - Valmis seuraavaan vaiheeseen
+[ ] ✅ HYVÄKSYTTY
+[ ] ❌ HYLÄTTY (syy: _______________)
 
-LISÄKOMMENTIT:
-- FlatLaf-integraatio onnistunut
-- Kaikki perustoiminnot testattu ja toimivat
-- Valmis Windows-asennusohjelman (jPackage) testaukseen
-- Testausaika: ~15 minuuttia
+KOMMENTIT:
+_______________________________________________
 ```
 
 ---
@@ -497,4 +487,108 @@ HUOMIOT:
 - Wizardi näkyy vain asennuksen aikana (kerran)
 - Sovelluksen FlatLaf-teema näkyy joka päivä (tärkeämpi)
 - Modernisointivaihtoehdot saatavilla tarvittaessa
+```
+
+---
+
+## 🎨 Inno Setup -asennusohjelman testaus (27.12.2025)
+
+```
+================================
+INNO SETUP INSTALLER TESTAUSRAPORTTI
+================================
+
+Päivämäärä: 27.12.2025
+Testaaja: Käyttäjä + GitHub Copilot
+
+PÄÄTÖS:
+Valittiin Inno Setup modernina asennusohjelmana jPackage MSI:n sijaan.
+
+TOTEUTUS:
+[x] Luotu installer/tilitin.iss (Inno Setup -skripti)
+[x] Luotu build-inno-installer.bat (Build-skripti)
+[x] Inno Setup 6.6.1 asennettu
+
+BUILD:
+[x] build-windows.bat suoritettu (luo app-image)
+[x] build-inno-installer.bat suoritettu
+[x] Kompiloi onnistuneesti ISCC.exe:llä
+
+LUODUT TIEDOSTOT:
+[x] dist\installer\Tilitin-2.0.0-setup.exe (~57 MB)
+[x] Pienempi kuin MSI (57 MB vs. 71.8 MB)
+[x] LZMA2 ultra64 -pakkaus
+
+INNO SETUP OMINAISUUDET:
+[x] WizardStyle=modern (moderni ulkoasu)
+[x] Suomen- ja englanninkielinen käyttöliittymä
+[x] GPL-lisenssi näytetään asennuksen aikana
+[x] Käyttäjä voi valita asennushakemiston
+[x] Pikakuvake Start Menuun (oletuksena)
+[x] Pikakuvake työpöydälle (vapaaehtoinen)
+[x] "Käynnistä Tilitin 2.0" -valinta asennuksen jälkeen
+[x] Per-user asennus (ei vaadi admin-oikeuksia)
+
+TESTAUS:
+[x] Setup.exe tuplaklikkaus toimii
+[x] Moderni wizard käynnistyy
+[x] Kielivalinta toimii (suomi/englanti)
+[x] Asennus onnistuu ilman virheitä
+[x] Start Menu -pikakuvake luotu: "Tilitin 2.0"
+[x] Työpöydän pikakuvake (jos valittu)
+[x] Sovellus käynnistyy asennuksen jälkeen
+[x] FlatLaf-teema näkyy oikein
+[x] Ei native access -varoituksia
+[x] Tietokanta toimii (sama kuin aiemmin)
+[x] Uninstaller toimii (ohjelmat-listasta)
+
+KÄYTTÖLIITTYMÄ:
+- Asennuswizard: Moderni Inno Setup -tyyli ⭐⭐⭐⭐⭐
+- Värimaailma: Vaalea, moderni (parempi kuin MSI)
+- Moderniteetti: ⭐⭐⭐⭐ (paljon parempi kuin jPackage MSI)
+- Toiminnallisuus: Ammattimainen, toimiva
+- Käyttäjäkokemus: Sujuva, tuttu Windows-käyttäjille
+
+VERTAILU MSI vs. Inno Setup:
+| Ominaisuus | jPackage MSI | Inno Setup |
+|------------|--------------|------------|
+| Tiedostokoko | 71.8 MB | 57 MB |
+| Ulkoasu | ⭐⭐ Vanha | ⭐⭐⭐⭐ Moderni |
+| Kustomointi | ⭐ Ei mahdollista | ⭐⭐⭐⭐ Pascal-skripti |
+| Monikielisyys | - Englanti | ⭐ Suomi + Englanti |
+| Build-aika | ~30 sek | ~10 sek |
+
+MIKSI INNO SETUP VALITTIIN:
+1. Modernimpi ulkoasu (WizardStyle=modern)
+2. Helpompi kustomoida kuin WiX
+3. Ilmainen (ei kustannuksia)
+4. Pienempi tiedostokoko (parempi pakkaus)
+5. Suomen kielen tuki
+6. Pascal-skriptaus helposti luettavaa
+
+SKRIPTIN RAKENNE (installer/tilitin.iss):
+- [Setup] - Perusasetukset (nimi, versio, kuvake)
+- [Languages] - Suomi + Englanti
+- [CustomMessages] - Käännetyt viestit
+- [Tasks] - Pikakuvake-valinnat
+- [Files] - Kopioitavat tiedostot (jPackage app-image)
+- [Icons] - Start Menu ja työpöydän pikakuvakkeet
+- [Run] - "Käynnistä sovellus" -valinta
+- [Code] - Pascal-koodi (tulevaa laajennusta varten)
+
+BUILD-PROSESSI:
+1. build-windows.bat → dist\windows\Tilitin 2.0\
+2. build-inno-installer.bat → dist\installer\Tilitin-2.0.0-setup.exe
+3. ISCC.exe kompiloi .iss-skriptin
+4. Valmis installer muutamassa sekunnissa
+
+YHTEENVETO:
+[x] ✅ HYVÄKSYTTY - Inno Setup on parempi vaihtoehto kuin jPackage MSI
+
+HUOMIOT:
+- Inno Setup tarjoaa modernimman käyttökokemuksen
+- Pienempi tiedostokoko (20% säästö)
+- Helpompi ylläpitää kuin WiX XML
+- Suomen kieli arvokasta kotimaiselle ohjelmistolle
+- Jatkossa voidaan lisätä lisäominaisuuksia Pascal-skriptauksella
 ```

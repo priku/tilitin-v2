@@ -24,17 +24,32 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 - [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) - Kehityssuunnitelma ja sprintit
 - [TESTAUS.md](TESTAUS.md) - Testausraportit ja ohjeet
 - [BUILDING.md](BUILDING.md) - Build-ohjeet
-- [MSI-MODERNISOINTI.md](MSI-MODERNISOINTI.md) - MSI-asennusohjelman modernisointivaihtoehdot
+- [CHANGELOG.md](CHANGELOG.md) - Muutosloki
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Kehittäjäohjeet
 
 ## Asennus
 
 ### Windows (suositeltu)
 
-1. Lataa **Tilitin 2.0-2.0.0.msi** GitHubin [releases-osiosta][releases]
-2. Tuplaklikkaa MSI-tiedostoa ja seuraa asennusohjeita
+**Moderni Inno Setup -asennusohjelma:**
+
+1. Lataa **Tilitin-2.0.0-setup.exe** GitHubin [releases-osiosta][releases]
+2. Tuplaklikkaa asennusohjelmaa ja seuraa ohjeita
 3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
 
-MSI-asennusohjelma sisältää Java-ajoympäristön, joten erillistä Java-asennusta ei tarvita.
+**Vaihtoehtoisesti MSI-asennusohjelma:**
+
+1. Lataa **Tilitin 2.0-2.0.0.msi** GitHubin [releases-osiosta][releases]
+2. Tuplaklikkaa MSI-tiedostoa ja seuraa asennusohjeita
+
+**Huom:** Molemmat asennusohjelmat sisältävät Java-ajoympäristön, joten erillistä Java-asennusta ei tarvita.
+
+**Ominaisuudet:**
+
+- ✨ Moderni käyttöliittymä (Inno Setup)
+- 🌍 Suomen- ja englanninkielinen
+- 📦 Pienempi tiedostokoko (~57 MB vs. 71.8 MB)
+- 🚀 Nopea asennus
 
 ### Jar-tiedostolla (kaikki alustat)
 
@@ -57,10 +72,13 @@ Katso [BUILDING.md](BUILDING.md) tarkemmat ohjeet.
 # JAR-paketin buildaaminen
 mvn clean package
 
-# Windows .exe sovellus
+# Windows .exe sovellus (app-image)
 build-windows.bat
 
-# Windows MSI-asennusohjelma
+# Windows Inno Setup -asennusohjelma (suositeltu)
+build-inno-installer.bat
+
+# Windows MSI-asennusohjelma (vaihtoehtoinen)
 build-windows-installer.bat
 ```
 
