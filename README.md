@@ -5,6 +5,21 @@ sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
+## 🚀 Versio 1.6.0 - Windows Modernisointiprojekti (Kehityksessä)
+
+**Uutta versiossa 1.6.0:**
+
+- ✨ **Moderni FlatLaf-teema** - Aikaisempaa hienompi käyttöliittymä
+- 🎨 **Vaalea ja tumma teema** - Valittavissa asetuksista
+- 📦 **Windows natiivi-asennusohjelma** - .exe ja .msi -paketit
+- 🏪 **Microsoft Store -tuki** (tulossa)
+- ⚡ Parannettu käytettävyys ja modernimpi ulkoasu
+
+**Kehityshaara:** `feature/windows-modernization`
+**Tila:** 🟡 Testausvaihe (Sprint 1.2)
+
+Katso [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) ja [TESTAUS.md](TESTAUS.md)
+
 ## Asennus
 
 1. Asenna Java 21 tai uudempi. Suosittelen OpenJDK-versiota, joka on saatavailla ilmaiseksi ja
