@@ -46,6 +46,7 @@ jpackage ^
   --vendor "Tilitin Project" ^
   --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
   --icon src\main\resources\tilitin.ico ^
+  --java-options "--enable-native-access=ALL-UNNAMED" ^
   --win-console ^
   --win-menu ^
   --win-menu-group "Tilitin" ^
