@@ -1,4 +1,4 @@
-# Tilitin - Build-ohjeet
+# Tilitin 2.0 - Build-ohjeet
 
 ## Vaatimukset
 
@@ -6,7 +6,7 @@
   - Suositus: [Eclipse Temurin](https://adoptium.net/)
 - **Apache Maven 3.x**
 - **Windows 10/11** (Windows-buildia varten)
-- **WiX Toolset 3.11+** (MSI-asennusohjelmaa varten)
+- **WiX Toolset 3.14+** (MSI-asennusohjelmaa varten)
   - Lataa: https://wixtoolset.org/
 
 ## Perus JAR-paketin Buildaaminen
@@ -15,11 +15,11 @@
 mvn clean package
 ```
 
-Tuottaa: `target/tilitin-1.6.0.jar`
+Tuottaa: `target/tilitin-2.0.0.jar`
 
 Suorita:
 ```bash
-java -jar target/tilitin-1.6.0.jar
+java -jar target/tilitin-2.0.0.jar
 ```
 
 ## Windows Natiivi Sovellus
@@ -33,8 +33,8 @@ build-windows.bat
 ```
 
 Tuottaa:
-- `dist/windows/Tilitin/Tilitin.exe`
-- `dist/windows/Tilitin/` (koko sovelluskansio)
+- `dist/windows/Tilitin 2.0/Tilitin 2.0.exe`
+- `dist/windows/Tilitin 2.0/` (koko sovelluskansio)
 
 Sovellus sisältää JRE:n, joten Java-asennusta ei tarvita.
 
@@ -47,9 +47,9 @@ build-windows-installer.bat
 ```
 
 Tuottaa:
-- `dist/installer/Tilitin-1.6.0.msi`
+- `dist/installer/Tilitin 2.0-2.0.0.msi`
 
-**Huom:** Vaatii WiX Toolset -asennuksen.
+**Huom:** Vaatii WiX Toolset 3.14+ -asennuksen.
 
 ## Code Signing (Allekirjoitus)
 
@@ -85,14 +85,14 @@ signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist\Tilitin.msix
 ### Testaa app-image
 
 ```bash
-dist\windows\Tilitin\Tilitin.exe
+"dist\windows\Tilitin 2.0\Tilitin 2.0.exe"
 ```
 
 ### Testaa MSI-asennusohjelma
 
-1. Tuplaklikkaa `dist/installer/Tilitin-1.6.0.msi`
+1. Tuplaklikkaa `dist/installer/Tilitin 2.0-2.0.0.msi`
 2. Seuraa asennusohjeita
-3. Käynnistä sovellus Start Menusta
+3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
 
 ## Ongelmatilanteet
 

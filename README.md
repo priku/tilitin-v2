@@ -23,6 +23,16 @@ Katso [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) ja [TESTAUS.md](TESTAUS.m
 
 ## Asennus
 
+### Windows (suositeltu)
+
+1. Lataa **Tilitin 2.0-2.0.0.msi** GitHubin [releases-osiosta][releases]
+2. Tuplaklikkaa MSI-tiedostoa ja seuraa asennusohjeita
+3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
+
+MSI-asennusohjelma sisältää Java-ajoympäristön, joten erillistä Java-asennusta ei tarvita.
+
+### Jar-tiedostolla (kaikki alustat)
+
 1. Asenna Java 21 tai uudempi. Suosittelen OpenJDK-versiota, joka on saatavailla ilmaiseksi ja
    avoimella lisenssillä. Esimerkiksi [Azulin](https://www.azul.com/downloads/#zulu) tai
    [Adoptiumin](https://adoptium.net/) jakelut ovat hyviä. (Oraclen Javaa en suosittele, koska
@@ -33,6 +43,21 @@ Katso [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) ja [TESTAUS.md](TESTAUS.m
    epäilyttävästä ohjelmistosta. Jos uskallat käyttää sitä, voit ohittaa valituksen klikkaamalla
    jar-tiedostoa hiiren oikealla painikkeella (ohjauslevyllä käytä kahta sormea, tai paina
    ctrl-näppäintä klikatessa) ja valitsemalla "Avaa".
+
+## Buildaaminen
+
+Katso [BUILDING.md](BUILDING.md) tarkemmat ohjeet.
+
+```bash
+# JAR-paketin buildaaminen
+mvn clean package
+
+# Windows .exe sovellus
+build-windows.bat
+
+# Windows MSI-asennusohjelma
+build-windows-installer.bat
+```
 
 ## Muutokset
 
