@@ -16,7 +16,7 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 | Tiedosto | Koko | Kuvaus |
 |----------|------|--------|
 | `Tilitin-2.0.0-setup.exe` | 57 MB | ⭐ Suositus! Moderni asennusohjelma |
-| `tilitin-2.0.0.jar` | 24 MB | JAR (vaatii Java 21+) |
+| `tilitin-2.0.0.jar` | 24 MB | JAR (vaatii Java 25+) |
 
 ### Lisätty
 - **FlatLaf-teema** - Moderni käyttöliittymä FlatLaf 3.5.2 -kirjastolla
@@ -39,6 +39,7 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 - **Versio** - 1.6.0 → 2.0.0 (major version bump)
 - **Sovelluksen nimi** - "Tilitin" → "Tilitin 2.0"
 - **Käyttöliittymä** - Vanha Swing-teema → FlatLaf Light/Dark
+- **Java-versio** - Java 21 → Java 25 (LTS)
 
 ### Korjattu
 - Native access -varoitukset poistettu jPackage-buildista

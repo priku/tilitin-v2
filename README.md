@@ -26,6 +26,8 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 - [BUILDING.md](BUILDING.md) - Build-ohjeet
 - [CHANGELOG.md](CHANGELOG.md) - Muutosloki
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Kehittäjäohjeet
+- [IKONI-MODERNISOINTI.md](IKONI-MODERNISOINTI.md) - Ikoni-suunnitelma (v2.1+)
+- [GITHUB-RELEASE-PUUTTUU.md](GITHUB-RELEASE-PUUTTUU.md) - Release-julkaisuohjeet
 
 ## Asennus
 
@@ -49,7 +51,7 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 
 ### Jar-tiedostolla (kaikki alustat)
 
-1. Asenna Java 21 tai uudempi. Suosittelen OpenJDK-versiota, joka on saatavailla ilmaiseksi ja
+1. Asenna Java 25 tai uudempi. Suosittelen OpenJDK-versiota, joka on saatavailla ilmaiseksi ja
    avoimella lisenssillä. Esimerkiksi [Azulin](https://www.azul.com/downloads/#zulu) tai
    [Adoptiumin](https://adoptium.net/) jakelut ovat hyviä. (Oraclen Javaa en suosittele, koska
    vaikka uusia versioita saakin ilmaiseksi, sillä on ollut kummallisia lisenssitemppuja
