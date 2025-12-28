@@ -37,9 +37,11 @@ public class CSVExportWorker extends SwingWorker<Void, Void> {
 		this.registry = registry;
 		this.file = file;
 		dateFormat = new SimpleDateFormat("d.M.yyyy");
-		numberFormat = new DecimalFormat();
-		numberFormat.setMinimumFractionDigits(2);
-		numberFormat.setMaximumFractionDigits(2);
+		// Käytä englantilaista numerof ormaattia (piste desimaalierottimena)
+		// jotta CSV-tiedosto on yhteensopiva (erottin = pilkku, desimaali = piste)
+		numberFormat = new DecimalFormat("0.00",
+				new java.text.DecimalFormatSymbols(java.util.Locale.US));
+		numberFormat.setGroupingUsed(false); // Ei tuhanserottimia
 	}
 	
 	protected Void doInBackground() throws Exception {
