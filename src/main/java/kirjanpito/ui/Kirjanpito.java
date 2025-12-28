@@ -13,6 +13,9 @@ import java.util.logging.SimpleFormatter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
 import kirjanpito.models.DocumentModel;
 import kirjanpito.util.AppSettings;
 import kirjanpito.util.Registry;
@@ -29,9 +32,19 @@ public class Kirjanpito implements Runnable {
 	private String jdbcUrl;
 	private String username;
 	private String password;
+	private SplashScreen splash;
 
-	public static final String APP_NAME = "Tilitin";
-	public static final String APP_VERSION = Kirjanpito.class.getPackage().getImplementationVersion();
+	public static final String APP_DATA_NAME = "Tilitin"; // Asetuskansion nimi (yhteensopivuus vanhan version kanssa)
+	public static final String APP_VERSION = getAppVersion();
+	public static final String APP_NAME = "Tilitin " + APP_VERSION;
+	
+	/**
+	 * Hakee sovelluksen version manifestista tai palauttaa oletusarvon.
+	 */
+	private static String getAppVersion() {
+		String version = Kirjanpito.class.getPackage().getImplementationVersion();
+		return version != null ? version : "2.0.3";
+	}
 	public static final String LOGGER_NAME = "kirjanpito";
 
 	private Kirjanpito() {
@@ -41,10 +54,16 @@ public class Kirjanpito implements Runnable {
 	 * Avaa tositteiden muokkausikkunan.
 	 */
 	public void run() {
+		// Näytä splash screen
+		splash = new SplashScreen();
+		splash.showSplash();
+		splash.setStatus("Ladataan asetuksia...");
+		splash.setProgress(10);
+		
 		AppSettings settings = AppSettings.getInstance();
 
 		if (configFile == null) {
-			File file = new File(AppSettings.buildDirectoryPath(APP_NAME),
+			File file = new File(AppSettings.buildDirectoryPath(APP_DATA_NAME),
 				"asetukset.properties");
 
 			settings.load(file);
@@ -55,18 +74,18 @@ public class Kirjanpito implements Runnable {
 
 		configureLogging(settings.getDirectoryPath());
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+
+		splash.setStatus("Alustetaan käyttöliittymää...");
+		splash.setProgress(30);
+
+		// Aseta moderni FlatLaf Look and Feel
+		setupLookAndFeel(settings);
+
 		String osName = System.getProperty("os.name").toLowerCase();
 
 		if (osName.startsWith("mac os x")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_NAME);
-
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 		else if (osName.startsWith("linux")) {
 			try {
@@ -81,6 +100,9 @@ public class Kirjanpito implements Runnable {
 				e.printStackTrace();
 			}
 		}
+
+		splash.setStatus("Ladataan tietokanta-asetuksia...");
+		splash.setProgress(50);
 
 		if (jdbcUrl != null) {
 			if (!jdbcUrl.startsWith("jdbc:")) {
@@ -98,12 +120,60 @@ public class Kirjanpito implements Runnable {
 			settings.set("database.password", password);
 		}
 
+		splash.setStatus("Luodaan pääikkunaa...");
+		splash.setProgress(70);
+
 		Registry registry = new Registry();
 		DocumentFrame frame = new DocumentFrame(registry,
 				new DocumentModel(registry));
+		
+		splash.setStatus("Viimeistellään...");
+		splash.setProgress(90);
+		
 		frame.create();
+		
+		splash.setProgress(100);
+		splash.hideSplash();
+		
 		frame.setVisible(true);
 		frame.openDataSource();
+	}
+
+	/**
+	 * Asettaa modernin FlatLaf Look and Feel -teeman.
+	 * Tukee vaalean ja tumman teeman vaihtoa asetuksista.
+	 */
+	private void setupLookAndFeel(AppSettings settings) {
+		try {
+			// Lue teema-asetus (oletus: light)
+			String theme = settings.getString("ui.theme", "light");
+
+			if ("dark".equalsIgnoreCase(theme)) {
+				FlatDarkLaf.setup();
+			} else {
+				FlatLightLaf.setup();
+			}
+
+			// Aseta FlatLaf-spesifit asetukset
+			UIManager.put("Button.arc", 10);
+			UIManager.put("Component.arc", 10);
+			UIManager.put("ProgressBar.arc", 10);
+			UIManager.put("TextComponent.arc", 10);
+			UIManager.put("ScrollBar.showButtons", true);
+			UIManager.put("Table.showHorizontalLines", true);
+			UIManager.put("Table.showVerticalLines", true);
+
+		} catch (Exception e) {
+			System.err.println("FlatLaf-teeman asetus epäonnistui, käytetään oletusta");
+			e.printStackTrace();
+
+			// Fallback perinteiseen Look and Feeliin
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	private void configureLogging(String dirname) {

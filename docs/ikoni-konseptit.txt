@@ -1,0 +1,288 @@
+TILITIN 2.0 - IKONI-KONSEPTIT (ASCII-visualisointi)
+
+================================================================================
+NYKYINEN IKONI (v2.0)
+================================================================================
+
+    16x16                32x32                    48x48
+  ┌────────┐          ┌─────────────┐         ┌─────────────────┐
+  │ ≡≡≡≡≡≡ │          │ ≡≡≡≡≡≡≡≡≡≡≡ │         │ ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡ │
+  │ ≡≡≡≡≡≡ │          │ ≡≡≡≡≡≡≡≡≡≡≡ │         │ ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡ │
+  │ ≡≡≡≡✏️ │          │ ≡≡≡≡≡≡≡≡≡≡✏️│         │ ≡≡≡≡≡≡≡≡≡≡≡≡≡≡✏️│
+  └────────┘          └─────────────┘         └─────────────────┘
+
+Värit:
+- Lomake: #4A90E2 (vaalea sininen)
+- Kynä:   #FFA500 (oranssi)
+- Tyyli:  Flat design, yksinkertainen
+
+Arvio: 7/10 - Toimiva mutta yleinen
+
+================================================================================
+VAIHTOEHTO 1: "EVOLUTION" - KEVYT PÄIVITYS
+================================================================================
+
+    16x16                32x32                    48x48
+  ┌────────┐€         ┌─────────────┐€        ┌─────────────────┐€
+  │▓▓▓▓▓▓▓▓│          │▓▓▓▓▓▓▓▓▓▓▓▓▓│         │▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│
+  │░░░░░░░░│          │░░░░░░░░░░░░░│         │░░░░░░░░░░░░░░░░░│
+  │░░░░░✨🖊│          │░░░░░░░░░░✨🖊│         │░░░░░░░░░░░░░✨🖊│
+  └────────┘          └─────────────┘         └─────────────────┘
+   ▒▒▒▒▒▒▒▒             ▒▒▒▒▒▒▒▒▒▒▒▒▒           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+   (varjo)              (varjo)                 (varjo)
+
+Muutokset:
+✓ Tummansininen gradientti (#1E3A8A → #3B82F6)
+✓ Turkoosi kynä (#14B8A6) + glow-efekti
+✓ Euro-symboli (€) oikeassa yläkulmassa (#F59E0B)
+✓ Pyöristetyt kulmat (border-radius: 4px)
+✓ Pehmeä varjo (depth-efekti)
+✓ Grid-viivat lomakkeessa
+
+Kustannus: 0€ (DIY) tai 100-200€ (freelancer)
+Aika: 2-4 tuntia
+Arvio: 8.5/10 - Modernimpi, erottuu paremmin
+
+================================================================================
+VAIHTOEHTO 2: "DIGITAL LEDGER" - DIGITAALINEN KIRJANPITO
+================================================================================
+
+                         48x48
+              ┌───────────────────────┐
+              │ 📊  ___________    € │  <- Kaavio + Euro
+              │    │   │   │   │     │
+              │    │───│───│───│     │  <- Taulukko/Grid
+              │    │   │   │   │     │
+              │    │───│───│───│     │
+              │    │   │   │   │     │
+              │    │___│___│___│     │
+              │                       │
+              │  [✓] _________  💰  │  <- Checkbox + rahat
+              └───────────────────────┘
+                 ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+                 (varjo)
+
+Elementit:
+- Taulukko/Spreadsheet (pääelementti)
+- Mini-kaavio yläreunassa (📈 trendi)
+- Euro-symboli (€) korostettuna
+- Checkbox (✓) valmis-merkki
+- Rahasäkki (💰) alakulmassa
+- 3D-varjo ja depth
+
+Värit:
+- Pohja:     #0F172A (tummansininen)
+- Aksentti:  #14B8A6 (teal/turkoosi)
+- Euro:      #F59E0B (kulta)
+- Checkbox:  #10B981 (vihreä)
+
+Kustannus: 150-300€ (freelancer)
+Aika: 4-8 tuntia
+Arvio: 9/10 - Uniikimpi, digitaalinen
+
+================================================================================
+VAIHTOEHTO 3: "BRAND IDENTITY" - TILITIN-MONOGRAMMI
+================================================================================
+
+                         256x256
+              ┌───────────────────────┐
+              │                       │
+              │      ████████         │
+              │     ██      ██        │
+              │    ██   ██   ██       │  <- "T" + "2.0"
+              │   ██    ████   ██     │     integroitu
+              │  ██     ████    ██    │
+              │ ████████████████████  │
+              │                       │
+              │   TILITIN 2.0         │
+              │                       │
+              └───────────────────────┘
+
+Konsepti:
+- Geometrinen "T"-kirjain
+- "2.0" integroitu muotoon
+- Euro-symboli (€) sisään rakennettu
+- Minimalistinen, moderni
+- Toimii monogrammina
+
+Väripaletti:
+  Primääri:   #0F172A ████  Tummansininen
+  Sekundääri: #14B8A6 ████  Teal
+  Aksentti:   #F59E0B ████  Kulta
+  Neutraali:  #94A3B8 ████  Harmaa
+
+Ikoniperhe:
+- Pääikoni (sovellus)
+- Dokumentti-ikoni (.tilitin)
+- Splash screen
+- Favicon (16x16)
+- Social media (1200x630)
+
+Kustannus: 500-2000€ (ammattilainen)
+Aika: 16-24 tuntia
+Arvio: 10/10 - Täysi brändi-identiteetti
+
+================================================================================
+VERTAILU - RINNAKKAIN
+================================================================================
+
+NYKYINEN          EVOLUTION        DIGITAL LEDGER    BRAND IDENTITY
+  v2.0              v2.1              v2.5/3.0           v3.0
+
+┌────────┐€      ┌────────┐€      ┌──────────┐      ┌──────────┐
+│ ≡≡≡≡≡≡ │      │▓▓▓▓▓▓▓▓│      │📊 ___ € │      │  ██████  │
+│ ≡≡≡≡≡≡ │      │░░░░░░░░│      │ │ │ │ │ │      │ ██  ██   │
+│ ≡≡≡≡✏️ │      │░░░░✨🖊│      │ │─│─│─│ │      │ ████████ │
+└────────┘      └────────┘      │✓ ____💰│      │ TILITIN  │
+                 ▒▒▒▒▒▒▒▒       └──────────┘      └──────────┘
+                 (varjo)          ▒▒▒▒▒▒▒▒▒▒
+
+Kustannus:      0€             0-200€           150-300€        500-2000€
+Aika:           0h             2-4h             4-8h            16-24h
+Moderni:        ⭐⭐           ⭐⭐⭐⭐         ⭐⭐⭐⭐⭐       ⭐⭐⭐⭐⭐
+Uniikki:        ⭐⭐           ⭐⭐⭐           ⭐⭐⭐⭐         ⭐⭐⭐⭐⭐
+Tunnistettava:  ⭐⭐⭐⭐⭐     ⭐⭐⭐⭐⭐       ⭐⭐⭐           ⭐⭐⭐⭐
+Riski:          Matala         Matala           Keskisuuri      Korkea
+
+================================================================================
+SUOSITELTU AIKATAULU
+================================================================================
+
+2025 Q1 (TAMMIKUU)          → NYKYINEN IKONI
+├─ GitHub Release v2.0       │ ≡≡≡≡≡≡ │
+├─ Installer-julkaisu        │ ≡≡≡≡✏️ │
+└─ Käyttäjäpalaute           └────────┘
+
+2025 Q2 (HUHTIKUU-KESÄKUU)  → EVOLUTION
+├─ Suunnittelu (2h)          │▓▓▓▓▓▓▓▓│€
+├─ Toteutus (2h)             │░░░░✨🖊│
+├─ Testaus                   └────────┘
+└─ Release v2.1               ▒▒▒▒▒▒▒▒
+
+2025 Q3-Q4 (SYKSY)          → ANALYSOINTI
+├─ Käyttäjäpalaute
+├─ Brändi-strategia
+└─ Päätös: Digital Ledger vs. Brand Identity?
+
+2026 (JOS TARVE)            → TÄYSI UUDISTUS
+├─ Vaihtoehto 2 tai 3        ┌──────────┐
+├─ Ammattilaisen palkkaus    │ TILITIN  │
+└─ Release v3.0              └──────────┘
+
+================================================================================
+VÄRIPALETTIT
+================================================================================
+
+NYKYINEN (v2.0):
+████ #4A90E2  Vaalea sininen (lomake)
+████ #FFA500  Oranssi (kynä)
+
+EVOLUTION (v2.1):
+████ #1E3A8A  Tummansininen (tumma)
+████ #3B82F6  Sininen (vaalea)
+████ #14B8A6  Teal (kynä)
+████ #F59E0B  Kulta (euro €)
+
+DIGITAL LEDGER (v2.5/3.0):
+████ #0F172A  Tummansininen (pohja)
+████ #14B8A6  Teal (aksentti)
+████ #F59E0B  Kulta (euro €)
+████ #10B981  Vihreä (checkbox)
+
+BRAND IDENTITY (v3.0):
+████ #0F172A  Primääri (tummansininen)
+████ #14B8A6  Sekundääri (teal)
+████ #F59E0B  Aksentti (kulta)
+████ #94A3B8  Neutraali (harmaa)
+
+================================================================================
+TEKNISET VAATIMUKSET
+================================================================================
+
+Windows (.ico):
+  16x16   ✓ Taskbar (small)
+  24x24   ✓ Toolbar icons
+  32x32   ✓ Desktop icon
+  48x48   ✓ Large icons
+  64x64   ✓ Extra large
+  128x128 ✓ Jumbo icons
+  256x256 ✓ High-DPI
+
+macOS (.icns):
+  16x16 @1x, 32x32 @2x
+  32x32 @1x, 64x64 @2x
+  128x128 @1x, 256x256 @2x
+  256x256 @1x, 512x512 @2x
+  512x512 @1x, 1024x1024 @2x
+
+Microsoft Store (.png):
+  50x50   - Small tile
+  150x150 - Medium tile
+  300x300 - Large tile
+
+Linux (.svg + .png):
+  scalable/apps/tilitin.svg
+  16x16 → 256x256 (kaikki koot)
+
+================================================================================
+TOIMENPIDEOHJE (VAIHTOEHTO 1)
+================================================================================
+
+VAIHE 1: SUUNNITTELU
+[✓] Lataa Figma tai Inkscape
+[✓] Luo 256x256 canvas
+[✓] Määrittele värit:
+    - Pohja: #1E3A8A → #3B82F6 (gradientti)
+    - Kynä:  #14B8A6 → #0D9488 (gradientti)
+    - Euro:  #F59E0B
+
+VAIHE 2: TOTEUTUS
+[✓] Piirrä lomakkeen pohja (180x220px, border-radius: 8px)
+[✓] Lisää gradientti (135° kulma)
+[✓] Piirrä 3-4 vaakaviivaa (grid-efekti)
+[✓] Lisää varjo (0 4px 6px rgba(0,0,0,0.1))
+[✓] Piirrä kynä (120x20px, 45° kulma)
+[✓] Lisää euro-symboli (24x24px, oikea yläkulma)
+[✓] Lisää "glow" kynän kärkeen
+
+VAIHE 3: EXPORT
+[✓] Exporttaa PNG: 256x256, 128x128, 64x64, 48x48, 32x32, 16x16
+[✓] Luo .ico tiedosto (ImageMagick tai IcoFX)
+[✓] Tarkista että 16x16 on tunnistettava
+
+VAIHE 4: INTEGRAATIO
+[✓] Korvaa: src/main/resources/tilitin.ico
+[✓] Korvaa: src/main/resources/app-*.png
+[✓] Buildaa: mvn clean package
+[✓] Buildaa: build-windows.bat
+[✓] Testaa taskbaarissa
+
+VAIHE 5: JULKAISU
+[✓] Commitoi: "feat: Modernisoidut sovellusikonit v2.1"
+[✓] Pushaa: git push
+[✓] Tag: git tag v2.1.0
+[✓] Release: GitHub Release v2.1.0
+
+================================================================================
+YHTEENVETO
+================================================================================
+
+SUOSITUS NYKYTILAAN:
+→ Säilytä nykyinen ikoni Tilitin 2.0 -releasessa
+→ Keskity GitHub Release -julkaisuun (PRIORITEETTI #1)
+→ Ikoni-modernisointi voidaan tehdä v2.1:ssä (Kevät 2025)
+
+PERUSTELU:
+✓ Nykyinen ikoni on riittävän hyvä (7/10)
+✓ Fokus julkaisuun, ei visuaaliseen uudistukseen
+✓ Käyttäjäpalaute ensin, sitten brändäys
+
+SEURAAVA ASKEL:
+1. Julkaise Tilitin 2.0.0 (seuraa: GITHUB-RELEASE-PUUTTUU.md)
+2. Kerää käyttäjäpalautetta
+3. Kevät 2025: Suunnittele Vaihtoehto 1 "Evolution"
+4. Tilitin 2.1: Julkaise modernisoitu ikoni
+
+================================================================================
+LOPPU
+================================================================================

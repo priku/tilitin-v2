@@ -78,6 +78,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultCaret;
 
+import kirjanpito.util.BackupService;
+
 import kirjanpito.db.Account;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.db.Document;
@@ -122,6 +124,7 @@ import kirjanpito.reports.VATReportModel;
 import kirjanpito.reports.VATReportPrint;
 import kirjanpito.ui.resources.Resources;
 import kirjanpito.util.AppSettings;
+import kirjanpito.util.RecentDatabases;
 import kirjanpito.util.Registry;
 import kirjanpito.util.RegistryAdapter;
 
@@ -138,6 +141,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	protected JMenu gotoMenu;
 	protected JMenu reportsMenu;
 	protected JMenu toolsMenu;
+	protected JMenu recentMenu;
 	private JMenuItem newDatabaseMenuItem;
 	private JMenuItem openDatabaseMenuItem;
 	private JMenuItem newDocMenuItem;
@@ -171,6 +175,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	private JLabel documentLabel;
 	private JLabel periodLabel;
 	private JLabel documentTypeLabel;
+	private JLabel backupStatusLabel;
 	private JTable entryTable;
 	private TableColumn vatColumn;
 	private EntryTableHeaderRenderer tableHeaderRenderer;
@@ -284,7 +289,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
 		newDatabaseMenuItem = SwingUtils.createMenuItem("Uusi…",
-				null, 'U', null, newDatabaseListener);
+				null, 'U', KeyStroke.getKeyStroke('U', shortcutKeyMask), newDatabaseListener);
 
 		menu.add(newDatabaseMenuItem);
 
@@ -294,8 +299,18 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 
 		menu.add(openDatabaseMenuItem);
 
-		menu.add(SwingUtils.createMenuItem("Tietokanta-asetukset…", null, 'T', null,
-				databaseSettingsListener));
+		// Viimeisimmät tietokannat -alivalikko
+		recentMenu = new JMenu("Viimeisimmät");
+		recentMenu.setMnemonic('V');
+		updateRecentDatabasesMenu();
+		menu.add(recentMenu);
+
+		menu.add(SwingUtils.createMenuItem("Tietokanta-asetukset…", null, 'T', 
+				KeyStroke.getKeyStroke('D', shortcutKeyMask), databaseSettingsListener));
+		menu.add(SwingUtils.createMenuItem("Varmuuskopiointi…", null, 'V',
+				null, backupSettingsListener));
+		menu.add(SwingUtils.createMenuItem("Palauta varmuuskopiosta…", null, 'P',
+				null, restoreBackupListener));
 
 		menu.addSeparator();
 		menu.add(SwingUtils.createMenuItem("Lopeta", "quit-16x16.png", 'L',
@@ -335,7 +350,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 
 		removeEntryMenuItem = SwingUtils.createMenuItem("Poista vienti",
 				"list-remove-16x16.png", 'o',
-				null, removeEntryListener);
+				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK), removeEntryListener);
 
 		entryTemplateMenu = new JMenu("Vientimallit");
 		editEntryTemplatesMenuItem = SwingUtils.createMenuItem("Muokkaa", null, 'M',
@@ -357,18 +372,22 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 						shortcutKeyMask), chartOfAccountsListener);
 
 		startingBalancesMenuItem = SwingUtils.createMenuItem("Alkusaldot…", null, 's',
-				null, startingBalancesListener);
+				KeyStroke.getKeyStroke('B', shortcutKeyMask), startingBalancesListener);
 
 		propertiesMenuItem = SwingUtils.createMenuItem("Perustiedot…", null, 'e',
-				null, propertiesListener);
+				KeyStroke.getKeyStroke('P', shortcutKeyMask), propertiesListener);
 
 		settingsMenuItem = SwingUtils.createMenuItem("Kirjausasetukset…", null, 'K',
-				null, settingsListener);
+				KeyStroke.getKeyStroke('S', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), settingsListener);
+
+		JMenuItem appearanceMenuItem = SwingUtils.createMenuItem("Ulkoasu…", null, 'U',
+				KeyStroke.getKeyStroke('A', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), appearanceListener);
 
 		menu.add(coaMenuItem);
 		menu.add(startingBalancesMenuItem);
 		menu.add(propertiesMenuItem);
 		menu.add(settingsMenuItem);
+		menu.add(appearanceMenuItem);
 
 		/* Luodaan Siirry-valikko. */
 		menu = gotoMenu = new JMenu("Siirry");
@@ -515,7 +534,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 				null, vatChangeListener));
 
 		menu.add(SwingUtils.createMenuItem("Vie tiedostoon",
-				null, 'V', null, exportListener));
+				null, 'V', KeyStroke.getKeyStroke('E', shortcutKeyMask), exportListener));
 
 		/* Luodaan Ohje-valikko. */
 		menu = new JMenu("Ohje");
@@ -544,37 +563,43 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	protected void createToolBar() {
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
+		toolBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
 
+		// Navigointi-osio
 		prevButton = SwingUtils.createToolButton("go-previous-22x22.png",
-				"Edellinen tosite", prevDocListener, false);
+				"Edellinen tosite (Page Up)", prevDocListener, false);
 
 		nextButton = SwingUtils.createToolButton("go-next-22x22.png",
-				"Seuraava tosite", nextDocListener, false);
+				"Seuraava tosite (Page Down)", nextDocListener, false);
 
 		toolBar.add(prevButton);
 		toolBar.add(nextButton);
-		toolBar.addSeparator();
+		toolBar.addSeparator(new Dimension(16, 0));
 
+		// Tosite-osio
 		newDocButton = SwingUtils.createToolButton("document-new-22x22.png",
-				"Uusi tosite", newDocListener, true);
+				"Uusi tosite (Ctrl+N)", newDocListener, true);
 
+		toolBar.add(newDocButton);
+		toolBar.addSeparator(new Dimension(16, 0));
+
+		// Vienti-osio
 		addEntryButton = SwingUtils.createToolButton("list-add-22x22.png",
-				"Lisää vienti", addEntryListener, true);
+				"Lisää vienti (F8)", addEntryListener, true);
 
 		removeEntryButton = SwingUtils.createToolButton("list-remove-22x22.png",
 				"Poista vienti", removeEntryListener, true);
 
-		toolBar.add(newDocButton);
-		toolBar.addSeparator();
 		toolBar.add(addEntryButton);
 		toolBar.add(removeEntryButton);
-		toolBar.addSeparator();
+		toolBar.addSeparator(new Dimension(16, 0));
 
+		// Haku-osio
 		findByNumberButton = SwingUtils.createToolButton("jump-22x22.png",
-				"Hae numerolla", findDocumentByNumberListener, true);
+				"Hae numerolla (Ctrl+G)", findDocumentByNumberListener, true);
 
 		searchButton = SwingUtils.createToolButton("find-22x22.png",
-				"Etsi", searchListener, true);
+				"Etsi (Ctrl+F)", searchListener, true);
 
 		toolBar.add(findByNumberButton);
 		toolBar.add(searchButton);
@@ -952,10 +977,63 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		documentTypeLabel = new JLabel();
 		documentTypeLabel.setBorder(new EtchedBorder());
 		documentTypeLabel.setPreferredSize(new Dimension(200, 0));
+		
+		// Backup-indikaattori (Word AutoSave -tyylinen)
+		backupStatusLabel = new JLabel();
+		backupStatusLabel.setBorder(new EtchedBorder());
+		backupStatusLabel.setPreferredSize(new Dimension(120, 0));
+		backupStatusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		updateBackupStatusLabel();
+		
+		// Aseta listener backup-statuksen päivitykseen
+		BackupService.getInstance().setStatusListener(status -> updateBackupStatusLabel());
+		
+		// Backup-indikaattoria klikkaamalla avautuu asetukset
+		backupStatusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+				BackupSettingsDialog.show(DocumentFrame.this);
+				updateBackupStatusLabel();
+			}
+		});
+		backupStatusLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		backupStatusLabel.setToolTipText("Klikkaa muuttaaksesi varmuuskopiointiasetuksia");
+		
+		JPanel rightPanel = new JPanel(new BorderLayout());
+		rightPanel.add(backupStatusLabel, BorderLayout.WEST);
+		rightPanel.add(documentTypeLabel, BorderLayout.CENTER);
+		
 		statusBarPanel.add(documentLabel, BorderLayout.WEST);
 		statusBarPanel.add(periodLabel, BorderLayout.CENTER);
-		statusBarPanel.add(documentTypeLabel, BorderLayout.EAST);
+		statusBarPanel.add(rightPanel, BorderLayout.EAST);
 		add(statusBarPanel, BorderLayout.PAGE_END);
+	}
+	
+	/**
+	 * Päivittää backup-indikaattorin tilariville.
+	 */
+	private void updateBackupStatusLabel() {
+		BackupService backup = BackupService.getInstance();
+		
+		if (!backup.isEnabled()) {
+			backupStatusLabel.setText("○ Backup");
+			backupStatusLabel.setForeground(java.awt.Color.GRAY);
+		} else if (backup.isAutoBackupEnabled()) {
+			String cloudName = backup.getCloudServiceName();
+			if (cloudName != null) {
+				backupStatusLabel.setText("☁ AutoBackup");
+				backupStatusLabel.setForeground(new java.awt.Color(0, 128, 0));
+				backupStatusLabel.setToolTipText("AutoBackup käytössä • " + cloudName + " • Klikkaa muuttaaksesi");
+			} else {
+				backupStatusLabel.setText("◉ AutoBackup");
+				backupStatusLabel.setForeground(new java.awt.Color(0, 100, 200));
+				backupStatusLabel.setToolTipText("AutoBackup käytössä • Klikkaa muuttaaksesi");
+			}
+		} else {
+			backupStatusLabel.setText("● Backup");
+			backupStatusLabel.setForeground(java.awt.Color.DARK_GRAY);
+			backupStatusLabel.setToolTipText("Varmuuskopiointi käytössä • Klikkaa muuttaaksesi");
+		}
 	}
 
 	/**
@@ -968,6 +1046,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 			}
 
 			saveDocumentTypeIfChanged();
+			
+			// Suorita varmuuskopiointi ennen sulkemista
+			performBackupOnClose();
+			
+			// Pysäytä AutoBackup
+			BackupService.getInstance().stopAutoBackup();
+			
 			model.closeDataSource();
 		}
 
@@ -1412,6 +1497,15 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		}
 
 		SettingsDialog dialog = new SettingsDialog(this, registry);
+		dialog.create();
+		dialog.setVisible(true);
+	}
+
+	/**
+	 * Näyttää ulkoasun asetukset.
+	 */
+	public void showAppearanceDialog() {
+		AppearanceDialog dialog = new AppearanceDialog(this);
 		dialog.create();
 		dialog.setVisible(true);
 	}
@@ -2157,6 +2251,17 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		updateEntryTemplates();
 		updateDocumentTypes();
 		updateTableSettings();
+		
+		// Tallenna viimeisimpien tietokantojen listaan
+		String dbUrl = AppSettings.getInstance().getString("database.url", "");
+		if (!dbUrl.isEmpty()) {
+			RecentDatabases.getInstance().addDatabase(dbUrl);
+			updateRecentDatabasesMenu();
+			
+			// Käynnistä AutoBackup jos käytössä
+			BackupService.getInstance().setCurrentDatabase(dbUrl);
+			updateBackupStatusLabel();
+		}
 	}
 
 	public void openSqliteDataSource(File file) {
@@ -2165,6 +2270,67 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 				file.getAbsolutePath().replace(File.pathSeparatorChar, '/')));
 		settings.set("database.username", "");
 		settings.set("database.password", "");
+		openDataSource();
+	}
+	
+	/**
+	 * Päivittää viimeisimpien tietokantojen valikon.
+	 */
+	protected void updateRecentDatabasesMenu() {
+		if (recentMenu == null) return;
+		
+		recentMenu.removeAll();
+		RecentDatabases recent = RecentDatabases.getInstance();
+		List<String> databases = recent.getRecentDatabases();
+		
+		if (databases.isEmpty()) {
+			JMenuItem emptyItem = new JMenuItem("(ei viimeisimpiä)");
+			emptyItem.setEnabled(false);
+			recentMenu.add(emptyItem);
+		} else {
+			int index = 1;
+			for (final String dbUrl : databases) {
+				String displayName = RecentDatabases.getDisplayName(dbUrl);
+				JMenuItem item = new JMenuItem(index + ". " + displayName);
+				if (index <= 9) {
+					item.setMnemonic(Character.forDigit(index, 10));
+				}
+				item.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						openRecentDatabase(dbUrl);
+					}
+				});
+				recentMenu.add(item);
+				index++;
+			}
+			
+			recentMenu.addSeparator();
+			JMenuItem clearItem = new JMenuItem("Tyhjennä lista");
+			clearItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					RecentDatabases.getInstance().clearAll();
+					updateRecentDatabasesMenu();
+				}
+			});
+			recentMenu.add(clearItem);
+		}
+	}
+	
+	/**
+	 * Avaa viimeisimmän tietokannan.
+	 */
+	private void openRecentDatabase(String dbUrl) {
+		AppSettings settings = AppSettings.getInstance();
+		settings.set("database.url", dbUrl);
+		
+		// Jos SQLite, tyhjennä käyttäjätunnus/salasana
+		if (dbUrl.startsWith("jdbc:sqlite:")) {
+			settings.set("database.username", "");
+			settings.set("database.password", "");
+		}
+		
 		openDataSource();
 	}
 
@@ -2758,6 +2924,94 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	}
 
 	/**
+	 * Suorittaa varmuuskopioinnin sulkemisen yhteydessä.
+	 */
+	protected void performBackupOnClose() {
+		BackupService backupService = BackupService.getInstance();
+		
+		if (!backupService.isEnabled()) {
+			return;
+		}
+		
+		String uri = backupService.getCurrentDatabase();
+		if (uri == null || !uri.contains("sqlite")) {
+			return;
+		}
+		
+		boolean success = backupService.performBackup(uri);
+		
+		if (!success) {
+			// Näytä varoitus mutta älä estä sulkemista
+			logger.warning("Varmuuskopiointi epäonnistui sulkemisen yhteydessä");
+		}
+	}
+
+	/**
+	 * Näyttää dialogin varmuuskopion palauttamiseksi.
+	 */
+	protected void restoreFromBackup() {
+		BackupService backupService = BackupService.getInstance();
+		File backupDir = backupService.getBackupDirectory();
+		
+		if (backupDir == null || !backupDir.exists()) {
+			// Tarjoa mahdollisuus määrittää asetukset suoraan
+			String[] options = {"Määritä asetukset", "Peruuta"};
+			int choice = JOptionPane.showOptionDialog(this,
+				"Varmuuskopiokansiota ei ole määritetty tai se ei ole olemassa.\n\n" +
+				"Haluatko määrittää varmuuskopiointiasetukset nyt?",
+				"Ei varmuuskopioita",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.INFORMATION_MESSAGE,
+				null,
+				options,
+				options[0]);
+			
+			if (choice == 0) {
+				// Avaa asetukset
+				BackupSettingsDialog.show(this);
+				// Tarkista uudelleen
+				backupDir = backupService.getBackupDirectory();
+				if (backupDir == null || !backupDir.exists()) {
+					return;
+				}
+			} else {
+				return;
+			}
+		}
+		
+		// Listaa varmuuskopiot
+		File[] backups = backupService.listAllBackups();
+		
+		if (backups.length == 0) {
+			JOptionPane.showMessageDialog(this,
+				"Varmuuskopiokansiossa ei ole varmuuskopioita.\n\n" +
+				"Kansio: " + backupDir.getAbsolutePath(),
+				"Ei varmuuskopioita",
+				JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		// Näytä valintadialogi
+		RestoreBackupDialog dialog = new RestoreBackupDialog(this, backups, backupService);
+		dialog.setVisible(true);
+		
+		File restoredFile = dialog.getRestoredFile();
+		if (restoredFile != null) {
+			// Avaa palautettu tietokanta
+			int result = JOptionPane.showConfirmDialog(this,
+				"Tietokanta palautettu:\n" + restoredFile.getAbsolutePath() + "\n\n" +
+				"Haluatko avata sen nyt?",
+				"Palautus onnistui",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+			
+			if (result == JOptionPane.YES_OPTION) {
+				openSqliteDataSource(restoredFile);
+			}
+		}
+	}
+
+	/**
 	 * Etsii tositelajin, johon tositenumero <code>number</code> kuuluu.
 	 *
 	 * @param number tositenumero
@@ -2886,13 +3140,46 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		}
 	};
 
+	/**
+	 * Generoi vapaan tiedostonimen tietokannalle.
+	 * Jos "kirjanpito.sqlite" on olemassa, ehdottaa "kirjanpito_2.sqlite" jne.
+	 */
+	private File generateUniqueFileName(File directory, String baseName) {
+		File file = new File(directory, baseName + ".sqlite");
+		if (!file.exists()) {
+			return file;
+		}
+		
+		int counter = 2;
+		while (true) {
+			file = new File(directory, baseName + "_" + counter + ".sqlite");
+			if (!file.exists()) {
+				return file;
+			}
+			counter++;
+			if (counter > 1000) { // Turvarajoitus
+				break;
+			}
+		}
+		return new File(directory, baseName + "_" + System.currentTimeMillis() + ".sqlite");
+	}
+
 	/* Uusi tietokanta */
 	private ActionListener newDatabaseListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			final JFileChooser fileChooser = new JFileChooser(model.getDatabaseDir());
+			File dbDir = model.getDatabaseDir();
+			if (dbDir == null) {
+				dbDir = new File(AppSettings.getInstance().getDirectoryPath());
+			}
+			
+			// Ehdota automaattisesti vapaata nimeä
+			File suggestedFile = generateUniqueFileName(dbDir, "kirjanpito");
+			
+			final JFileChooser fileChooser = new JFileChooser(dbDir);
 			fileChooser.setFileFilter(sqliteFileFilter);
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setDialogTitle("Uusi tietokanta");
+			fileChooser.setSelectedFile(suggestedFile);
 			File file = null;
 
 			while (true) {
@@ -2910,6 +3197,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 				if (file.exists()) {
 					SwingUtils.showErrorMessage(DocumentFrame.this, String.format(
 							"Tiedosto %s on jo olemassa. Valitse toinen nimi.", file.getAbsolutePath()));
+					// Ehdota seuraavaa vapaata nimeä
+					String currentName = file.getName().replace(".sqlite", "");
+					File nextSuggestion = generateUniqueFileName(file.getParentFile(), currentName);
+					fileChooser.setSelectedFile(nextSuggestion);
 				}
 				else {
 					break;
@@ -3081,6 +3372,27 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	private ActionListener settingsListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			showSettings();
+		}
+	};
+
+	/* Ulkoasu */
+	private ActionListener appearanceListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			showAppearanceDialog();
+		}
+	};
+
+	/* Varmuuskopiointiasetukset */
+	private ActionListener backupSettingsListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			BackupSettingsDialog.show(DocumentFrame.this);
+		}
+	};
+
+	/* Palauta varmuuskopiosta */
+	private ActionListener restoreBackupListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			restoreFromBackup();
 		}
 	};
 
