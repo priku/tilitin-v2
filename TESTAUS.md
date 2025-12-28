@@ -594,3 +594,160 @@ HUOMIOT:
 - Suomen kieli arvokasta kotimaiselle ohjelmistolle
 - Jatkossa voidaan lisätä lisäominaisuuksia Pascal-skriptauksella
 ```
+
+---
+
+## 📎 PDF-liitteet -ominaisuuden testaus (v2.2.0+)
+
+### Pika-testaus PDF-liitteille
+
+#### Valmistelu
+
+```bash
+# Buildaa ja käynnistä
+mvn clean package -DskipTests
+mvn exec:java
+```
+
+#### Perustestitapaukset
+
+**1. PDF-liitteen lisääminen**
+
+```
+✓ Avaa/luo tietokanta
+✓ Avaa tai luo tosite (tositeella oltava vähintään yksi vienti)
+✓ Vieritä alas "PDF-liitteet" -osioon (ikkunan alaosa)
+✓ Klikkaa "Lisää PDF"
+✓ Valitse PDF-tiedosto
+✓ Tarkista että PDF näkyy listassa
+✓ Tarkista että tiedoston koko, sivumäärä ja päivämäärä näkyvät
+```
+
+**2. PDF-liitteen vienti**
+
+```
+✓ Valitse liite listasta
+✓ Klikkaa "Vie tiedostoksi"
+✓ Valitse tallennussijainti
+✓ Avaa viety tiedosto ja varmista että se on oikea PDF
+```
+
+**3. PDF-liitteen poisto**
+
+```
+✓ Valitse liite listasta
+✓ Klikkaa "Poista"
+✓ Vahvista poisto
+✓ Tarkista että liite poistui listasta
+```
+
+**4. Dokumenttien välillä navigointi**
+
+```
+✓ Lisää PDF-liite tositteeseen A
+✓ Vaihda tositteeseen B
+✓ Tarkista että liitteet-paneeli päivittyy (tyhjä tai B:n liitteet)
+✓ Palaa tositteeseen A
+✓ Tarkista että A:n liitteet näkyvät taas
+```
+
+### Virhetilanteiden testaus
+
+**Testi 5: Iso tiedosto (5-10 MB)**
+
+```
+1. Yritä lisätä 5-10 MB:n PDF
+2. Odotettu: Varoitusviesti (jatka/peruuta)
+3. Tarkista että liite tallentuu kun jatketaan
+```
+
+**Testi 6: Liian iso tiedosto (>10 MB)**
+
+```
+1. Yritä lisätä >10 MB PDF
+2. Odotettu: Virheviesti, liitettä EI tallenneta
+```
+
+**Testi 7: Virheellinen PDF**
+
+```
+1. Yritä lisätä korruptoitunut/virheellinen PDF
+2. Odotettu: Virheviesti "ei kelvollinen PDF"
+```
+
+**Testi 8: Tallentamaton tosite**
+
+```
+1. Luo uusi tosite (älä tallenna/lisää vientejä)
+2. Yritä lisätä PDF
+3. Odotettu: Painike ei ole aktiivinen tai varoitus
+```
+
+### Automaattiset testit
+
+**Tietokantakerroksen testit:**
+
+```bash
+# Windows
+run-attachment-test.bat
+
+# Linux/Mac
+./run-attachment-test.sh
+```
+
+**Odotettu tulos:** ✅ 15/15 testiä läpi
+
+**Testikattavuus:**
+
+- Tietokantamigraatio 14 → 15
+- CRUD-operaatiot (SQLite, MySQL, PostgreSQL)
+- PDF-validointi
+- Sivumäärän laskenta
+- Tiedostokoon rajoitukset
+
+### PDF-testausraportti
+
+```
+================================
+PDF-LIITTEET TESTAUSRAPORTTI
+================================
+
+Testaaja: _______________
+Päivämäärä: _______________
+Versio: 2.2.0+
+
+PERUSTOIMINNOT:
+[ ] Liitteet-paneeli näkyy ikkunan alaosassa
+[ ] PDF-liitteen lisäys toimii
+[ ] Liitetiedot näkyvät oikein (nimi, koko, sivut, pvm)
+[ ] PDF-liitteen vienti toimii
+[ ] PDF-liitteen poisto toimii
+[ ] Poistovahvistus toimii
+
+NAVIGOINTI:
+[ ] Liitteet päivittyvät dokumentin vaihtuessa
+[ ] Liitteet pysyvät tallessa tietokantaan
+[ ] Liitteet latautuvat oikein tietokannan avautuessa
+
+VIRHEENKÄSITTELY:
+[ ] Iso tiedosto (5-10 MB) → Varoitus
+[ ] Liian iso (>10 MB) → Virhe
+[ ] Virheellinen PDF → Virhe
+[ ] Tallentamaton tosite → Varoitus/painike ei aktiivinen
+
+AUTOMAATTISET TESTIT:
+[ ] AttachmentDAOTest: ___/15 testiä läpi
+
+YHTEENVETO:
+[ ] ✅ HYVÄKSYTTY
+[ ] ❌ HYLÄTTY (syy: _______________)
+
+KOMMENTIT:
+_______________________________________________
+```
+
+---
+
+**Onnea testaukseen!** 🎯
+
+Jos löydät ongelmia, raportoi ne ja korjataan yhdessä.

@@ -1,4 +1,4 @@
-# Tilitin 2.1
+# Tilitin 2.2
 
 [![Build Status](https://github.com/priku/tilitin-modernized/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-modernized/actions)
 [![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://adoptium.net/)
@@ -10,9 +10,16 @@ sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
-## 🚀 Versio 2.1.2 - Kotlin Modernization
+## 🚀 Versio 2.2.0 - PDF-liitteiden tuki
 
-**Uutta versiossa 2.1.2:**
+**Uutta versiossa 2.2.0:**
+
+- 📎 **PDF-liitteet tositteisiin** - Liitä kuitteja ja laskuja tositteisiin
+- 📄 **Apache PDFBox 3.0.3** - Moderni PDF-käsittelykirjasto
+- 🗄️ **Tietokantamigraatio** - Automaattinen päivitys versioon 15
+- 🧪 **Testattu** - 15 testiä, 100% läpäisy
+
+**Versiossa 2.1.x:**
 
 - 🦜 **Kotlin 2.3.0** - Moderni Kotlin-tuki Java 25:lle
 - 📊 **Kotlin Data Classes** - AccountData, DocumentData, EntryData, PeriodData
@@ -48,8 +55,8 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 - ⚡ Parannettu käytettävyys ja modernimpi ulkoasu
 - 🔄 **Rinnakkainen asennus** - Voit pitää vanhan Tilitin-version asennettuna
 
-**Kehityshaara:** `feature/windows-modernization`
-**Tila:** 🟢 Aktiivinen kehitys (Sprint 2.2)
+**Kehityshaara:** `feature/2.2-listener-extraction`
+**Tila:** ✅ Julkaistu (v2.2.0)
 
 **Dokumentaatio:**
 
@@ -73,7 +80,7 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 
 **Moderni Inno Setup -asennusohjelma:**
 
-1. Lataa **Tilitin-2.0.3-setup.exe** GitHubin [releases-osiosta][releases]
+1. Lataa **Tilitin-2.2.0-setup.exe** GitHubin [releases-osiosta][releases]
 2. Tuplaklikkaa asennusohjelmaa ja seuraa ohjeita
 3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
 

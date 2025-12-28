@@ -12,6 +12,8 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 ### 📎 PDF-liitteet - Uusi ominaisuus
 
 **Branch:** `feature/pdf-attachments`
+**Toteutusaika:** 2025-12-28 to 2025-12-29 (Sprint 1 & 2)
+**Tila:** ✅ Valmis - Odottaa käyttäjätestausta
 
 ### Lisätty
 - **PDF-liitteet tositteisiin** - Täysi tuki PDF-tiedostojen liittämiseen
@@ -22,68 +24,39 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
   - ✅ UI-komponentit (AttachmentsPanel, AttachmentsTableModel)
   - ✅ Integraatio DocumentFrameen
   - ✅ PDF-validoinnit ja kookontrollit
-  - ✅ Testaussuite (15 testiä, kaikki läpi ✅)
+  - ✅ Testaussuite (15 testiä, 100% läpäisyaste)
 
-#### Tietokantakerros
-- **Attachment.kt** - Kotlin data class PDF-liitteille
-  - Tiedostokoon validoinnit (10 MB max, 5 MB varoitus)
-  - Tiedostonimen sanitointi
-  - Apumetodit tiedostokoon muotoiluun
-  - Factory-metodi `fromFile()` validoinnilla
+#### Sprint 1: Tietokanta & DAO-kerros
+**Toteutetut ominaisuudet:**
+- **Tietokantamigraatio:** `upgrade14to15()` - tuki kaikille tietokannoille
+- **Tietokantaskeema:** 9 saraketta, indeksi `document_id`:lle, CASCADE-poisto
+- **Domain-malli:** `Attachment.kt` - validoinnit (10 MB max, 5 MB varoitus)
+- **DAO-rajapinta:** `AttachmentDAO` - 6 CRUD-operaatiota
+- **DAO-toteutukset:** SQLite, MySQL, PostgreSQL - tietokantakohtaiset BLOB-tyypit
+- **PDF-apuvälineet:** `PdfUtils.kt` - validointi ja sivumäärän laskenta
+- **DataSource-integraatio:** `getAttachmentDAO()` kaikissa DataSource-luokissa
 
-- **AttachmentDAO** - Rajapinta CRUD-operaatioille
-  - `findById()`, `findByDocumentId()`
-  - `save()`, `delete()`
-  - `countByDocumentId()`, `getTotalSize()`
+**Testattu:** 15 testitapausta, 100% läpäisyaste
 
-- **DAO-toteutukset:**
-  - `SQLiteAttachmentDAO.kt` - SQLite-toteutus
-  - `MySQLAttachmentDAO.kt` - MySQL-toteutus
-  - `PSQLAttachmentDAO.kt` - PostgreSQL-toteutus
+#### Sprint 2: Käyttöliittymä
+**Toteutetut ominaisuudet:**
+- **AttachmentsPanel:** Lista-, lisää-, poista- ja vie-painikkeet
+- **AttachmentsTableModel:** 5 saraketta (tiedosto, koko, sivut, lisätty, kuvaus)
+- **Tiedostovalitsin:** PDF-suodatin, validointi ennen tallennusta
+- **Virheenkäsittely:** Käyttäjäystävälliset viestit, vahvistukset
+- **DocumentFrame-integraatio:** Paneeli näkyy ikkunan alaosassa
+- **Automaattiset päivitykset:** Lista päivittyy dokumenttien välillä navigoitaessa
 
-- **PdfUtils.kt** - PDF-apufunktiot
-  - PDF-validoinnit Apache PDFBox:lla
-  - Sivumäärän laskenta
-  - Virheenkäsittely korruptoituneille PDF:ille
+**Testattu:** Manuaalinen testaus (katso TESTAUS.md)
 
-#### UI-kerros
-- **AttachmentsPanel.java** - Pääpaneeli PDF-liitteiden hallintaan
-  - Listanäkymä JTable:lla
-  - "Lisää PDF" -painike tiedostonvalitsimella
-  - "Poista" -painike vahvistuksella
-  - "Vie tiedostoksi" -painike PDF:ien vientiin
-  - Automaattiset päivitykset dokumentin vaihtuessa
+#### Tilastot
 
-- **AttachmentsTableModel.java** - Taulukkomalli liitteiden näyttämiseen
-  - Sarakkeet: Tiedosto, Koko, Sivut, Lisätty, Kuvaus
-  - Päivämäärän muotoilu
-  - Tiedostokoon muotoilu (B/KB/MB)
+- **Koodimäärä:** ~1,400 riviä (800 Kotlin + 600 Java)
+- **Testikattavuus:** 15 testitapausta, 100% läpäisyaste
+- **Luodut tiedostot:** 15 (5 Kotlin, 3 Java, 7 dokumentaatio)
+- **Muokatut tiedostot:** 12 (tietokantakerros, skeema, UI, build)
 
-#### Integraatio
-- **DocumentFrame.java** - Liitteet-paneeli integroitu
-  - Paneeli näkyy ikkunan alaosassa
-  - Päivittyy automaattisesti dokumenttien välillä navigoidessa
-  - Käyttää Registryä DataSource-pääsyyn
-
-#### Riippuvuudet
-- **Apache PDFBox 3.0.3** - PDF-katseluun ja -validoinnin
-  - JAR-koko kasvu: ~4-5 MB
-  - Java 11+ yhteensopiva
-
-#### Testaus
-- **AttachmentDAOTest.java** - Kattava testaussuite
-  - 15 testitapausta kaikille toiminnallisuuksille
-  - Tietokantamigraation testaus
-  - PDF-apufunktioiden testaus
-  - Kaikki testit läpi ✅
-
-#### Dokumentaatio
-- **PDF-ATTACHMENTS-IMPLEMENTATION.md** - Täydellinen toteutusdokumentaatio
-- **PDF-IMPROVEMENTS-PLAN.md** - Alkuperäinen suunnitelma
-- **PDF-IMPROVEMENTS-PLAN-REVIEW.md** - Arvostelu ja palaute
-- **TEST-PDF-ATTACHMENTS.md** - Testausopas tietokantakerrokselle
-- **QUICK-TEST-GUIDE.md** - Nopea viite manuaaliseen testaamiseen
-- **TEST-SPRINT2-GUIDE.md** - Yksityiskohtainen Sprint 2 -testausopas
+Katso yksityiskohtainen tekninen dokumentaatio: `PDF-ATTACHMENTS-IMPLEMENTATION.md`
 
 ### Muutettu
 - **Tietokantaversio:** Päivitetty versiosta 14 → 15

@@ -1,196 +1,252 @@
-# PDF Attachments Feature - Documentation Index
+# Tilitin - Dokumentaatio-indeksi
 
-**Feature:** PDF Attachments for Documents  
-**Version:** 2.2.0  
-**Last Updated:** 2025-12-29
-
----
-
-## 📚 Complete Documentation List
-
-### 🎯 Start Here
-
-1. **README-PDF-ATTACHMENTS.md** ⭐ **START HERE**
-   - Quick overview
-   - Quick start guide
-   - Links to all documentation
-   - User guide
-   - **Best for:** First-time readers
-
-2. **IMPLEMENTATION-COMPLETE.md** ⭐
-   - Completion checklist
-   - Success metrics
-   - File inventory
-   - **Best for:** Project managers, overview
-
-3. **SPRINT-1-2-SUMMARY.md**
-   - Executive summary
-   - What was accomplished
-   - Statistics
-   - **Best for:** Quick status update
+**Versio:** 2.2.0
+**Viimeksi päivitetty:** 2025-12-29
 
 ---
 
-### 📖 Technical Documentation
+## 📚 Kaikki dokumentaatio
 
-4. **PDF-ATTACHMENTS-IMPLEMENTATION.md** ⭐ **MOST DETAILED**
-   - Complete technical documentation
-   - Architecture overview
-   - Database schema
-   - API reference
-   - Code examples
-   - Troubleshooting
-   - **Size:** 24,848 bytes
-   - **Best for:** Developers, technical deep dive
+### 🎯 Käyttäjille
 
-5. **PDF-IMPROVEMENTS-PLAN.md**
-   - Original feature plan
-   - Technical design
-   - Sprint breakdown
-   - Risk analysis
-   - **Size:** 34,814 bytes
-   - **Best for:** Understanding original plan
+1. **README.md** ⭐ **ALOITA TÄSTÄ**
+   - Projektin yleiskuvaus
+   - Asennusohjeet
+   - Pika-aloitus
+   - **Parhaiten sopii:** Ensikertalaisten
 
-6. **PDF-IMPROVEMENTS-PLAN-REVIEW.md**
-   - Review and feedback
-   - Critical issues identified
-   - Recommendations
-   - Approval checklist
-   - **Size:** 18,819 bytes
-   - **Best for:** Understanding review process
+2. **USER-GUIDE.md**
+   - Käyttäjän kattava opas (1,085 riviä)
+   - Kaikki ominaisuudet selitetty
+   - PDF-liitteet-ohje (v2.2.0+)
+   - Näppäinkomennot
+   - UKK
+   - **Parhaiten sopii:** Loppukäyttäjät, perusteellinen opas
 
----
+### 🏗️ Kehittäjille
 
-### 🧪 Testing Documentation
+3. **BUILDING.md**
+   - Build-ohjeet (Windows, Mac, Linux)
+   - jPackage-paketointi
+   - Asennusohjelmien luonti
+   - **Parhaiten sopii:** Build-prosessi
 
-7. **QUICK-TEST-GUIDE.md** ⭐
-   - Quick reference
-   - Test scenarios
-   - Success criteria
-   - **Best for:** Quick testing
+4. **CONTRIBUTING.md**
+   - Kehittäjäohjeet
+   - Code style
+   - Pull request -ohje
+   - **Parhaiten sopii:** Kontribuuttorit
 
-8. **TEST-SPRINT2-GUIDE.md**
-   - Detailed UI testing guide
-   - Step-by-step instructions
-   - Error case testing
-   - **Best for:** Comprehensive UI testing
+5. **KOTLIN_MIGRATION.md**
+   - Kotlin-migraatiostrategia
+   - Hyödyt ja haasteet
+   - Migration roadmap
+   - **Parhaiten sopii:** Arkkitehtuuri, modernisointipäätökset
 
-9. **TEST-PDF-ATTACHMENTS.md**
-   - Database layer testing
-   - Automated test suite
-   - Manual testing procedures
-   - **Size:** 5,964 bytes
-   - **Best for:** Database testing
+### 🧪 Testaajille
 
----
+6. **TESTAUS.md** ⭐
+   - Kattava testausopas
+   - PDF-liitteet-testaus (v2.2.0+)
+   - Build-testaus
+   - MSI/Inno Setup -testaus
+   - Testausraportit
+   - **Parhaiten sopii:** Testaajat, QA
 
-### 📝 Project Documentation
+### 📋 Projektinhallinta
 
-10. **CHANGELOG.md**
-    - Version 2.2.0 entry (Finnish)
-    - All changes documented
-    - **Best for:** Version history
+7. **PROJEKTISUUNNITELMA.md**
+   - Modernisointisuunnitelma
+   - Sprint-jako
+   - Tavoitteet ja tulokset
+   - **Parhaiten sopii:** Projektipäälliköt
 
----
+8. **MODERNIZATION-TODO.md**
+   - TODO-lista modernisointitöistä
+   - Tekninen velka
+   - Priorisoitu lista
+   - **Parhaiten sopii:** Kehitystiimi, sprinttien suunnittelu
 
-## 📋 Documentation by Audience
+9. **NEXT-STEPS-PLAN.md**
+   - Seuraavat askeleet
+   - Tulevaisuuden ominaisuudet
+   - **Parhaiten sopii:** Roadmap-suunnittelu
 
-### For End Users
+10. **CHANGELOG.md** ⭐
+    - Versiohistoria (v1.5.0 → v2.2.0)
+    - PDF-liitteet v2.2.0 (Sprint 1 & 2)
+    - Kaikki muutokset dokumentoitu
+    - **Parhaiten sopii:** Versiohistoria, julkaisut
 
-- **README-PDF-ATTACHMENTS.md** → User Guide section
-- **QUICK-TEST-GUIDE.md** → How to test the feature
+### 🔬 Analyysit ja vertailut
 
-### For Testers
+11. **TILITIN-KITUPIIKKI-COMPARISON.md**
+    - Tekninen vertailu Kitupiikkiin
+    - Arkkitehtuurierot
+    - Ominaisuusvertailu
+    - **Parhaiten sopii:** Arkkitehtuuri, benchmarking
 
-- **QUICK-TEST-GUIDE.md** ⭐
-- **TEST-SPRINT2-GUIDE.md**
-- **TEST-PDF-ATTACHMENTS.md**
+12. **KITSAS-FEATURE-RECOMMENDATIONS.md**
+    - Ominaisuussuositukset Kitsaksesta
+    - Prioriteetti 1-4 ominaisuudet
+    - Valmis Kotlin-koodi esimerkkeineen
+    - **Parhaiten sopii:** Ominaisuuskehitys
 
-### For Developers
+### 📝 Suunnitteludokumentit
 
-- **PDF-ATTACHMENTS-IMPLEMENTATION.md** ⭐
-- **SPRINT-1-2-SUMMARY.md**
-- **PDF-IMPROVEMENTS-PLAN.md**
+13. **PDF-IMPROVEMENTS-PLAN.md**
+    - PDF-liitteet -ominaisuuden alkuperäinen suunnitelma
+    - Tekninen design
+    - Sprint-jako (Sprint 1-4)
+    - Database schema
+    - **Parhaiten sopii:** PDF-liitteet toteutus
 
-### For Project Managers
+14. **CSV-IMPORT-PLAN.md**
+    - CSV-tuonti -ominaisuuden suunnitelma
+    - Encoding-tunnistus
+    - Delimiter-tunnistus
+    - Column mapping
+    - **Parhaiten sopii:** CSV-tuonti toteutus
 
-- **IMPLEMENTATION-COMPLETE.md** ⭐
-- **SPRINT-1-2-SUMMARY.md**
-- **CHANGELOG.md**
+### 🔧 Työkalut ja apuvälineet
 
----
-
-## 📊 Documentation Statistics
-
-### File Sizes
-
-- **Largest:** PDF-IMPROVEMENTS-PLAN.md (34,814 bytes)
-- **Most Detailed:** PDF-ATTACHMENTS-IMPLEMENTATION.md (24,848 bytes)
-- **Quickest Read:** TEST-PDF-ATTACHMENTS.md (5,964 bytes)
-
-### Total Documentation
-
-- **Files:** 10 documentation files
-- **Total Size:** ~100 KB
-- **Languages:** English (primary), Finnish (CHANGELOG)
-
----
-
-## 🗂️ Documentation Structure
-
-```
-Documentation/
-├── README-PDF-ATTACHMENTS.md          # Main entry point
-├── IMPLEMENTATION-COMPLETE.md         # Completion status
-├── SPRINT-1-2-SUMMARY.md              # Executive summary
-├── PDF-ATTACHMENTS-IMPLEMENTATION.md  # Technical docs
-├── PDF-IMPROVEMENTS-PLAN.md           # Original plan
-├── PDF-IMPROVEMENTS-PLAN-REVIEW.md    # Review
-├── QUICK-TEST-GUIDE.md                # Quick testing
-├── TEST-SPRINT2-GUIDE.md              # UI testing
-├── TEST-PDF-ATTACHMENTS.md            # DB testing
-└── CHANGELOG.md                       # Version history
-```
+15. **DOCUMENTATION-INDEX.md** (tämä tiedosto)
+    - Dokumentaation hakemisto
+    - Navigointiopas
+    - **Parhaiten sopii:** Dokumentaation löytäminen
 
 ---
 
-## 🎯 Quick Navigation
+## 📂 Dokumentaatio yleisön mukaan
 
-### I want to...
+### Loppukäyttäjät
 
-**...understand what was built:**
-→ Read `IMPLEMENTATION-COMPLETE.md`
+- **README.md** → Projektin yleiskuvaus
+- **USER-GUIDE.md** ⭐ → Kattava käyttöopas
+- **CHANGELOG.md** → Mitä on muuttunut
 
-**...see technical details:**
-→ Read `PDF-ATTACHMENTS-IMPLEMENTATION.md`
+### Testaajat
 
-**...test the feature:**
-→ Read `QUICK-TEST-GUIDE.md`
+- **TESTAUS.md** ⭐ → Testausohjeet
+- **USER-GUIDE.md** → Ominaisuuksien ymmärtäminen
 
-**...understand the plan:**
-→ Read `PDF-IMPROVEMENTS-PLAN.md`
+### Kehittäjät
 
-**...see what changed:**
-→ Read `CHANGELOG.md` (version 2.2.0)
+- **BUILDING.md** → Build-ohjeet
+- **CONTRIBUTING.md** → Kontribuutio-ohjeet
+- **KOTLIN_MIGRATION.md** → Migraatiostrategia
+- **PDF-IMPROVEMENTS-PLAN.md** → PDF-ominaisuuden tekninen suunnitelma
+- **CSV-IMPORT-PLAN.md** → CSV-tuonnin tekninen suunnitelma
+- **TILITIN-KITUPIIKKI-COMPARISON.md** → Tekninen vertailu
 
-**...get started quickly:**
-→ Read `README-PDF-ATTACHMENTS.md`
+### Projektipäälliköt
+
+- **PROJEKTISUUNNITELMA.md** ⭐ → Projektin suunnitelma
+- **CHANGELOG.md** → Versiohistoria
+- **MODERNIZATION-TODO.md** → TODO-lista
+- **NEXT-STEPS-PLAN.md** → Seuraavat askeleet
+
+### Arkkitehdit
+
+- **KOTLIN_MIGRATION.md** → Migraatiostrategia
+- **TILITIN-KITUPIIKKI-COMPARISON.md** → Vertailuanalyysi
+- **KITSAS-FEATURE-RECOMMENDATIONS.md** → Ominaisuussuositukset
 
 ---
 
-## ✅ Documentation Status
+## 🎯 Pika-navigointi
 
-- [x] Technical documentation complete
-- [x] Testing guides complete
-- [x] User guides complete
-- [x] API reference complete
-- [x] Troubleshooting guide complete
-- [x] Architecture documentation complete
-- [x] Change log updated
+### Haluan...
 
-**Status:** ✅ **COMPLETE**
+**...aloittaa Tilitinin käytön:**
+→ Lue `README.md` ja `USER-GUIDE.md`
+
+**...buildaa projektin:**
+→ Lue `BUILDING.md`
+
+**...testata sovelluksen:**
+→ Lue `TESTAUS.md`
+
+**...kontribuoida koodiin:**
+→ Lue `CONTRIBUTING.md` ja `KOTLIN_MIGRATION.md`
+
+**...nähdä mitä on muuttunut:**
+→ Lue `CHANGELOG.md`
+
+**...suunnitella uusia ominaisuuksia:**
+→ Lue `KITSAS-FEATURE-RECOMMENDATIONS.md`, `PDF-IMPROVEMENTS-PLAN.md`, `CSV-IMPORT-PLAN.md`
+
+**...ymmärtää projektin suunnitelman:**
+→ Lue `PROJEKTISUUNNITELMA.md` ja `MODERNIZATION-TODO.md`
 
 ---
 
-**Last Updated:** 2025-12-29
+## 📊 Dokumentaatiotilastot
 
+### Määrä
+
+- **Yhteensä:** 17 markdown-tiedostoa
+- **Vähennetty:** 10 tiedostoa (konsolidointi 2025-12-29)
+- **Kieli:** Suomi (pääasiallinen), Englanti (tekninen)
+
+### Suurimmat tiedostot
+
+- **USER-GUIDE.md** → 1,085 riviä (kattavin)
+- **CSV-IMPORT-PLAN.md** → 40.1 KB (yksityiskohtaisin tekninen)
+- **PDF-IMPROVEMENTS-PLAN.md** → 34.8 KB (tekninen suunnitelma)
+- **KITSAS-FEATURE-RECOMMENDATIONS.md** → 28.2 KB (suositukset)
+
+### Konsolidointi (2025-12-29)
+
+**Poistetut tiedostot (10 kpl):**
+1. KITSAS-VERTAILU.md → Konsolidoitu TILITIN-KITUPIIKKI-COMPARISON.md
+2. PDF-ATTACHMENTS-IMPLEMENTATION.md → Konsolidoitu CHANGELOG.md
+3. IMPLEMENTATION-COMPLETE.md → Konsolidoitu CHANGELOG.md
+4. SPRINT-1-2-SUMMARY.md → Konsolidoitu CHANGELOG.md
+5. PDF-IMPROVEMENTS-PLAN-REVIEW.md → Ei enää tarpeen
+6. TEST-PDF-ATTACHMENTS.md → Konsolidoitu TESTAUS.md
+7. QUICK-TEST-GUIDE.md → Konsolidoitu TESTAUS.md
+8. TEST-SPRINT2-GUIDE.md → Konsolidoitu TESTAUS.md
+9. README-PDF-ATTACHMENTS.md → Konsolidoitu USER-GUIDE.md
+10. release-notes-temp.md → Vanhentunut
+
+**Konsolidoidut tiedostot (3 kpl):**
+- CHANGELOG.md → PDF-toteutuksen yhteenveto
+- TESTAUS.md → PDF-liitteet-testausohjeet
+- USER-GUIDE.md → PDF-liitteet-käyttöohje
+
+---
+
+## ✅ Dokumentaation tila
+
+- [x] Käyttäjädokumentaatio täydellinen
+- [x] Kehittäjädokumentaatio täydellinen
+- [x] Testausdokumentaatio täydellinen
+- [x] Projektin hallintadokumentaatio täydellinen
+- [x] Tekninen dokumentaatio täydellinen
+- [x] Konsolidointi valmis (25 → 17 tiedostoa)
+
+**Tila:** ✅ **TÄYDELLINEN**
+
+---
+
+## 🔄 Dokumentaation ylläpito
+
+### Päivitysohjeet
+
+Kun lisäät uuden dokumentin:
+1. Lisää se tähän indeksiin oikeaan kategoriaan
+2. Päivitä "Määrä"-tilastot
+3. Lisää "Pika-navigointi"-osioon tarvittaessa
+4. Päivitä viimeinen päivityspäivä
+
+### Kun poistat dokumentin
+
+1. Poista viittaus tästä indeksistä
+2. Päivitä "Määrä"-tilastot
+3. Varmista että tieto on konsolidoitu muualle
+
+---
+
+**Viimeksi päivitetty:** 2025-12-29
+**Konsolidoitu:** 2025-12-29 (25 → 17 tiedostoa, -32%)

@@ -182,7 +182,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private JTable entryTable;
 	private AttachmentsPanel attachmentsPanel;
 	private TableColumn vatColumn;
-	private EntryTableHeaderRenderer tableHeaderRenderer;
 	private JPanel searchPanel;
 	private JTextField searchPhraseTextField;
 	private EntryTableModel tableModel;
@@ -202,6 +201,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	
 	// Helper for entry table actions
 	private EntryTableActions entryTableActions;
+	
+	// Table manager for entry table
+	private DocumentTableManager tableManager;
 
 	// File filter for SQLite databases
 	FileFilter sqliteFileFilter = new FileFilter() {
@@ -280,6 +282,38 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 
 	/* Tietokanta-asetukset */
 	private ActionListener databaseSettingsListener = e -> showDatabaseSettings();
+	
+	// Column mapper for DocumentTableManager
+	// This will be initialized after tableManager is created
+	private DocumentTableManager.ColumnMapper columnMapper = new DocumentTableManager.ColumnMapper() {
+		@Override
+		public int mapColumnIndexToModel(int viewIndex) {
+			return DocumentFrame.this.mapColumnIndexToModel(viewIndex);
+		}
+		
+		@Override
+		public int mapColumnIndexToView(int modelIndex) {
+			return DocumentFrame.this.mapColumnIndexToView(modelIndex);
+		}
+	};
+	
+	// Table callbacks for DocumentTableManager
+	private DocumentTableManager.TableCallbacks tableCallbacks = new DocumentTableManager.TableCallbacks() {
+		@Override
+		public void onTableModelChanged() {
+			updateTotalRow();
+		}
+		
+		@Override
+		public void showAccountSelection(String query) {
+			DocumentFrame.this.showAccountSelection(query);
+		}
+		
+		@Override
+		public Action getToggleDebitCreditAction() {
+			return toggleDebitCreditAction;
+		}
+	};
 
 	private static Logger logger = Logger.getLogger(Kirjanpito.LOGGER_NAME);
 	private static final long serialVersionUID = 1L;
@@ -304,7 +338,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowOpened(WindowEvent e) {
-				entryTable.setRowHeight(getFontMetrics(entryTable.getFont()).getHeight() + 6);
+				if (tableManager != null) {
+					tableManager.setRowHeight(getFontMetrics(entryTable.getFont()));
+				}
 			}
 
 			public void windowClosing(WindowEvent e) {
@@ -591,170 +627,63 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * @param container paneeli, johon taulukko lisätään
 	 */
 	protected void createTable(JPanel container) {
-		tableModel = new EntryTableModel(model);
-		tableModel.addTableModelListener(new TableModelListener() {
-			public void tableChanged(TableModelEvent e) {
-				updateTotalRow();
+		// Create table manager
+		tableManager = new DocumentTableManager(registry, model, container, 
+				tableCallbacks, columnMapper);
+		
+		// Get references to table components
+		entryTable = tableManager.getTable();
+		tableModel = tableManager.getTableModel();
+		accountCellRenderer = tableManager.getAccountCellRenderer();
+		accountCellEditor = tableManager.getAccountCellEditor();
+		descriptionCellEditor = tableManager.getDescriptionCellEditor();
+		vatColumn = tableManager.getVatColumn();
+		
+		// Set table actions (this will configure keyboard shortcuts)
+		tableManager.setTableActions(new DocumentTableManager.TableActions() {
+			@Override
+			public Action getPrevCellAction() { return prevCellAction; }
+			
+			@Override
+			public Action getNextCellAction() { return nextCellAction; }
+			
+			@Override
+			public Action getAddEntryAction() { return addEntryListener; }
+			
+			@Override
+			public Action getRemoveEntryAction() { return removeEntryListener; }
+			
+			@Override
+			public Action getCopyEntriesAction() { return copyEntriesAction; }
+			
+			@Override
+			public Action getPasteEntriesAction() { return pasteEntriesAction; }
+			
+			@Override
+			public Action getPrevDocumentAction() { 
+				return new AbstractAction() {
+					private static final long serialVersionUID = 1L;
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						prevDocListener.actionPerformed(e);
+					}
+				};
 			}
+			
+			@Override
+			public Action getNextDocumentAction() { 
+				return new AbstractAction() {
+					private static final long serialVersionUID = 1L;
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						nextDocListener.actionPerformed(e);
+					}
+				};
+			}
+			
+			@Override
+			public Action getSetIgnoreFlagAction() { return setIgnoreFlagToEntryAction; }
 		});
-
-		accountCellRenderer = new AccountCellRenderer(registry, tableModel);
-		accountCellEditor = new AccountCellEditor(registry, tableModel, e -> {
-			String q = accountCellEditor.getTextField().getText();
-			showAccountSelection(q);
-		});
-
-		descriptionCellEditor = new DescriptionCellEditor(model);
-
-		entryTable = new JTable(tableModel);
-		entryTable.setFillsViewportHeight(true);
-		entryTable.setPreferredScrollableViewportSize(new Dimension(680, 250));
-		entryTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		entryTable.setSurrendersFocusOnKeystroke(true);
-		entryTable.setColumnSelectionAllowed(true);
-
-		tableHeaderRenderer = new EntryTableHeaderRenderer(
-				entryTable.getTableHeader().getDefaultRenderer());
-		entryTable.getTableHeader().setDefaultRenderer(tableHeaderRenderer);
-
-		TableColumn column;
-		int[] widths = new int[] {190, 80, 80, 80, 190};
-		AppSettings settings = AppSettings.getInstance();
-		int width;
-
-		DescriptionCellEditor descriptionCellEditor = new DescriptionCellEditor(model);
-		CurrencyCellRenderer currencyCellRenderer = new CurrencyCellRenderer();
-		CurrencyCellEditor currencyCellEditor = new CurrencyCellEditor();
-		currencyCellEditor.setActionListener(toggleDebitCreditAction);
-		tableModel.setCurrencyCellEditor(currencyCellEditor);
-
-		TableCellRenderer[] renderers = new TableCellRenderer[] {
-			accountCellRenderer, currencyCellRenderer, currencyCellRenderer,
-			currencyCellRenderer, null };
-
-		TableCellEditor[] editors = new TableCellEditor[] {
-			accountCellEditor, currencyCellEditor, currencyCellEditor,
-			currencyCellEditor, descriptionCellEditor };
-
-		for (int i = 0; i < widths.length; i++) {
-			column = entryTable.getColumnModel().getColumn(i);
-			width = settings.getInt("table.columns." + i, 0);
-
-			if (width > 0) {
-				column.setPreferredWidth(width);
-			}
-			else {
-				column.setPreferredWidth(widths[i]);
-			}
-
-			if (renderers[i] != null) {
-				column.setCellRenderer(renderers[i]);
-			}
-
-			if (editors[i] != null) {
-				column.setCellEditor(editors[i]);
-			}
-		}
-
-		container.add(new JScrollPane(entryTable,
-				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
-
-		// Use modern API instead of deprecated getMenuShortcutKeyMask()
-		// Detect OS and use appropriate mask (Ctrl on Windows/Linux, Cmd on Mac)
-		String osName = System.getProperty("os.name").toLowerCase();
-		int shortcutKeyMask = osName.contains("mac") 
-			? InputEvent.META_DOWN_MASK 
-			: InputEvent.CTRL_DOWN_MASK;
-
-		/* Muutetaan enter-näppäimen toiminta. */
-		entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "nextCell");
-
-		entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, shortcutKeyMask), "nextCell");
-
-		entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), "prevCell");
-
-		entryTable.getActionMap().put("prevCell", prevCellAction);
-		entryTable.getActionMap().put("nextCell", nextCellAction);
-
-		/* Muutetaan ylänuolen toiminta. */
-		Object key = entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
-
-		AbstractAction previousRowAction = new PreviousRowAction(
-				entryTable.getActionMap().get(key));
-
-		entryTable.getActionMap().put(key, previousRowAction);
-
-		/* Lisätään vienti, kun insert-näppäintä painetaan. */
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), "insertRow");
-
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0), "insertRow");
-
-		entryTable.getActionMap().put("insertRow", addEntryListener);
-
-		/* Vaihdetaan debet-vienti kredit-vienniksi ja toisin päin, kun
-		 * §-näppäintä painetaan. */
-		entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-				KeyStroke.getKeyStroke('§'), "toggleDebitCredit");
-
-		entryTable.getActionMap().put("toggleDebitCredit", toggleDebitCreditAction);
-
-		/* Kun F12-näppäintä painetaan, aloitetaan selitteen muokkaaminen
-		 * ja poistetaan teksti viimeiseen pilkkuun asti. */
-		RemoveSuffixAction removeSuffixAction = new RemoveSuffixAction();
-
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), "removeSuffix");
-
-		entryTable.getActionMap().put("removeSuffix", removeSuffixAction);
-
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_C, shortcutKeyMask), "copy");
-
-		entryTable.getActionMap().put("copy", copyEntriesAction);
-
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcutKeyMask), "paste");
-
-		entryTable.getActionMap().put("paste", pasteEntriesAction);
-
-		descriptionCellEditor.getTextField().getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0), "removeSuffix");
-
-		descriptionCellEditor.getTextField().getActionMap().put(
-				"removeSuffix", removeSuffixAction);
-
-		/* Siirrytään edelliseen tositteeseen, kun
-		 * Page Up -näppäintä painetaan. */
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0), "prevDocument");
-
-		entryTable.getActionMap().put("prevDocument", prevDocListener);
-
-		/* Siirrytään seuraavaan tositteeseen, kun
-		 * Page Down -näppäintä painetaan. */
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0), "nextDocument");
-
-		entryTable.getActionMap().put("nextDocument", nextDocListener);
-
-		/* Poistetaan vienti, kun delete-näppäintä painetaan. */
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "removeRow");
-
-		entryTable.getActionMap().put("removeRow", removeEntryListener);
-
-		/* Merkitään vienti ohitettavaksi ALV-laskelmassa, kun painetaan Ctrl+H */
-		entryTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_H, shortcutKeyMask), "setIgnoreFlag");
-
-		entryTable.getActionMap().put("setIgnoreFlag", setIgnoreFlagToEntryAction);
 	}
 
 	/**
@@ -949,13 +878,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		settings.set("window.height", getHeight());
 
 		/* Tallennetaan taulukon sarakkeiden leveydet. */
-		for (int i = 0; i < 5; i++) {
-			int columnIndex = mapColumnIndexToView(i);
-
-			if (columnIndex >= 0) {
-				settings.set("table.columns." + i, entryTable.getColumnModel(
-						).getColumn(columnIndex).getWidth());
-			}
+		if (tableManager != null) {
+			tableManager.saveColumnWidths();
 		}
 
 		settings.save();
@@ -2489,57 +2413,26 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 */
 	protected void updateTableSettings() {
 		Settings settings = registry.getSettings();
-
-		if (settings == null) {
-			return;
+		if (tableManager != null) {
+			tableManager.updateTableSettings(settings);
+			vatColumn = tableManager.getVatColumn();
 		}
-
-		TableColumnModel columnModel = entryTable.getColumnModel();
-		boolean vatVisible = !settings.getProperty("vatVisible", "true").equals("false");
-
-		if (vatVisible && vatColumn != null) {
-			/* Näytetään ALV-sarake. */
-			columnModel.addColumn(vatColumn);
-			columnModel.moveColumn(columnModel.getColumnCount() - 1, 3);
-			vatColumn = null;
-		}
-		else if (!vatVisible && vatColumn == null) {
-			/* Piilotetaan ALV-sarake. */
-			vatColumn = columnModel.getColumn(3);
-			columnModel.removeColumn(vatColumn);
-		}
-
-		boolean vatEditable = settings.getProperty("vatLocked", "true").equals("false");
-		tableModel.setVatEditable(vatEditable);
-
-		boolean autoCompleteEnabled = !settings.getProperty("autoCompleteEnabled", "true").equals("false");
-		model.setAutoCompleteEnabled(autoCompleteEnabled);
 	}
 
 	protected int mapColumnIndexToView(int col) {
-		int[] indexes = {0, 1, 2, 3, 4};
-
-		if (vatColumn != null) {
-			indexes[3] = -1;
-			indexes[4] = 3;
+		if (tableManager != null) {
+			return tableManager.mapColumnIndexToView(col);
 		}
-
-		return indexes[col];
+		// Fallback if tableManager not initialized yet
+		return col;
 	}
 
 	protected int mapColumnIndexToModel(int col) {
-		int[] indexes = {0, 1, 2, 3, 4};
-
-		if (vatColumn != null) {
-			indexes[3] = 4;
-			indexes[4] = -1;
+		if (tableManager != null) {
+			return tableManager.mapColumnIndexToModel(col);
 		}
-
-		if (col < 0 || col >= indexes.length) {
-			return -1;
-		}
-
-		return indexes[col];
+		// Fallback if tableManager not initialized yet
+		return col;
 	}
 
 	protected void initializeDataSource() {
@@ -2991,31 +2884,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		}
 	};
 
-	private class EntryTableHeaderRenderer extends DefaultTableCellRenderer {
-		private TableCellRenderer defaultRenderer;
-		private final int[] alignments = {
-				JLabel.LEFT, JLabel.RIGHT, JLabel.RIGHT, JLabel.RIGHT, JLabel.LEFT};
-		private static final long serialVersionUID = 1L;
-
-		public EntryTableHeaderRenderer(TableCellRenderer defaultRenderer) {
-			this.defaultRenderer = defaultRenderer;
-		}
-
-		@Override
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
-			Component comp = defaultRenderer.getTableCellRendererComponent(table,
-					value, isSelected, hasFocus, row, column);
-
-			if (comp instanceof JLabel) {
-				/* Muutetaan tekstin tasaus. */
-				((JLabel)comp).setHorizontalAlignment(alignments[mapColumnIndexToModel(column)]);
-			}
-
-			return comp;
-		}
-	};
 
 	/**
 	 * Generoi vapaan tiedostonimen tietokannalle.
@@ -3045,22 +2913,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener quitListener = e -> quit();
 
 	/* Edellinen tosite */
-	private AbstractAction prevDocListener = new AbstractAction() {
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			goToDocument(DocumentModel.FETCH_PREVIOUS);
-		}
-	};
+	private ActionListener prevDocListener = e -> goToDocument(DocumentModel.FETCH_PREVIOUS);
 
 	/* Seuraava tosite */
-	private AbstractAction nextDocListener = new AbstractAction() {
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			goToDocument(DocumentModel.FETCH_NEXT);
-		}
-	};
+	private ActionListener nextDocListener = e -> goToDocument(DocumentModel.FETCH_NEXT);
 
 	/* Ensimmäinen tosite */
 	private ActionListener firstDocListener = e -> goToDocument(DocumentModel.FETCH_FIRST);
@@ -3147,18 +3003,18 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener editDocTypesListener = e -> editDocumentTypes();
 
 	/* Kopioi */
-	private AbstractAction copyEntriesAction = new AbstractAction() {
+	private Action copyEntriesAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
-
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			copyEntries();
 		}
 	};
 
 	/* Liitä */
-	private AbstractAction pasteEntriesAction = new AbstractAction() {
+	private Action pasteEntriesAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
-
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			pasteEntries();
 		}
@@ -3450,41 +3306,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		}
 	};
 
-	private class PreviousRowAction extends AbstractAction {
-		private Action defaultAction;
 
-		private static final long serialVersionUID = 1L;
-
-		public PreviousRowAction(Action defaultAction) {
-			this.defaultAction = defaultAction;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			int row = entryTable.getSelectedRow();
-			defaultAction.actionPerformed(e);
-
-			if (row <= 0) {
-				entryTable.transferFocusBackward();
-			}
-		}
-	};
-
-	private class RemoveSuffixAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			if (entryTable.isEditing()) {
-				if (entryTable.getSelectedColumn() != 4) return;
-			}
-			else {
-				int row = entryTable.getSelectedRow();
-				if (row < 0) return;
-				entryTable.editCellAt(row, 4);
-			}
-
-			descriptionCellEditor.removeSuffix();
-		}
-	};
 
 	private class InitializationWorkerListener implements PropertyChangeListener {
 		private Window owner;
