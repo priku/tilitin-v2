@@ -51,16 +51,19 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+REM Hae versio pom.xml:stä
+for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+
 echo.
 echo ============================================
 echo   Build Complete!
 echo ============================================
 echo.
 echo Installer created:
-dir /b "dist\installer\Tilitin-2.0.0-setup.exe" 2>nul
-for %%F in ("dist\installer\Tilitin-2.0.0-setup.exe") do echo Size: %%~zF bytes (about !size! MB^)
+dir /b "dist\installer\Tilitin-%VERSION%-setup.exe" 2>nul
+for %%F in ("dist\installer\Tilitin-%VERSION%-setup.exe") do echo Size: %%~zF bytes
 echo.
-echo Location: dist\installer\Tilitin-2.0.0-setup.exe
+echo Location: dist\installer\Tilitin-%VERSION%-setup.exe
 echo.
 
 pause
