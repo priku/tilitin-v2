@@ -6,8 +6,9 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 ## Status
 **Phase 1: Foundation - COMPLETED ✓**
 **Phase 2: Model Classes - COMPLETED ✓**
-**Phase 2.5: DAO Foundation - IN PROGRESS 🔄**
-**Phase 3: DAO Migration - PLANNED 📋**
+**Phase 2.5: DAO Foundation - COMPLETED ✓**
+**Phase 3: AccountDAO Migration - COMPLETED ✓**
+**Phase 4: Entry/Document DAO Migration - PLANNED 📋**
 
 ## What Has Been Done
 

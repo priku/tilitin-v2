@@ -2,7 +2,6 @@ package kirjanpito.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -40,7 +39,6 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -48,7 +46,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -57,26 +54,18 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultCaret;
 
 import kirjanpito.util.BackupService;
@@ -97,32 +86,11 @@ import kirjanpito.models.DocumentModel;
 import kirjanpito.models.DocumentTypeModel;
 import kirjanpito.models.EntryTableModel;
 import kirjanpito.models.EntryTemplateModel;
-import kirjanpito.models.PrintPreviewModel;
 import kirjanpito.models.PropertiesModel;
 import kirjanpito.models.ReportEditorModel;
 import kirjanpito.models.StartingBalanceModel;
 import kirjanpito.models.StatisticsModel;
 import kirjanpito.models.TextFieldWithLockIcon;
-import kirjanpito.reports.AccountStatementModel;
-import kirjanpito.reports.AccountStatementPrint;
-import kirjanpito.reports.AccountSummaryModel;
-import kirjanpito.reports.AccountSummaryPrint;
-import kirjanpito.reports.COAPrint;
-import kirjanpito.reports.COAPrintModel;
-import kirjanpito.reports.DocumentPrint;
-import kirjanpito.reports.DocumentPrintModel;
-import kirjanpito.reports.FinancialStatementModel;
-import kirjanpito.reports.FinancialStatementPrint;
-import kirjanpito.reports.GeneralJournalModel;
-import kirjanpito.reports.GeneralJournalModelT;
-import kirjanpito.reports.GeneralJournalPrint;
-import kirjanpito.reports.GeneralLedgerModel;
-import kirjanpito.reports.GeneralLedgerModelT;
-import kirjanpito.reports.GeneralLedgerPrint;
-import kirjanpito.reports.Print;
-import kirjanpito.reports.PrintModel;
-import kirjanpito.reports.VATReportModel;
-import kirjanpito.reports.VATReportPrint;
 import kirjanpito.ui.resources.Resources;
 import kirjanpito.util.AppSettings;
 import kirjanpito.util.RecentDatabases;
@@ -190,7 +158,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private DescriptionCellEditor descriptionCellEditor;
 	private DecimalFormat formatter;
 	private AccountSelectionDialog accountSelectionDialog;
-	private PrintPreviewFrame printPreviewFrame;
 	private boolean searchEnabled;
 	private BigDecimal debitTotal;
 	private BigDecimal creditTotal;
@@ -204,6 +171,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	
 	// Table manager for entry table
 	private DocumentTableManager tableManager;
+	
+	// Print manager
+	private DocumentPrinter documentPrinter;
 
 	// File filter for SQLite databases
 	FileFilter sqliteFileFilter = new FileFilter() {
@@ -216,7 +186,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		public String getDescription() {
 			return "Tilitin-tietokannat (.sqlite)";
 		}
-	};
+	}; // Note: FileFilter has two methods, cannot be converted to lambda
 
 	// Action listeners - defined early so they can be used in createMenuBar()
 	/* Uusi tietokanta */
@@ -333,6 +303,22 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	public void create() {
 		// Initialize managers
 		documentExporter = new DocumentExporter(this, registry, this);
+		documentPrinter = new DocumentPrinter(this, registry, new DocumentPrinter.PrintCallbacks() {
+			@Override
+			public boolean saveDocumentIfChanged() {
+				return DocumentFrame.this.saveDocumentIfChanged();
+			}
+			
+			@Override
+			public DocumentModel getDocumentModel() {
+				return model;
+			}
+			
+			@Override
+			public JTable getEntryTable() {
+				return entryTable;
+			}
+		});
 
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -552,7 +538,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 
 		numberTextField.getActionMap().put("transferFocus", new AbstractAction() {
 			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				numberTextField.transferFocus();
@@ -665,7 +650,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 					private static final long serialVersionUID = 1L;
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						prevDocListener.actionPerformed(e);
+						goToDocument(DocumentModel.FETCH_PREVIOUS);
 					}
 				};
 			}
@@ -676,7 +661,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 					private static final long serialVersionUID = 1L;
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						nextDocListener.actionPerformed(e);
+						goToDocument(DocumentModel.FETCH_NEXT);
 					}
 				};
 			}
@@ -866,9 +851,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			model.closeDataSource();
 		}
 
-		if (printPreviewFrame != null) {
-			printPreviewFrame.close();
-			printPreviewFrame = null;
+		if (documentPrinter != null) {
+			documentPrinter.disposePrintPreview();
 		}
 
 		AppSettings settings = AppSettings.getInstance();
@@ -1116,7 +1100,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			return;
 		}
 
-		closePrintPreview();
+		if (documentPrinter != null) {
+			documentPrinter.closePrintPreview();
+		}
 		COAModel coaModel = new COAModel(registry);
 		COADialog dialog = new COADialog(this, registry, coaModel);
 		dialog.create();
@@ -1252,7 +1238,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			return;
 		}
 
-		closePrintPreview();
+		if (documentPrinter != null) {
+			documentPrinter.closePrintPreview();
+		}
 		final PropertiesModel settingsModel = new PropertiesModel(registry);
 
 		try {
@@ -1552,311 +1540,60 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Näyttää tilien saldot esikatseluikkunassa.
 	 */
 	public void showAccountSummary() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		AppSettings settings = AppSettings.getInstance();
-		AccountSummaryOptionsDialog dialog = new AccountSummaryOptionsDialog(this);
-		dialog.create();
-		dialog.setPeriod(registry.getPeriod());
-		dialog.setDocumentDate(model.getDocument().getDate());
-		dialog.setDateSelectionMode(0);
-		dialog.setPreviousPeriodVisible(settings.getBoolean("previous-period", false));
-		dialog.setVisible(true);
-
-		if (dialog.getResult() == JOptionPane.OK_OPTION) {
-			boolean previousPeriodVisible = dialog.isPreviousPeriodVisible();
-			settings.set("previous-period", previousPeriodVisible);
-			int printedAccounts = dialog.getPrintedAccounts();
-			AccountSummaryModel printModel = new AccountSummaryModel();
-			printModel.setRegistry(registry);
-			printModel.setPeriod(registry.getPeriod());
-			printModel.setStartDate(dialog.getStartDate());
-			printModel.setEndDate(dialog.getEndDate());
-			printModel.setPreviousPeriodVisible(previousPeriodVisible);
-			printModel.setPrintedAccounts(printedAccounts);
-			showPrintPreview(printModel, new AccountSummaryPrint(printModel,
-					printedAccounts != 1));
-		}
-
-		dialog.dispose();
+		documentPrinter.showAccountSummary();
 	}
 
 	/**
 	 * Näyttää tositteen esikatseluikkunassa.
 	 */
 	public void showDocumentPrint() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		DocumentPrintModel printModel = new DocumentPrintModel();
-		printModel.setRegistry(registry);
-		printModel.setDocument(model.getDocument());
-		showPrintPreview(printModel, new DocumentPrint(printModel));
+		documentPrinter.showDocumentPrint();
 	}
 
 	/**
 	 * Näyttää tiliotteen esikatseluikkunassa.
 	 */
 	public void showAccountStatement() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		int row = entryTable.getSelectedRow();
-		Account account = null;
-
-		if (row >= 0) {
-			Entry entry = model.getEntry(row);
-			int accountId = entry.getAccountId();
-
-			if (accountId >= 0) {
-				account = registry.getAccountById(accountId);
-			}
-		}
-
-		if (account == null) {
-			Settings settings = registry.getSettings();
-			int accountId = -1;
-
-			try {
-				accountId = Integer.parseInt(settings.getProperty("defaultAccount", ""));
-			}
-			catch (NumberFormatException e) {
-			}
-
-			account = registry.getAccountById(accountId);
-		}
-
-		AppSettings settings = AppSettings.getInstance();
-		AccountStatementOptionsDialog dialog = new AccountStatementOptionsDialog(this, registry);
-		dialog.create();
-		dialog.setPeriod(registry.getPeriod());
-		dialog.setDocumentDate(model.getDocument().getDate());
-		dialog.setDateSelectionMode(1);
-		dialog.setOrderByDate(settings.getString("sort-entries", "number").equals("date"));
-		dialog.selectAccount(account);
-		dialog.setVisible(true);
-
-		if (dialog.getResult() == JOptionPane.OK_OPTION) {
-			AccountStatementModel printModel = new AccountStatementModel();
-			printModel.setDataSource(registry.getDataSource());
-			printModel.setPeriod(registry.getPeriod());
-			printModel.setSettings(registry.getSettings());
-			printModel.setAccount(dialog.getSelectedAccount());
-			printModel.setStartDate(dialog.getStartDate());
-			printModel.setEndDate(dialog.getEndDate());
-			printModel.setOrderBy(dialog.isOrderByDate() ? AccountStatementModel.ORDER_BY_DATE :
-				AccountStatementModel.ORDER_BY_NUMBER);
-			settings.set("sort-entries", dialog.isOrderByDate() ? "date" : "number");
-			showPrintPreview(printModel, new AccountStatementPrint(printModel));
-		}
-
-		dialog.dispose();
+		documentPrinter.showAccountStatement();
 	}
 
 	/**
 	 * Näyttää tuloslaskelman esikatseluikkunassa.
 	 */
 	public void showIncomeStatement(boolean detailed) {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		FinancialStatementOptionsDialog dialog = new FinancialStatementOptionsDialog(
-				registry, this, "Tuloslaskelma",
-				FinancialStatementOptionsDialog.TYPE_INCOME_STATEMENT);
-
-		try {
-			dialog.fetchData();
-		}
-		catch (DataAccessException e) {
-			String message = "Tietojen hakeminen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-			return;
-		}
-
-		dialog.create();
-		dialog.setVisible(true);
-
-		if (dialog.getStartDates() != null) {
-			FinancialStatementModel printModel = new FinancialStatementModel(
-					detailed ? FinancialStatementModel.TYPE_INCOME_STATEMENT_DETAILED :
-						FinancialStatementModel.TYPE_INCOME_STATEMENT);
-			printModel.setDataSource(registry.getDataSource());
-			printModel.setSettings(registry.getSettings());
-			printModel.setAccounts(registry.getAccounts());
-			printModel.setStartDates(dialog.getStartDates());
-			printModel.setEndDates(dialog.getEndDates());
-			showPrintPreview(printModel, new FinancialStatementPrint(printModel));
-		}
+		documentPrinter.showIncomeStatement(detailed);
 	}
 
 	/**
 	 * Näyttää taseen esikatseluikkunassa.
 	 */
 	public void showBalanceSheet(boolean detailed) {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		FinancialStatementOptionsDialog dialog = new FinancialStatementOptionsDialog(
-				registry, this, "Tase",
-				FinancialStatementOptionsDialog.TYPE_BALANCE_SHEET);
-
-		try {
-			dialog.fetchData();
-		}
-		catch (DataAccessException e) {
-			String message = "Tietojen hakeminen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-			return;
-		}
-
-		dialog.create();
-		dialog.setVisible(true);
-
-		if (dialog.getStartDates() != null) {
-			FinancialStatementModel printModel = new FinancialStatementModel(
-					detailed ? FinancialStatementModel.TYPE_BALANCE_SHEET_DETAILED :
-						FinancialStatementModel.TYPE_BALANCE_SHEET);
-			printModel.setDataSource(registry.getDataSource());
-			printModel.setSettings(registry.getSettings());
-			printModel.setAccounts(registry.getAccounts());
-			printModel.setStartDates(dialog.getStartDates());
-			printModel.setEndDates(dialog.getEndDates());
-			printModel.setPageBreakEnabled(dialog.isPageBreakEnabled());
-			showPrintPreview(printModel, new FinancialStatementPrint(printModel));
-		}
+		documentPrinter.showBalanceSheet(detailed);
 	}
 
 	/**
 	 * Näyttää päiväkirjan esikatseluikkunassa.
 	 */
 	public void showGeneralJournal() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		AppSettings settings = AppSettings.getInstance();
-		GeneralLJOptionsDialog dialog = new GeneralLJOptionsDialog(this, "Päiväkirja");
-		dialog.create();
-		dialog.setPeriod(registry.getPeriod());
-		dialog.setDocumentDate(model.getDocument().getDate());
-		dialog.setDateSelectionMode(0);
-		dialog.setOrderByDate(settings.getString("sort-entries", "number").equals("date"));
-		dialog.setGroupByDocumentTypesEnabled(!registry.getDocumentTypes().isEmpty());
-		dialog.setGroupByDocumentTypesSelected(settings.getBoolean("group-by-document-types", true));
-		dialog.setTotalAmountVisible(settings.getBoolean("general-journal.total-amount-visible", true));
-		dialog.setVisible(true);
-
-		if (dialog.getResult() == JOptionPane.OK_OPTION) {
-			GeneralJournalModel printModel = dialog.isGroupByDocumentTypesSelected() ?
-					new GeneralJournalModelT() : new GeneralJournalModel();
-			printModel.setRegistry(registry);
-			printModel.setPeriod(registry.getPeriod());
-			printModel.setStartDate(dialog.getStartDate());
-			printModel.setEndDate(dialog.getEndDate());
-			printModel.setOrderBy(dialog.isOrderByDate() ? GeneralJournalModel.ORDER_BY_DATE :
-				GeneralJournalModel.ORDER_BY_NUMBER);
-			printModel.setTotalAmountVisible(dialog.isTotalAmountVisible());
-			settings.set("sort-entries", dialog.isOrderByDate() ? "date" : "number");
-			settings.set("group-by-document-types", dialog.isGroupByDocumentTypesSelected());
-			settings.set("general-journal.total-amount-visible", dialog.isTotalAmountVisible());
-			showPrintPreview(printModel, new GeneralJournalPrint(printModel));
-		}
-
-		dialog.dispose();
+		documentPrinter.showGeneralJournal();
 	}
 
 	/**
 	 * Näyttää pääkirjan esikatseluikkunassa.
 	 */
 	public void showGeneralLedger() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		AppSettings settings = AppSettings.getInstance();
-		GeneralLJOptionsDialog dialog = new GeneralLJOptionsDialog(this, "Pääkirja");
-		dialog.create();
-		dialog.setPeriod(registry.getPeriod());
-		dialog.setDocumentDate(model.getDocument().getDate());
-		dialog.setDateSelectionMode(0);
-		dialog.setOrderByDate(settings.getString("sort-entries", "number").equals("date"));
-		dialog.setGroupByDocumentTypesEnabled(!registry.getDocumentTypes().isEmpty());
-		dialog.setGroupByDocumentTypesSelected(settings.getBoolean("group-by-document-types", true));
-		dialog.setTotalAmountVisible(settings.getBoolean("general-ledger.total-amount-visible", true));
-		dialog.setVisible(true);
-
-		if (dialog.getResult() == JOptionPane.OK_OPTION) {
-			GeneralLedgerModel printModel = dialog.isGroupByDocumentTypesSelected() ?
-					new GeneralLedgerModelT() : new GeneralLedgerModel();
-			printModel.setRegistry(registry);
-			printModel.setPeriod(registry.getPeriod());
-			printModel.setStartDate(dialog.getStartDate());
-			printModel.setEndDate(dialog.getEndDate());
-			printModel.setOrderBy(dialog.isOrderByDate() ? GeneralLedgerModel.ORDER_BY_DATE :
-				GeneralLedgerModel.ORDER_BY_NUMBER);
-			printModel.setTotalAmountVisible(dialog.isTotalAmountVisible());
-			settings.set("sort-entries", dialog.isOrderByDate() ? "date" : "number");
-			settings.set("group-by-document-types", dialog.isGroupByDocumentTypesSelected());
-			settings.set("general-ledger.total-amount-visible", dialog.isTotalAmountVisible());
-			showPrintPreview(printModel, new GeneralLedgerPrint(printModel));
-		}
-
-		dialog.dispose();
+		documentPrinter.showGeneralLedger();
 	}
 
 	/**
 	 * Näyttää ALV-laskelman esikatseluikkunassa.
 	 */
 	public void showVATReport() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		PrintOptionsDialog dialog = new PrintOptionsDialog(this, "ALV-laskelma");
-		dialog.create();
-		dialog.setPeriod(registry.getPeriod());
-		dialog.setDocumentDate(model.getDocument().getDate());
-		dialog.setDateSelectionMode(1);
-		dialog.setVisible(true);
-
-		if (dialog.getResult() == JOptionPane.OK_OPTION) {
-			VATReportModel printModel = new VATReportModel();
-			printModel.setDataSource(registry.getDataSource());
-			printModel.setPeriod(registry.getPeriod());
-			printModel.setSettings(registry.getSettings());
-			printModel.setAccounts(registry.getAccounts());
-			printModel.setStartDate(dialog.getStartDate());
-			printModel.setEndDate(dialog.getEndDate());
-			showPrintPreview(printModel, new VATReportPrint(printModel));
-		}
-
-		dialog.dispose();
+		documentPrinter.showVATReport();
 	}
 
 	public void showChartOfAccountsPrint(int mode) {
-		COAPrintModel printModel = new COAPrintModel();
-		printModel.setRegistry(registry);
-		printModel.setMode(mode);
-
-		try {
-			printModel.run();
-		}
-		catch (DataAccessException e) {
-			String message = "Tulosteen luominen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-			return;
-		}
-
-		showPrintPreview(printModel, new COAPrint(printModel));
+		documentPrinter.showChartOfAccountsPrint(mode);
 	}
 
 	/**
@@ -2801,50 +2538,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		return -1;
 	}
 
-	/**
-	 * Näyttää tulosteiden esikatseluikkunan.
-	 *
-	 * @param printModel tulosteen malli
-	 * @param print tuloste
-	 */
-	protected void showPrintPreview(PrintModel printModel, Print print) {
-		try {
-			printModel.run();
-		}
-		catch (DataAccessException e) {
-			String message = "Tulosteen luominen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-			return;
-		}
-
-		print.setSettings(registry.getSettings());
-		PrintPreviewModel previewModel;
-
-		if (printPreviewFrame == null) {
-			previewModel = new PrintPreviewModel();
-			printPreviewFrame = new PrintPreviewFrame(this, previewModel);
-			printPreviewFrame.setIconImage(getIconImage());
-			printPreviewFrame.create();
-		}
-		else {
-			previewModel = printPreviewFrame.getModel();
-		}
-
-		previewModel.setPrintModel(printModel);
-		previewModel.setPrint(print);
-		printPreviewFrame.updatePrint();
-		printPreviewFrame.setVisible(true);
-	}
-
-	/**
-	 * Sulkee tulosteiden esikatseluikkunan, jos se on auki.
-	 */
-	private void closePrintPreview() {
-		if (printPreviewFrame != null) {
-			printPreviewFrame.setVisible(false);
-		}
-	}
 
 	/**
 	 * Lopettaa vientien muokkaamisen.
@@ -2977,7 +2670,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/* Lisää vienti */
 	private AbstractAction addEntryListener = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
-
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (!entryTable.isEditing()) {
 				addEntry();
@@ -2988,13 +2681,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/* Poista vienti */
 	private AbstractAction removeEntryListener = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
-
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (!entryTable.isEditing()) {
 				removeEntry();
-
-				if (entryTable.getRowCount() == 0)
+				if (entryTable.getRowCount() == 0) {
 					dateTextField.requestFocusInWindow();
+				}
 			}
 		}
 	};
@@ -3009,7 +2702,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		public void actionPerformed(ActionEvent e) {
 			copyEntries();
 		}
-	};
+	}; // Note: AbstractAction needed for Action interface, cannot use simple lambda
 
 	/* Liitä */
 	private Action pasteEntriesAction = new AbstractAction() {
@@ -3018,7 +2711,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		public void actionPerformed(ActionEvent e) {
 			pasteEntries();
 		}
-	};
+	}; // Note: AbstractAction needed for Action interface, cannot use simple lambda
 
 	/* Tositelaji */
 	private ActionListener docTypeListener = e -> {

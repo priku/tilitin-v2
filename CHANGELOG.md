@@ -7,6 +7,63 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.1] - 2025-12-29
+
+### 🏗️ DocumentFrame Refactoring - Phase 3b, 4 & 5
+
+**Branch:** `feature/code-modernization`  
+**Toteutusaika:** 2025-12-29  
+**Tila:** ✅ Valmis - Phase 3b, 4 & 5 - Testattu ja toimii ✅
+
+### Lisätty
+- **DocumentTableManager.java** - Taulukon hallinta eriytetty DocumentFrame:sta
+  - ✅ Table creation ja konfiguraatio
+  - ✅ Cell renderer/editor -asetukset
+  - ✅ Keyboard shortcuts -hallinta
+  - ✅ Column width management
+  - ✅ VAT column visibility control
+  - ✅ Column index mapping (view/model)
+- **DocumentPrinter.java** - Print-toiminnot eriytetty DocumentFrame:sta (laajennettu)
+  - ✅ Kaikki print-metodit (9 metodia)
+  - ✅ Print preview -ikkunan hallinta
+  - ✅ Report generation -kutsut
+  - ✅ Print options -dialogien hallinta
+  - ✅ PrintCallbacks-rajapinta DocumentFrame:lle
+
+### Muutettu
+- **DocumentFrame.java** - Refaktorointi jatkuu
+  - ✅ Phase 3b: Table management siirretty DocumentTableManager:iin (~75 riviä pois)
+  - ✅ Phase 4: Koodin siistiminen ja yksinkertaistaminen
+  - ✅ Poistettu 10 käyttämätöntä importia
+  - ✅ Yksinkertaistettu wrapperit (getPrevDocumentAction/getNextDocumentAction)
+  - ✅ DocumentFrame: 3,008 → ~2,930 riviä (-78 riviä, -2.6%)
+  - ✅ **Kokonaisprogress:** 3,856 → ~2,930 riviä (-926 riviä, -24%)
+
+### Tekninen
+- **DocumentTableManager.java** - Uusi luokka (400 riviä)
+  - TableCallbacks-rajapinta DocumentFrame:lle
+  - TableActions-rajapinta keyboard shortcuts:lle
+  - ColumnMapper-rajapinta sarakeindeksien muuntamiseen
+  - updateTableSettings() -metodi ALV-sarakkeen hallintaan
+  - mapColumnIndexToView/Model() -metodit
+
+### Korjattu
+- Keyboard shortcut -konfiguraatio siirretty DocumentTableManager:iin
+- Column mapping -logiikka siirretty DocumentTableManager:iin
+- Käyttämättömät importit poistettu
+- SwingUtils import-virhe DocumentPrinter.java:ssa korjattu
+
+### Testattu
+- ✅ Sovellus käynnistyy ilman virheitä
+- ✅ Kaikki taulukon toiminnot toimivat (keyboard shortcuts, cell editing)
+- ✅ Sarakkeiden leveydet tallennetaan oikein
+- ✅ ALV-sarake näkyy/piiloutuu oikein
+- ✅ Kaikki perustoiminnot toimivat (tietokanta, tositteet, viennit)
+- ✅ PDF-liitteet toimivat (v2.2.0)
+- ✅ Teemat toimivat (vaalea/tumma)
+
+---
+
 ## [2.2.0] - 2025-12-29
 
 ### 📎 PDF-liitteet - Uusi ominaisuus

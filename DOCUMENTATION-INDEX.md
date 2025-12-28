@@ -1,6 +1,6 @@
 # Tilitin - Dokumentaatio-indeksi
 
-**Versio:** 2.2.0
+**Versio:** 2.2.1
 **Viimeksi päivitetty:** 2025-12-29
 
 ---
@@ -73,20 +73,28 @@
    - **Parhaiten sopii:** Roadmap-suunnittelu
 
 10. **CHANGELOG.md** ⭐
-    - Versiohistoria (v1.5.0 → v2.2.0)
+    - Versiohistoria (v1.5.0 → v2.2.1)
     - PDF-liitteet v2.2.0 (Sprint 1 & 2)
+    - DocumentFrame refactoring v2.2.1 (Phase 3b & 4)
     - Kaikki muutokset dokumentoitu
     - **Parhaiten sopii:** Versiohistoria, julkaisut
 
+11. **REFACTORING-PROGRESS.md** ⭐ (UUSI v2.2.1)
+    - DocumentFrame refaktoroinnin yksityiskohtainen seuranta
+    - Kaikki vaiheet dokumentoitu (Phase 1-4)
+    - Edistymistaulukot ja tilastot
+    - Jäljellä olevat vaiheet
+    - **Parhaiten sopii:** Kehitystiimi, refaktoroinnin seuranta
+
 ### 🔬 Analyysit ja vertailut
 
-11. **TILITIN-KITUPIIKKI-COMPARISON.md**
+12. **TILITIN-KITUPIIKKI-COMPARISON.md**
     - Tekninen vertailu Kitupiikkiin
     - Arkkitehtuurierot
     - Ominaisuusvertailu
     - **Parhaiten sopii:** Arkkitehtuuri, benchmarking
 
-12. **KITSAS-FEATURE-RECOMMENDATIONS.md**
+13. **KITSAS-FEATURE-RECOMMENDATIONS.md**
     - Ominaisuussuositukset Kitsaksesta
     - Prioriteetti 1-4 ominaisuudet
     - Valmis Kotlin-koodi esimerkkeineen
@@ -94,14 +102,14 @@
 
 ### 📝 Suunnitteludokumentit
 
-13. **PDF-IMPROVEMENTS-PLAN.md**
+14. **PDF-IMPROVEMENTS-PLAN.md**
     - PDF-liitteet -ominaisuuden alkuperäinen suunnitelma
     - Tekninen design
     - Sprint-jako (Sprint 1-4)
     - Database schema
     - **Parhaiten sopii:** PDF-liitteet toteutus
 
-14. **CSV-IMPORT-PLAN.md**
+15. **CSV-IMPORT-PLAN.md**
     - CSV-tuonti -ominaisuuden suunnitelma
     - Encoding-tunnistus
     - Delimiter-tunnistus
@@ -110,7 +118,7 @@
 
 ### 🔧 Työkalut ja apuvälineet
 
-15. **DOCUMENTATION-INDEX.md** (tämä tiedosto)
+16. **DOCUMENTATION-INDEX.md** (tämä tiedosto)
     - Dokumentaation hakemisto
     - Navigointiopas
     - **Parhaiten sopii:** Dokumentaation löytäminen
@@ -134,7 +142,8 @@
 
 - **BUILDING.md** → Build-ohjeet
 - **CONTRIBUTING.md** → Kontribuutio-ohjeet
-- **KOTLIN_MIGRATION.md** → Migraatiostrategia
+- **KOTLIN_MIGRATION.md** → Migraatiostrategia ja status
+- **REFACTORING-PROGRESS.md** → DocumentFrame refaktoroinnin seuranta
 - **PDF-IMPROVEMENTS-PLAN.md** → PDF-ominaisuuden tekninen suunnitelma
 - **CSV-IMPORT-PLAN.md** → CSV-tuonnin tekninen suunnitelma
 - **TILITIN-KITUPIIKKI-COMPARISON.md** → Tekninen vertailu
@@ -148,7 +157,8 @@
 
 ### Arkkitehdit
 
-- **KOTLIN_MIGRATION.md** → Migraatiostrategia
+- **KOTLIN_MIGRATION.md** → Migraatiostrategia ja status
+- **REFACTORING-PROGRESS.md** → DocumentFrame refaktoroinnin seuranta
 - **TILITIN-KITUPIIKKI-COMPARISON.md** → Vertailuanalyysi
 - **KITSAS-FEATURE-RECOMMENDATIONS.md** → Ominaisuussuositukset
 
@@ -185,8 +195,9 @@
 
 ### Määrä
 
-- **Yhteensä:** 17 markdown-tiedostoa
+- **Yhteensä:** 19 markdown-tiedostoa (+2 uutta v2.2.1)
 - **Vähennetty:** 10 tiedostoa (konsolidointi 2025-12-29)
+- **Lisätty:** 2 uutta (REFACTORING-PROGRESS.md, KOTLIN-MIGRATION-STATUS.md)
 - **Kieli:** Suomi (pääasiallinen), Englanti (tekninen)
 
 ### Suurimmat tiedostot
@@ -228,6 +239,11 @@
 
 **Tila:** ✅ **TÄYDELLINEN**
 
+### Uudet dokumentit (v2.2.1)
+
+- **REFACTORING-PROGRESS.md** - DocumentFrame refaktoroinnin seuranta
+- **KOTLIN-MIGRATION-STATUS.md** - Kotlin-migraation status
+
 ---
 
 ## 🔄 Dokumentaation ylläpito
@@ -250,3 +266,4 @@ Kun lisäät uuden dokumentin:
 
 **Viimeksi päivitetty:** 2025-12-29
 **Konsolidoitu:** 2025-12-29 (25 → 17 tiedostoa, -32%)
+**Lisätty v2.2.1:** 2 uutta dokumenttia (19 yhteensä)

@@ -1,9 +1,9 @@
 # Tilitin - Next Steps Plan
 ## Comprehensive Development Roadmap
 
-**Current Version:** 2.1.5  
-**Last Updated:** 2025-12-28  
-**DocumentFrame Size:** 3,024 lines (target: <500 lines)
+**Current Version:** 2.2.1  
+**Last Updated:** 2025-12-29  
+**DocumentFrame Size:** ~2,930 lines (target: <500 lines)
 
 ---
 
@@ -32,7 +32,9 @@
    - ✅ Phase 2: DocumentToolbarBuilder (112 lines)
    - ✅ Phase 3: DocumentListenerHelpers (76 lines)
    - ✅ Phase 3: EntryTableActions (280 lines)
-   - **Progress:** 3,856 → 3,024 lines (-22%)
+   - ✅ Phase 3b: DocumentTableManager (400 lines)
+   - ✅ Phase 4: Code cleanup (imports, wrappers)
+   - **Progress:** 3,856 → ~2,930 lines (-24%)
 
 4. **Backup System**
    - ✅ Per-database backup locations

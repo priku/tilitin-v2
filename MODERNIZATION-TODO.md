@@ -151,18 +151,23 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - ✅ **Phase 3**: Helper classes (v2.1.5)
   - ✅ DocumentListenerHelpers.java (76 riviä)
   - ✅ EntryTableActions.java (280 riviä)
-- ✅ **Phase 4 (partial)**: Lambda-migraatio aloitettu (v2.1.6)
-  - ✅ 6 anonymous inner class → lambda-lausekkeet
-  - ✅ Field initialization order korjattu
-- ✅ DocumentFrame.java vähennetty: 3,856 → 3,008 riviä (-848 riviä, -22%)
+- ✅ **Phase 3b**: Table management (v2.2.1)
+  - ✅ DocumentTableManager.java (400 riviä)
+  - ✅ Cell renderer/editor logiikka siirretty
+  - ✅ Keyboard shortcuts -hallinta siirretty
+  - ✅ Column mapping -logiikka siirretty
+  - ✅ updateTableSettings() -metodi siirretty
+- ✅ **Phase 4 (partial)**: Lambda-migraatio ja koodin siistiminen (v2.2.1)
+  - ✅ 6 anonymous inner class → lambda-lausekkeet (v2.1.6)
+  - ✅ Field initialization order korjattu (v2.1.6)
+  - ✅ Wrapperit yksinkertaistettu (getPrevDocumentAction/getNextDocumentAction)
+  - ✅ 10 käyttämätöntä importia poistettu
+- ✅ DocumentFrame.java vähennetty: 3,856 → ~2,930 riviä (-926 riviä, -24%)
 
 **Jäljellä**:
 
-- [ ] **Phase 3b**: Table management
-  - [ ] Luo `DocumentTableManager.java`
-  - [ ] Siirrä cell renderer/editor logiikka
 - [ ] **Phase 4**: Event handling (jatkuu)
-  - [ ] Jäljellä olevat anonymous inner classes → lambdas
+  - [ ] Jäljellä olevat anonymous inner classes → lambdas (jos mahdollista)
   - [ ] Luo `DocumentEventHandler.java` (valinnainen)
 - [ ] **Phase 5**: Print toiminnot
   - [ ] Luo `DocumentPrinter.java`
