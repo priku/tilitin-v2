@@ -155,7 +155,7 @@ public class KotlinDemo {
 
             // Status label
             JLabel statusLabel = new JLabel(
-                "✓ Kotlin 2.1.10 käytössä | Java 21 | Tilitin 2.1.1"
+                "✓ Kotlin 2.1.10 käytössä | Java 25 | Tilitin 2.1.1"
             );
             statusLabel.setFont(new Font("Arial", Font.ITALIC, 10));
             statusLabel.setForeground(Color.GRAY);

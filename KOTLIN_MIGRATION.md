@@ -11,7 +11,7 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 
 ### 1. Maven Configuration
 - Added Kotlin 2.1.10 support to [pom.xml](pom.xml)
-- Configured kotlin-maven-plugin with Java 21 target
+- Configured kotlin-maven-plugin with Java 25 target
 - Added kotlin-stdlib dependency
 - Configured mixed Java/Kotlin compilation
 
