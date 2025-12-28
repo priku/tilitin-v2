@@ -2328,67 +2328,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		worker.execute();
 	}
 
-	/**
-	 * Päivittää viimeisimpien tietokantojen valikon.
-	 */
-	protected void updateRecentDatabasesMenu() {
-		if (recentMenu == null) return;
-		
-		recentMenu.removeAll();
-		RecentDatabases recent = RecentDatabases.getInstance();
-		List<String> databases = recent.getRecentDatabases();
-		
-		if (databases.isEmpty()) {
-			JMenuItem emptyItem = new JMenuItem("(ei viimeisimpiä)");
-			emptyItem.setEnabled(false);
-			recentMenu.add(emptyItem);
-		} else {
-			int index = 1;
-			for (final String dbUrl : databases) {
-				String displayName = RecentDatabases.getDisplayName(dbUrl);
-				JMenuItem item = new JMenuItem(index + ". " + displayName);
-				if (index <= 9) {
-					item.setMnemonic(Character.forDigit(index, 10));
-				}
-				item.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						openRecentDatabase(dbUrl);
-					}
-				});
-				recentMenu.add(item);
-				index++;
-			}
-			
-			recentMenu.addSeparator();
-			JMenuItem clearItem = new JMenuItem("Tyhjennä lista");
-			clearItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					RecentDatabases.getInstance().clearAll();
-					updateRecentDatabasesMenu();
-				}
-			});
-			recentMenu.add(clearItem);
-		}
-	}
-	
-	/**
-	 * Avaa viimeisimmän tietokannan.
-	 */
-	private void openRecentDatabase(String dbUrl) {
-		AppSettings settings = AppSettings.getInstance();
-		settings.set("database.url", dbUrl);
-		
-		// Jos SQLite, tyhjennä käyttäjätunnus/salasana
-		if (dbUrl.startsWith("jdbc:sqlite:")) {
-			settings.set("database.username", "");
-			settings.set("database.password", "");
-		}
-		
-		openDataSource();
-	}
-
 	protected void refreshModel(boolean positionChanged) {
 		try {
 			model.fetchDocuments(positionChanged ? -1 : model.getDocumentPosition());
