@@ -25,7 +25,7 @@ AllowNoIcons=yes
 LicenseFile=..\COPYING
 ; Output settings
 OutputDir=..\dist\installer
-OutputBaseFilename=Tilitin-2.1.2-setup
+OutputBaseFilename=Tilitin-{#MyAppVersion}-setup
 ; Compression
 Compression=lzma2/ultra64
 SolidCompression=yes

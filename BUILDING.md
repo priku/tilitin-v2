@@ -64,7 +64,7 @@ build-inno-installer.bat
 ```
 
 Tuottaa:
-- `dist/installer/Tilitin-2.1.2-setup.exe` (~57 MB)
+- `dist/installer/Tilitin-<versio>-setup.exe` (~57 MB)
 
 **Edut:**
 - Moderni ulkoasu (WizardStyle=modern)

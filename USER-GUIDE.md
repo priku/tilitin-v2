@@ -144,14 +144,14 @@
 ### 1. Asenna Tilitin
 
 **Windows:**
-1. Lataa `Tilitin-2.1.2-setup.exe` [releases-sivulta](https://github.com/priku/tilitin-modernized/releases)
+1. Lataa `Tilitin-<versio>-setup.exe` [releases-sivulta](https://github.com/priku/tilitin-modernized/releases/latest)
 2. Tuplaklikkaa asennusohjelmaa
 3. Seuraa ohjeita
 4. Käynnistä Tilitin Start-valikosta
 
 **Muut käyttöjärjestelmät (JAR):**
 1. Asenna Java 25+ ([Adoptium](https://adoptium.net/))
-2. Lataa `tilitin-2.1.2.jar`
+2. Lataa `tilitin-<versio>.jar`
 3. Tuplaklikkaa JAR-tiedostoa
 
 ### 2. Luo ensimmäinen tietokanta
