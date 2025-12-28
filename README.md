@@ -1,5 +1,10 @@
 # Tilitin 2.0
 
+[![Build Status](https://github.com/priku/tilitin-modernized/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-modernized/actions)
+[![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://adoptium.net/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-blue.svg)](https://kotlinlang.org/)
+[![License](https://img.shields.io/badge/License-GPL%20v3-green.svg)](COPYING)
+
 Tilitin on ilmainen kirjanpito-ohjelma. Ohjelman teki alun perin Tommi Helineva, ja sen dokumentaatio on hänen
 sivuillaan: <https://helineva.net/tilitin/>
 

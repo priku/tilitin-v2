@@ -1,0 +1,142 @@
+name: Advanced Build & Release
+
+on:
+  push:
+    branches: [ master, 'feature/**' ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-test:
+    name: Build JAR (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        java-version: '25-ea'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Kotlin compilation statistics
+      run: |
+        echo "=== Kotlin Migration Progress ==="
+        KOTLIN_COUNT=$(find src/main/kotlin -name "*.kt" 2>/dev/null | wc -l || echo "0")
+        JAVA_COUNT=$(find src/main/java -name "*.java" 2>/dev/null | wc -l || echo "0")
+        echo "📊 Kotlin files: $KOTLIN_COUNT"
+        echo "📊 Java files: $JAVA_COUNT"
+        if [ $KOTLIN_COUNT -gt 0 ]; then
+          PERCENTAGE=$((KOTLIN_COUNT * 100 / (KOTLIN_COUNT + JAVA_COUNT)))
+          echo "📈 Kotlin adoption: ${PERCENTAGE}%"
+        fi
+        echo "==================================="
+
+    - name: Build with Maven
+      run: mvn -B clean package --file pom.xml
+
+    - name: Verify Kotlin + Java compilation
+      run: |
+        echo "✅ Kotlin 2.3.0 + Java 25 compilation successful"
+        echo "📦 JAR built: $(ls -lh target/tilitin*.jar | awk '{print $9, $5}')"
+
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4.3.6
+      with:
+        name: tilitin-jar-${{ github.sha }}
+        path: target/tilitin*.jar
+        retention-days: 30
+
+    - name: Upload dependency graph
+      uses: advanced-security/maven-dependency-submission-action@v4
+      continue-on-error: true
+
+  windows-installer:
+    name: Build Windows Installer
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        java-version: '25-ea'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build JAR
+      run: mvn -B package -DskipTests
+
+    - name: Build Windows app-image
+      run: |
+        echo "Building Windows app-image with jPackage..."
+        .\build-windows.bat
+      shell: cmd
+
+    - name: Install Inno Setup
+      run: |
+        choco install innosetup -y
+      shell: powershell
+
+    - name: Build Inno Setup installer
+      run: |
+        echo "Building Inno Setup installer..."
+        .\build-inno-installer.bat
+      shell: cmd
+
+    - name: Upload Windows installer
+      uses: actions/upload-artifact@v4.3.6
+      with:
+        name: windows-installer-${{ github.ref_name }}
+        path: dist/installer/*.exe
+        retention-days: 90
+
+    - name: Upload to release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        files: |
+          target/tilitin*.jar
+          dist/installer/*.exe
+
+  release-dependencies:
+    name: Package Dependencies (Release)
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        java-version: '25-ea'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Gather dependencies
+      run: mvn -B dependency:copy-dependencies -Dclassifier=sources
+
+    - name: Zip dependencies
+      run: cd target && zip -9 -r tilitin-dependencies.zip dependency
+
+    - name: Upload dependencies to release
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        files: target/tilitin-dependencies.zip
