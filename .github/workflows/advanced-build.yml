@@ -134,7 +134,9 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v2
       with:
-        draft: true
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        draft: false
         body_path: release-notes.md
         files: |
           target/tilitin*.jar
@@ -166,5 +168,7 @@ jobs:
     - name: Upload dependencies to release
       uses: softprops/action-gh-release@v2
       with:
-        draft: true
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        draft: false
         files: target/tilitin-dependencies.zip
