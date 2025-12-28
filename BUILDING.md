@@ -1,4 +1,4 @@
-# Tilitin 2.1 - Build-ohjeet
+# Tilitin 2.2 - Build-ohjeet
 
 ## Vaatimukset
 
@@ -15,11 +15,11 @@
 mvn clean package
 ```
 
-Tuottaa: `target/tilitin-2.1.2.jar`
+Tuottaa: `target/tilitin-2.2.0.jar`
 
 Suorita:
 ```bash
-java -jar target/tilitin-2.1.2.jar
+java -jar target/tilitin-2.2.0.jar
 ```
 
 ## Windows Natiivi Sovellus
@@ -47,7 +47,7 @@ build-windows-installer.bat
 ```
 
 Tuottaa:
-- `dist/installer/Tilitin 2.0-2.1.2.msi`
+- `dist/installer/Tilitin 2.0-2.2.0.msi`
 
 **Huom:** Vaatii WiX Toolset 3.14+ -asennuksen.
 
@@ -113,7 +113,7 @@ signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist\Tilitin.msix
 
 ### Testaa MSI-asennusohjelma
 
-1. Tuplaklikkaa `dist/installer/Tilitin 2.0-2.1.2.msi`
+1. Tuplaklikkaa `dist/installer/Tilitin 2.0-2.2.0.msi`
 2. Seuraa asennusohjeita
 3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
 

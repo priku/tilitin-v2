@@ -95,3 +95,19 @@ CREATE TABLE entry_template (
 CREATE INDEX document_number_idx ON document (
 	period_id, number
 );
+
+CREATE TABLE attachments (
+	id INT AUTO_INCREMENT NOT NULL,
+	document_id INT NOT NULL,
+	filename VARCHAR(255) NOT NULL,
+	content_type VARCHAR(100) DEFAULT 'application/pdf',
+	data LONGBLOB NOT NULL,
+	file_size INT NOT NULL,
+	page_count INT,
+	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	description TEXT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (document_id) REFERENCES document(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_attachments_document_id ON attachments(document_id);

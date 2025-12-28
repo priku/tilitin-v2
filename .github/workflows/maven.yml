@@ -32,17 +32,5 @@ jobs:
     - name: Gather dependencies
       if: startsWith(github.ref, 'refs/tags/v')
       run: mvn -B dependency:copy-dependencies -Dclassifier=sources
-    - name: Zip dependencies
-      if: startsWith(github.ref, 'refs/tags/v')
-      run: cd target && zip -9 -r tilitin-dependencies.zip dependency
-    - name: Create Draft Release
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ github.ref }}
-        name: Release ${{ github.ref }}
-        draft: true
-        prerelease: false
-        files: |
-          target/tilitin*.jar
-          target/tilitin-dependencies.zip
+    - name: Build completed
+      run: echo "Build successful - releases handled by advanced-build.yml"

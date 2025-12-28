@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import kirjanpito.db.AccountDAO;
 // Kotlin DAO import
 // import kirjanpito.db.sqlite.SQLiteAccountDAOKt; // TODO: Phase 3 - enable when ready
+import kirjanpito.db.AttachmentDAO;
 import kirjanpito.db.COAHeadingDAO;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.db.DataSource;
@@ -128,6 +129,10 @@ public class SQLiteDataSource implements DataSource {
 		return new SQLiteDocumentTypeDAO((SQLiteSession)session);
 	}
 
+	public AttachmentDAO getAttachmentDAO(Session session) {
+		return new kirjanpito.db.sqlite.SQLiteAttachmentDAO((SQLiteSession)session);
+	}
+
 	public Session openSession() throws DataAccessException {
 		return new SQLiteSession(conn);
 	}
@@ -236,6 +241,12 @@ public class SQLiteDataSource implements DataSource {
 				backupDatabase(file);
 				DatabaseUpgradeUtil.upgrade13to14(conn, stmt, true);
 				version = 14;
+			}
+
+			if (version == 14) {
+				backupDatabase(file);
+				DatabaseUpgradeUtil.upgrade14to15(conn, stmt, true);
+				version = 15;
 			}
 
 			stmt.close();

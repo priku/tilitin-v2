@@ -7,6 +7,236 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.1] - 2025-12-29
+
+### 🏗️ DocumentFrame Refactoring - Phase 3b, 4 & 5
+
+**Branch:** `feature/code-modernization`  
+**Toteutusaika:** 2025-12-29  
+**Tila:** ✅ Valmis - Phase 3b, 4 & 5 - Testattu ja toimii ✅
+
+### Lisätty
+- **DocumentTableManager.java** - Taulukon hallinta eriytetty DocumentFrame:sta
+  - ✅ Table creation ja konfiguraatio
+  - ✅ Cell renderer/editor -asetukset
+  - ✅ Keyboard shortcuts -hallinta
+  - ✅ Column width management
+  - ✅ VAT column visibility control
+  - ✅ Column index mapping (view/model)
+- **DocumentPrinter.java** - Print-toiminnot eriytetty DocumentFrame:sta (laajennettu)
+  - ✅ Kaikki print-metodit (9 metodia)
+  - ✅ Print preview -ikkunan hallinta
+  - ✅ Report generation -kutsut
+  - ✅ Print options -dialogien hallinta
+  - ✅ PrintCallbacks-rajapinta DocumentFrame:lle
+
+### Muutettu
+- **DocumentFrame.java** - Refaktorointi jatkuu
+  - ✅ Phase 3b: Table management siirretty DocumentTableManager:iin (~75 riviä pois)
+  - ✅ Phase 4: Koodin siistiminen ja yksinkertaistaminen
+  - ✅ Phase 5: Print operations siirretty DocumentPrinter:iin (~276 riviä pois)
+  - ✅ Poistettu 10 käyttämätöntä importia + 21 print-importia
+  - ✅ Yksinkertaistettu wrapperit (getPrevDocumentAction/getNextDocumentAction)
+  - ✅ DocumentFrame: 3,008 → ~2,654 riviä (-354 riviä, -11.8%)
+  - ✅ **Kokonaisprogress:** 3,856 → ~2,654 riviä (-1,202 riviä, -31%)
+
+### Tekninen
+- **DocumentTableManager.java** - Uusi luokka (400 riviä)
+  - TableCallbacks-rajapinta DocumentFrame:lle
+  - TableActions-rajapinta keyboard shortcuts:lle
+  - ColumnMapper-rajapinta sarakeindeksien muuntamiseen
+  - updateTableSettings() -metodi ALV-sarakkeen hallintaan
+  - mapColumnIndexToView/Model() -metodit
+- **DocumentPrinter.java** - Laajennettu luokka (434 riviä)
+  - PrintCallbacks-rajapinta DocumentFrame:lle
+  - 9 print-metodia (showAccountSummary, showDocumentPrint, jne.)
+  - Print preview -ikkunan hallinta
+  - Kaikki report generation -kutsut
+
+### Korjattu
+- Keyboard shortcut -konfiguraatio siirretty DocumentTableManager:iin
+- Column mapping -logiikka siirretty DocumentTableManager:iin
+- Käyttämättömät importit poistettu
+- SwingUtils import-virhe DocumentPrinter.java:ssa korjattu
+
+### Testattu
+- ✅ Sovellus käynnistyy ilman virheitä
+- ✅ Kaikki taulukon toiminnot toimivat (keyboard shortcuts, cell editing)
+- ✅ Sarakkeiden leveydet tallennetaan oikein
+- ✅ ALV-sarake näkyy/piiloutuu oikein
+- ✅ Kaikki perustoiminnot toimivat (tietokanta, tositteet, viennit)
+- ✅ PDF-liitteet toimivat (v2.2.0)
+- ✅ Teemat toimivat (vaalea/tumma)
+
+---
+
+## [2.2.0] - 2025-12-29
+
+### 📎 PDF-liitteet - Uusi ominaisuus
+
+**Branch:** `feature/pdf-attachments`
+**Toteutusaika:** 2025-12-28 to 2025-12-29 (Sprint 1 & 2)
+**Tila:** ✅ Valmis - Odottaa käyttäjätestausta
+
+### Lisätty
+- **PDF-liitteet tositteisiin** - Täysi tuki PDF-tiedostojen liittämiseen
+  - ✅ Tietokantataulu `attachments` (versio 15)
+  - ✅ Tietokantamigraatio versiosta 14 → 15
+  - ✅ Tuki kaikille tietokannoille (SQLite, MySQL, PostgreSQL)
+  - ✅ DAO-kerros kaikille tietokannoille
+  - ✅ UI-komponentit (AttachmentsPanel, AttachmentsTableModel)
+  - ✅ Integraatio DocumentFrameen
+  - ✅ PDF-validoinnit ja kookontrollit
+  - ✅ Testaussuite (15 testiä, 100% läpäisyaste)
+
+#### Sprint 1: Tietokanta & DAO-kerros
+**Toteutetut ominaisuudet:**
+- **Tietokantamigraatio:** `upgrade14to15()` - tuki kaikille tietokannoille
+- **Tietokantaskeema:** 9 saraketta, indeksi `document_id`:lle, CASCADE-poisto
+- **Domain-malli:** `Attachment.kt` - validoinnit (10 MB max, 5 MB varoitus)
+- **DAO-rajapinta:** `AttachmentDAO` - 6 CRUD-operaatiota
+- **DAO-toteutukset:** SQLite, MySQL, PostgreSQL - tietokantakohtaiset BLOB-tyypit
+- **PDF-apuvälineet:** `PdfUtils.kt` - validointi ja sivumäärän laskenta
+- **DataSource-integraatio:** `getAttachmentDAO()` kaikissa DataSource-luokissa
+
+**Testattu:** 15 testitapausta, 100% läpäisyaste
+
+#### Sprint 2: Käyttöliittymä
+**Toteutetut ominaisuudet:**
+- **AttachmentsPanel:** Lista-, lisää-, poista- ja vie-painikkeet
+- **AttachmentsTableModel:** 5 saraketta (tiedosto, koko, sivut, lisätty, kuvaus)
+- **Tiedostovalitsin:** PDF-suodatin, validointi ennen tallennusta
+- **Virheenkäsittely:** Käyttäjäystävälliset viestit, vahvistukset
+- **DocumentFrame-integraatio:** Paneeli näkyy ikkunan alaosassa
+- **Automaattiset päivitykset:** Lista päivittyy dokumenttien välillä navigoitaessa
+
+**Testattu:** Manuaalinen testaus (katso TESTAUS.md)
+
+#### Tilastot
+
+- **Koodimäärä:** ~1,400 riviä (800 Kotlin + 600 Java)
+- **Testikattavuus:** 15 testitapausta, 100% läpäisyaste
+- **Luodut tiedostot:** 15 (5 Kotlin, 3 Java, 7 dokumentaatio)
+- **Muokatut tiedostot:** 12 (tietokantakerros, skeema, UI, build)
+
+Katso yksityiskohtainen tekninen dokumentaatio: `PDF-ATTACHMENTS-IMPLEMENTATION.md`
+
+### Muutettu
+- **Tietokantaversio:** Päivitetty versiosta 14 → 15
+- **Kaikki SettingsDAO-luokat:** Päivitetty versioon 15
+- **Kaikki DataSource-luokat:** Lisätty `getAttachmentDAO()` -metodi
+- **Kaikki DataSource-luokat:** Lisätty migraatiokutsu versiolle 14 → 15
+- **pom.xml:** Lisätty Apache PDFBox 3.0.3 -riippuvuus
+
+### Tekninen
+- **Kieli:** Kotlin 2.3.0 uusille komponenteille
+- **PDF-kirjastot:** Apache PDFBox 3.0.3 (uusi), iText 5.5.13.4 (olemassa oleva)
+- **Tiedostokoon rajat:** 10 MB maksimi, 5 MB varoituskynnys
+- **Tietokantatuki:** SQLite (pääasiallinen), MySQL, PostgreSQL
+
+### Tiedostot
+- **Uudet tiedostot:** 15 (5 Kotlin, 3 Java, 6 dokumentaatio, 2 testiskripti)
+- **Muokatut tiedostot:** 12 (8 tietokantakerros, 3 skeema, 1 UI, 1 build)
+- **Yhteensä:** 27 tiedostoa muutettu/luotu
+
+### Tunnettuja rajoituksia
+- PDF-katselija ei vielä toteutettu (suunniteltu Sprint 3:lle)
+- Ei drag & drop -tukea (suunniteltu Sprint 4:lle)
+- Ei leikepöytä-tukea (suunniteltu Sprint 4:lle)
+- Ei PDF-välimuistia (suunniteltu Sprint 3:lle)
+- Vain yhden tiedoston valinta kerrallaan
+
+### Seuraavat askeleet
+- Sprint 3: PDF-katselijan toteutus
+- Sprint 4: Välimuisti, drag & drop, leikepöytä-tuki
+
+---
+
+## [2.1.6] - 2025-12-28
+
+### 🔧 Code Modernization - Quick Wins
+
+**Branch:** `main` / `feature/code-modernization`
+
+### Korjattu
+- **Deprecated API poistettu** - Kaikki deprecated API-kutsut korjattu
+  - ✅ DocumentMenuBuilder.java: `getMenuShortcutKeyMask()` → OS-tunnistus
+  - ✅ DocumentFrame.java line 661: `getMenuShortcutKeyMask()` → OS-tunnistus
+  - ✅ DocumentFrame.java lines 2362, 2407: `InputEvent.ALT_MASK` → `InputEvent.ALT_DOWN_MASK`
+  - Ei enää riippuvainen deprecated API:sta
+  - Kaikki korvaukset käyttävät moderneja Java 9+ API:ja
+
+### Lisätty
+- **UIConstants teemavärit** - 7 uutta theme-aware värimetodia
+  - `getBackgroundColor()` - Paneelien taustavärit
+  - `getForegroundColor()` - Tekstivärit
+  - `getBorderColor()` - Reunusvärit
+  - `getTextFieldBackgroundColor()` - Tekstikenttien taustat
+  - `getTextFieldForegroundColor()` - Tekstikenttien tekstit
+  - `getTableBackgroundColor()` - Taulukoiden taustat
+  - `getTableForegroundColor()` - Taulukoiden tekstit
+  - Kaikki metodit käyttävät `UIManager`-värejä fallbackeilla
+  - Valmiina legacy-dialogien teematukeen
+
+### Muutettu
+- **DocumentFrame.java** - Lambda-migraatio edistynyt
+  - **10 anonymous inner class → lambda-lausekkeet** (yhteensä)
+  - AccountCellEditor ActionListener
+  - Search button ActionListener
+  - Recent database menu items (2 kpl)
+  - newDatabaseListener, openDatabaseListener
+  - entryTemplateListener
+  - editDocTypesListener
+  - docTypeListener
+  - printListener (switch-lauseke optimoitu)
+  - Tiedostokoko: 3,024 → 3,007 riviä (-17 riviä)
+  - Koodi nyt modernimpaa ja luettavampaa
+  - printListener optimoitu if-else → switch-lauseke
+
+### Tekninen
+- Field initialization order korjattu
+  - `sqliteFileFilter` ja listenerit siirretty oikeaan järjestykseen
+  - Ei enää forward reference -virheitä
+- Compilation errors korjattu
+- Kaikki muutokset testattavissa ja yhteensopivia
+- Ei enää deprecated API -varoituksia
+
+### Edistyminen
+- ✅ Deprecated API: **4/4 korjattu** (100% valmis)
+- Lambda-migraatio: **10/16+ DocumentFramessa** (62% valmis)
+- Theme helpers: 7 uutta metodia valmiina käyttöön
+
+---
+
+## [2.1.5] - 2025-12-28
+
+### 🏗️ DocumentFrame Phase 3 - Helper Classes
+
+**Branch:** `feature/2.2-listener-extraction`
+
+### Lisätty
+- **DocumentListenerHelpers.java** (76 riviä) - Kuuntelijoiden apuluokka
+  - `InitializationWorkerListener` - Tietokannan alustuksen kuuntelija
+  - `InitializationCallback` - Callback-rajapinta alustuksen jälkeisiin toimenpiteisiin
+- **EntryTableActions.java** (280 riviä) - Taulukkotoimintojen apuluokka
+  - `createPrevCellAction()` - Edellinen solu (Shift+Tab)
+  - `createNextCellAction()` - Seuraava solu (Tab)
+  - `createToggleDebitCreditAction()` - Debet/kredit vaihto (*)
+  - `createPreviousRowAction()` - Edellinen rivi (Up)
+  - `createRemoveSuffixAction()` - Päätteen poisto (Ctrl+Backspace)
+  - `createSetIgnoreFlagToEntryAction()` - ALV-ohitus
+
+### Muutettu
+- **DocumentFrame.java** - Valmisteltu käyttämään apuluokkia
+  - Lisätty `entryTableActions` kenttä
+
+### Tekninen
+- ColumnMapper-rajapinta sarakeindeksien muuntamiseen
+- EntryTableCallback-rajapinta DocumentFrame-toimintojen kutsumiseen
+- Valmiina täydelliseen refaktorointiin myöhemmin
+
+---
+
 ## [2.1.4] - 2025-12-28
 
 ### 🏗️ DocumentFrame Phase 2 - Builder Pattern

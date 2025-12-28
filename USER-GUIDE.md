@@ -1,6 +1,6 @@
 # Tilitin - Käyttäjän opas
 
-**Versio 2.1** | Ilmainen kirjanpito-ohjelma pk-yrityksille ja yhdistyksille
+**Versio 2.2** | Ilmainen kirjanpito-ohjelma pk-yrityksille ja yhdistyksille
 
 ---
 
@@ -13,10 +13,11 @@
 5. [Kirjanpidon perustoiminnot](#kirjanpidon-perustoiminnot)
 6. [Raportit ja tulosteet](#raportit-ja-tulosteet)
 7. [ALV-hallinta](#alv-hallinta)
-8. [Varmuuskopiointi](#varmuuskopiointi)
-9. [Asetukset ja konfiguraatio](#asetukset-ja-konfiguraatio)
-10. [Näppäinkomennot](#näppäinkomennot)
-11. [Usein kysytyt kysymykset](#usein-kysytyt-kysymykset)
+8. [PDF-liitteet](#pdf-liitteet) ⭐ **UUSI v2.2**
+9. [Varmuuskopiointi](#varmuuskopiointi)
+10. [Asetukset ja konfiguraatio](#asetukset-ja-konfiguraatio)
+11. [Näppäinkomennot](#näppäinkomennot)
+12. [Usein kysytyt kysymykset](#usein-kysytyt-kysymykset)
 
 ---
 
@@ -128,6 +129,28 @@
 - **Näppäinkomennot** - Nopea työskentely ilman hiirtä
 - **Automaattinen täydennys** - Tilit ja selitteet täydentyvät historiasta
 - **Drag & drop** - Järjestele tilikartta vetämällä
+
+### 📎 PDF-liitteet (v2.2.0+)
+
+**Liitä PDF-tiedostoja tositteisiin** - Tallenna kuitit, laskut ja muut dokumentit suoraan tositteisiin:
+
+- ✅ **Lisää PDF-liitteitä** - Liitä PDF-tiedostoja tositteisiin
+- 📋 **Katso liitetiedostoja** - Näe kaikki tosit teen liitteet yhdellä silmäyksellä
+- 💾 **Vie liitetiedostoja** - Tallenna liitetiedostoja takaisin levylle
+- 🗑️ **Poista liitteitä** - Hallitse liitteitä helposti
+- 🔍 **Metatiedot** - Tiedostokoko, sivumäärä ja lisäyspäivä näkyvissä
+- ⚡ **Automaattinen päivitys** - Liitteet päivittyvät tositteiden välillä navigoidessa
+
+**Rajoitukset:**
+- Maksimi tiedostokoko: 10 MB per PDF
+- Varoitus: 5 MB+ tiedostoista
+- Tuki: SQLite, MySQL, PostgreSQL
+
+**Miten käytän:**
+1. Avaa tosite
+2. Vieritä alas "PDF-liitteet" -osioon
+3. Klikkaa "Lisää PDF" ja valitse tiedosto
+4. Liite tallentuu automaattisesti tietokantaan
 
 ### 🔧 Työkalut
 

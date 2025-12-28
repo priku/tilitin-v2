@@ -124,4 +124,15 @@ public interface DataSource {
 	 * @return <code>DocumentTypeDAO</code>-olio
 	 */
 	public DocumentTypeDAO getDocumentTypeDAO(Session session);
+
+	/**
+	 * Palauttaa <code>AttachmentDAO</code>-olion, jonka avulla voidaan lisätä,
+	 * muokata ja poistaa PDF-liitteitä sekä hakea olemassa olevien
+	 * liitteiden tietoja.
+	 * 
+	 * @param session tietokantaistunto
+	 * @return <code>AttachmentDAO</code>-olio
+	 * @since 2.2.0
+	 */
+	public AttachmentDAO getAttachmentDAO(Session session);
 }
