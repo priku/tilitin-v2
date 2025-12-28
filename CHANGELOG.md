@@ -7,6 +7,33 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.1.4] - 2025-12-28
+
+### 🏗️ DocumentFrame Phase 2 - Builder Pattern
+
+**Branch:** `feature/2.1-documentframe-refactor`
+
+### Lisätty
+- **DocumentMenuBuilder.java** (449 riviä) - Eriytetty valikkojen luonti
+  - Kaikki 7 valikkoa: Tiedosto, Muokkaa, Siirry, Tositelaji, Tulosteet, Työkalut, Ohje
+  - Listener injection -pattern puhtaaseen separaatioon
+  - MenuListeners-luokka kuuntelijoiden hallintaan
+- **DocumentToolbarBuilder.java** (112 riviä) - Eriytetty työkalurivin luonti
+  - Navigointi-, tosite-, vienti- ja haku-osiot
+  - ToolbarListeners-luokka kuuntelijoiden hallintaan
+
+### Muutettu
+- **DocumentFrame.java** refaktoroitu edelleen (-731 riviä)
+  - 3752 → 3021 riviä (-19%)
+  - Käyttää nyt DocumentMenuBuilder ja DocumentToolbarBuilder -luokkia
+  - Modulaarisempi arkkitehtuuri
+
+### Tekninen
+- Builder-pattern menu- ja toolbar-komponenteille
+- Yhteensä -1429 riviä DocumentFramesta tässä sprintissä
+
+---
+
 ## [2.1.3] - 2025-12-28
 
 ### 🚀 Kotlin DAO Integration + Code Modernization
