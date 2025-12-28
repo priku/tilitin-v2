@@ -430,6 +430,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		listeners.numberShiftListener = numberShiftListener;
 		listeners.vatChangeListener = vatChangeListener;
 		listeners.exportListener = exportListener;
+		listeners.csvImportListener = csvImportListener;
 		listeners.helpListener = helpListener;
 		listeners.debugListener = debugListener;
 		listeners.aboutListener = aboutListener;
@@ -1117,6 +1118,27 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	@Deprecated
 	public void export() {
 		documentExporter.exportToCSV();
+	}
+
+	/**
+	 * Näyttää CSV-tuontidialogin.
+	 */
+	public void showCsvImportDialog() {
+		if (!model.isDocumentEditable()) {
+			SwingUtils.showErrorMessage(this, "Tilikausi on lukittu. CSV-tuonti ei ole mahdollista.");
+			return;
+		}
+		
+		kirjanpito.ui.dialogs.CsvImportDialog dialog = 
+			new kirjanpito.ui.dialogs.CsvImportDialog(this);
+		dialog.setVisible(true);
+		
+		// TODO: Käsittele tuontitulos kun tuontilogiikka on toteutettu
+		if (dialog.getImportResult() != null && dialog.getImportResult().getSuccess()) {
+			// Päivitä näkymä tuonnin jälkeen
+			updatePosition();
+			updateDocument();
+		}
 	}
 
 	/**
@@ -2645,6 +2667,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 
 	/* Vie */
 	private ActionListener exportListener = e -> export();
+
+	/* Tuo CSV */
+	private ActionListener csvImportListener = e -> showCsvImportDialog();
 
 	/* Tilikartta */
 	private ActionListener chartOfAccountsListener = e -> showChartOfAccounts();

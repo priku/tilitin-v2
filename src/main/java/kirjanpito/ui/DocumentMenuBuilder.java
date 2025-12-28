@@ -361,6 +361,11 @@ public class DocumentMenuBuilder {
         menu.add(SwingUtils.createMenuItem("Vie tiedostoon",
                 null, 'V', KeyStroke.getKeyStroke('E', shortcutKeyMask), l.exportListener));
         
+        menu.addSeparator();
+        
+        menu.add(SwingUtils.createMenuItem("Tuo CSV-tiedostosta…",
+                null, 'C', KeyStroke.getKeyStroke('I', shortcutKeyMask), l.csvImportListener));
+        
         return menu;
     }
     
@@ -452,6 +457,7 @@ public class DocumentMenuBuilder {
         public ActionListener numberShiftListener;
         public ActionListener vatChangeListener;
         public ActionListener exportListener;
+        public ActionListener csvImportListener;
         public ActionListener helpListener;
         public ActionListener debugListener;
         public ActionListener aboutListener;
