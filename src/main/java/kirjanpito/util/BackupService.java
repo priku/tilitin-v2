@@ -6,10 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -556,15 +552,8 @@ public class BackupService {
             String backupName = baseName + "_" + pathHash + "_" + timestamp + ".sqlite";
             File backupFile = new File(backupDirectory, backupName);
             
-            // Käytä SQLite:n VACUUM INTO -komentoa turvalliseen varmuuskopiointiin
-            // Tämä ei lukitse tietokantaa kuten suora tiedostokopio
-            boolean backupSuccess = performSQLiteBackup(databasePath, backupFile);
-            
-            if (!backupSuccess) {
-                // Fallback: kopioi tiedosto jos VACUUM INTO ei onnistu
-                logger.warning("VACUUM INTO epäonnistui, yritetään tiedostokopiota");
-                Files.copy(sourceFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
+            // Kopioi tiedosto
+            Files.copy(sourceFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
             lastBackupTime = new Date();
             logger.info("Varmuuskopio luotu: " + backupFile.getAbsolutePath());
@@ -589,33 +578,6 @@ public class BackupService {
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Varmuuskopiointi epäonnistui", e);
             notifyStatusChanged(BackupStatus.ERROR);
-            return false;
-        }
-    }
-    
-    /**
-     * Suorittaa varmuuskopioinnin SQLite:n VACUUM INTO -komennolla.
-     * Tämä on turvallinen tapa kopioida tietokanta lukitsematta sitä.
-     * 
-     * @param databasePath JDBC-yhteysosoite (jdbc:sqlite:...)
-     * @param backupFile kohdetiedosto
-     * @return true jos onnistui
-     */
-    private boolean performSQLiteBackup(String databasePath, File backupFile) {
-        String backupPath = backupFile.getAbsolutePath().replace("\\", "/");
-        
-        try (Connection conn = DriverManager.getConnection(databasePath);
-             Statement stmt = conn.createStatement()) {
-            
-            // VACUUM INTO luo uuden tietokantatiedoston atomisuudella
-            // ja ei lukitse lähdetietokantaa kirjoitusten ajaksi
-            stmt.execute("VACUUM INTO '" + backupPath + "'");
-            
-            logger.fine("VACUUM INTO onnistui: " + backupPath);
-            return true;
-            
-        } catch (SQLException e) {
-            logger.log(Level.WARNING, "VACUUM INTO epäonnistui: " + e.getMessage(), e);
             return false;
         }
     }
