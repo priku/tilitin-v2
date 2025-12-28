@@ -35,14 +35,18 @@ REM Luo dist-hakemisto jos ei ole olemassa
 if not exist "dist" mkdir dist
 if not exist "dist\windows" mkdir dist\windows
 
+REM Hae versio pom.xml:stä
+for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+echo Versio: %VERSION%
+
 REM Suorita jPackage
 jpackage ^
   --input target ^
   --name "Tilitin 2.0" ^
-  --main-jar tilitin-2.0.2.jar ^
+  --main-jar tilitin-%VERSION%.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type app-image ^
-  --app-version 2.0.2 ^
+  --app-version %VERSION% ^
   --vendor "Tilitin Project" ^
   --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
   --icon src\main\resources\tilitin.ico ^

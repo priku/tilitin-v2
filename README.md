@@ -1,16 +1,24 @@
-# Tilitin 2.0
+# Tilitin 2.1
+
+[![Build Status](https://github.com/priku/tilitin-modernized/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-modernized/actions)
+[![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://adoptium.net/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-blue.svg)](https://kotlinlang.org/)
+[![License](https://img.shields.io/badge/License-GPL%20v3-green.svg)](COPYING)
 
 Tilitin on ilmainen kirjanpito-ohjelma. Ohjelman teki alun perin Tommi Helineva, ja sen dokumentaatio on hänen
 sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
-## 🚀 Versio 2.0.4 - Foundation Sprint
+## 🚀 Versio 2.1.2 - Kotlin Modernization
 
-**Uutta versiossa 2.0.4:**
+**Uutta versiossa 2.1.2:**
 
-- 🏗️ **UIConstants** - Keskitetyt UI-vakiot (värit, fontit, marginaalit)
-- 📦 **BaseDialog** - Yhtenäinen pohjaluokka dialogeille
+- 🦜 **Kotlin 2.3.0** - Moderni Kotlin-tuki Java 25:lle
+- 📊 **Kotlin Data Classes** - AccountData, DocumentData, EntryData, PeriodData
+- 🗃️ **DAO Foundation** - DatabaseExtensions.kt, SQLAccountDAOKt
+- 🏗️ **DocumentFrame Refactoring** - DocumentBackupManager, DocumentExporter
+- 💾 **CSV-vienti** - Täydellinen Excel-yhteensopivuus (UTF-8 BOM)
 
 **Versiossa 2.0.3:**
 
@@ -45,13 +53,19 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 
 **Dokumentaatio:**
 
-- [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) - Kehityssuunnitelma ja sprintit
-- [TESTAUS.md](TESTAUS.md) - Testausraportit ja ohjeet
-- [BUILDING.md](BUILDING.md) - Build-ohjeet
+### Käyttäjille
+
+- **[USER-GUIDE.md](USER-GUIDE.md)** - 📖 Kattava käyttäjän opas (aloita tästä!)
 - [CHANGELOG.md](CHANGELOG.md) - Muutosloki
+
+### Kehittäjille
+
+- [BUILDING.md](BUILDING.md) - Build-ohjeet
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Kehittäjäohjeet
-- [IKONI-MODERNISOINTI.md](IKONI-MODERNISOINTI.md) - Ikoni-suunnitelma (v2.1+)
-- [GITHUB-RELEASE-PUUTTUU.md](GITHUB-RELEASE-PUUTTUU.md) - Release-julkaisuohjeet
+- [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) - Kehityssuunnitelma
+- [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md) - Kotlin-migraation tekninen dokumentaatio
+- [MODERNIZATION-TODO.md](MODERNIZATION-TODO.md) - Modernisaation roadmap
+- [TESTAUS.md](TESTAUS.md) - Testausraportit
 
 ## Asennus
 

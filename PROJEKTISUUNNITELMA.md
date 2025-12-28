@@ -14,7 +14,7 @@
 | Kenttä | Arvo |
 |--------|------|
 | **Kohdealusta** | Windows 10/11 (64-bit) |
-| **Teknologia** | Java 25 + Swing + FlatLaf |
+| **Teknologia** | Java 25 + Kotlin 2.3.0 + Swing + FlatLaf |
 | **Kokonaisaika** | 6-8 viikkoa |
 | **Resurssit** | 1 kehittäjä |
 | **Budjetti** | ~10,000-15,000 € (kehitystyö + sertifikaatit) |

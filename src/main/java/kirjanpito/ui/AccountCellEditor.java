@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableCellEditor;
@@ -48,7 +49,12 @@ public class AccountCellEditor extends AbstractCellEditor
 		this.textField.setCaret(new DefaultCaret());
 		this.textField.getDocument().addDocumentListener(documentListener);
 		this.textField.addKeyListener(keyListener);
-		this.textField.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		// Käytä teeman mukaista border-väriä
+		Color borderColor = UIManager.getColor("Component.borderColor");
+		if (borderColor == null) {
+			borderColor = Color.BLACK; // Fallback
+		}
+		this.textField.setBorder(BorderFactory.createLineBorder(borderColor));
 		this.registry = registry;
 		this.tableModel = tableModel;
 		this.listener = listener;

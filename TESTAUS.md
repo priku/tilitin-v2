@@ -10,8 +10,10 @@ mvn clean package
 ```
 
 **Odotettu tulos:**
+
 - ✅ BUILD SUCCESS
-- ✅ `target\tilitin-2.0.0.jar` luotu
+- ✅ `target\tilitin-2.1.1.jar` luotu
+- ✅ Kotlin 2.3.0 + Java 25 kääntyy onnistuneesti
 
 ### Vaihe 2: Käynnistä sovellus
 

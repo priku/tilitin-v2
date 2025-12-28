@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import kirjanpito.db.Account;
@@ -42,7 +43,13 @@ public class COATableCellRenderer extends DefaultTableCellRenderer {
 	public COATableCellRenderer() {
 		this.indentEnabled = true;
 		this.highlightFavouriteAccounts = true;
-		this.favouriteColor = new Color(245, 208, 169);
+		// Käytä teeman mukaista highlight-väriä suosikkitileille
+		// FlatLaf tarjoaa automaattisesti teemaan sopivan accent-värin
+		this.favouriteColor = UIManager.getColor("List.selectionInactiveBackground");
+		if (this.favouriteColor == null) {
+			// Fallback jos UIManager ei tarjoa väriä
+			this.favouriteColor = new Color(245, 208, 169);
+		}
 		this.formatter = new DecimalFormat();
 		this.formatter.setMinimumFractionDigits(0);
 		this.formatter.setMaximumFractionDigits(2);
@@ -98,7 +105,16 @@ public class COATableCellRenderer extends DefaultTableCellRenderer {
 			percentageText = null;
 
 			if (coa.getHeading(row).getLevel() == 0) {
-				setForeground(Color.RED);
+				// Käytä teeman mukaista aksentti-/korostusväriä pääotsikkotasolle
+				Color accentColor = UIManager.getColor("Component.accentColor");
+				if (accentColor == null) {
+					// Fallback: käytä error-väriä jos accent ei ole saatavilla
+					accentColor = UIManager.getColor("Actions.Red");
+					if (accentColor == null) {
+						accentColor = Color.RED; // Ultimate fallback
+					}
+				}
+				setForeground(accentColor);
 			}
 
 			setFont(font.deriveFont(Font.BOLD));
