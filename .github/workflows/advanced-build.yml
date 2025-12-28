@@ -112,16 +112,21 @@ jobs:
       id: changelog
       run: |
         $version = "${{ steps.version.outputs.VERSION }}"
-        $content = Get-Content CHANGELOG.md -Raw
-        # Extract section for this version (between ## [version] and next ## [)
-        if ($content -match "(?s)## \[$version\][^\n]*\n(.*?)(?=\n## \[|$)") {
+        $content = Get-Content CHANGELOG.md -Raw -Encoding UTF8
+        # Normalize line endings
+        $content = $content -replace "`r`n", "`n"
+        # Extract section for this version (between ## [version] and next ## [ or ---)
+        $pattern = "(?s)## \[$([regex]::Escape($version))\][^\n]*\n(.*?)(?=\n## \[|\n---|\z)"
+        if ($content -match $pattern) {
           $notes = $matches[1].Trim()
           # Write to file for body_path
-          $notes | Out-File -FilePath release-notes.md -Encoding utf8
-          echo "Found release notes for v$version"
+          $notes | Out-File -FilePath release-notes.md -Encoding utf8 -NoNewline
+          Write-Host "Found release notes for v$version ($($notes.Length) chars)"
         } else {
-          "Release $version" | Out-File -FilePath release-notes.md -Encoding utf8
-          echo "No specific notes found, using default"
+          "Release $version" | Out-File -FilePath release-notes.md -Encoding utf8 -NoNewline
+          Write-Host "No specific notes found for v$version, using default"
+          Write-Host "DEBUG: First 500 chars of CHANGELOG:"
+          Write-Host $content.Substring(0, [Math]::Min(500, $content.Length))
         }
       shell: pwsh
 
