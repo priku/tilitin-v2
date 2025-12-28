@@ -1,11 +1,12 @@
 
 name: Java CI with Maven
 
-on: push
+on:
+  push:
+  workflow_dispatch:
 
 permissions:
   contents: write
-  security-events: write
 
 jobs:
   build:
