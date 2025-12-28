@@ -73,6 +73,12 @@ public class DocumentExporter {
 
 		if (fc.showSaveDialog(parentFrame) == JFileChooser.APPROVE_OPTION) {
 			File file = fc.getSelectedFile();
+
+			// Lisää .csv-pääte jos sitä ei ole
+			if (!file.getName().toLowerCase().endsWith(".csv")) {
+				file = new File(file.getAbsolutePath() + ".csv");
+			}
+
 			settings.set("csv-directory",
 					file.getParentFile().getAbsolutePath());
 
