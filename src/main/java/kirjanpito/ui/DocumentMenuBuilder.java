@@ -1,6 +1,5 @@
 package kirjanpito.ui;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -51,7 +50,14 @@ public class DocumentMenuBuilder {
     private JMenuItem setIgnoreFlagMenuItem;
     
     public DocumentMenuBuilder() {
-        this.shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        // Use modern API instead of deprecated getMenuShortcutKeyMask()
+        // Detect OS and use appropriate mask (Ctrl on Windows/Linux, Cmd on Mac)
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.contains("mac")) {
+            this.shortcutKeyMask = InputEvent.META_DOWN_MASK;
+        } else {
+            this.shortcutKeyMask = InputEvent.CTRL_DOWN_MASK;
+        }
     }
     
     /**

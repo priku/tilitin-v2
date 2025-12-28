@@ -431,4 +431,117 @@ public final class UIConstants {
         }
         return color;
     }
+    
+    /**
+     * Palauttaa teeman mukaisen taustavärin.
+     * Käytetään paneelien ja dialogien taustoissa.
+     * 
+     * @return taustaväri teemasta tai fallback
+     */
+    public static java.awt.Color getBackgroundColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Panel.background");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("control");
+        }
+        if (color == null) {
+            color = java.awt.Color.WHITE; // Light mode fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen tekstivärin.
+     * Käytetään labelien ja tekstikenttien tekstissä.
+     * 
+     * @return tekstiväri teemasta tai fallback
+     */
+    public static java.awt.Color getForegroundColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Label.foreground");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("textText");
+        }
+        if (color == null) {
+            color = java.awt.Color.BLACK; // Light mode fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen reunusvärin.
+     * Käytetään komponenttien reunoissa.
+     * 
+     * @return reunusväri teemasta tai fallback
+     */
+    public static java.awt.Color getBorderColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Border.color");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("controlShadow");
+        }
+        if (color == null) {
+            color = new java.awt.Color(128, 128, 128); // Gray fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen tekstikentän taustavärin.
+     * Käytetään JTextField, JTextArea jne. taustoissa.
+     * 
+     * @return tekstikentän taustaväri teemasta tai fallback
+     */
+    public static java.awt.Color getTextFieldBackgroundColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("TextField.background");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("text");
+        }
+        if (color == null) {
+            color = java.awt.Color.WHITE; // Light mode fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen tekstikentän tekstivärin.
+     * Käytetään tekstikenttien tekstissä.
+     * 
+     * @return tekstikentän tekstiväri teemasta tai fallback
+     */
+    public static java.awt.Color getTextFieldForegroundColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("TextField.foreground");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("textText");
+        }
+        if (color == null) {
+            color = java.awt.Color.BLACK; // Light mode fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen taulukon taustavärin.
+     * Käytetään JTable taustoissa.
+     * 
+     * @return taulukon taustaväri teemasta tai fallback
+     */
+    public static java.awt.Color getTableBackgroundColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Table.background");
+        if (color == null) {
+            color = getBackgroundColor();
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen taulukon tekstivärin.
+     * Käytetään taulukon tekstissä.
+     * 
+     * @return taulukon tekstiväri teemasta tai fallback
+     */
+    public static java.awt.Color getTableForegroundColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Table.foreground");
+        if (color == null) {
+            color = getForegroundColor();
+        }
+        return color;
+    }
 }

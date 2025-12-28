@@ -2,7 +2,7 @@
 
 Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointitehtävistä Windows-modernisaatioprojektissa.
 
-**Projektin tila**: v2.1.1 kehitteillä (feature/2.1-documentframe-refactor)
+**Projektin tila**: v2.1.6 kehitteillä (feature/code-modernization)
 **Viimeksi päivitetty**: 2025-12-28
 **Analyysi perustuu**: 186 Java-tiedoston + Kotlin-modernisaation kattavaan analyysiin
 
@@ -19,13 +19,16 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - ✅ Kotlin 2.3.0 + Java 25 päivitys
 - ✅ Kotlin data classes (Account, Document, Entry, Period, DocumentType, COAHeading)
 - ✅ Kotlin utility classes (SwingExtensions, ValidationUtils, DialogUtils)
+- ✅ UIConstants theme-aware värimetodit (7 uutta metodia v2.1.6)
+- ✅ Deprecated API korjattu DocumentMenuBuilder:issa (v2.1.6)
+- ✅ Lambda-migraatio aloitettu: 6 anonymous inner class → lambda (v2.1.6)
 
 **Jäljellä olevia haasteita:**
 
-- ❌ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 3)
+- ⚠️ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 4 - tulevaisuus)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
-- ❌ DocumentFrame.java on 37KB monolittti
-- ❌ Vanhat Swing-patternit (anonymous inner classes)
+- ⚠️ DocumentFrame.java on 3,007 riviä (vähennetty -849 riviä, -22%)
+- ⚠️ Vanhat Swing-patternit (anonymous inner classes) - 10/40+ korjattu (25%)
 - ❌ Epäjohdonmukainen UI-komponenttisuunnittelu
 
 ---
@@ -94,21 +97,35 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ---
 
-### 2. ✅ Yhtenäinen spacing-järjestelmä (COMPLETED v2.0.4)
+### 2. ✅ Yhtenäinen spacing-järjestelmä (COMPLETED v2.0.4, EXTENDED v2.1.6)
 
-**Status**: ✅ **VALMIS** - UIConstants.java luotu ja käytössä
+**Status**: ✅ **VALMIS** - UIConstants.java luotu ja laajennettu
 
-**Toteutettu**:
+**Toteutettu v2.0.4**:
 
-- ✅ `UIConstants.java` luotu v2.0.4:ssä
+- ✅ `UIConstants.java` luotu
 - ✅ Standardoidut spacing-vakiot (5px perusyksikkö)
 - ✅ Valmiit Insets ja Border objektit
 - ✅ Käytössä uusissa dialogeissa (BackupSettingsDialog, RestoreBackupDialog, etc.)
+
+**Toteutettu v2.1.6**:
+
+- ✅ **7 uutta theme-aware värimetodia**:
+  - `getBackgroundColor()` - Paneelien taustavärit
+  - `getForegroundColor()` - Tekstivärit
+  - `getBorderColor()` - Reunusvärit
+  - `getTextFieldBackgroundColor()` - Tekstikenttien taustat
+  - `getTextFieldForegroundColor()` - Tekstikenttien tekstit
+  - `getTableBackgroundColor()` - Taulukoiden taustat
+  - `getTableForegroundColor()` - Taulukoiden tekstit
+- ✅ Kaikki metodit käyttävät `UIManager`-värejä fallbackeilla
+- ✅ Valmiina legacy-dialogien teematukeen
 
 **Jäljellä**:
 
 - [ ] Päivitä 19 vanhaa dialogia käyttämään UIConstants-vakioita
 - [ ] Korvaa hardkoodatut marginaalit UIConstants-viittauksilla
+- [ ] Käytä uusia theme-aware värimetodeja legacy-dialogeissa
 
 **Prioriteetti**: 🟡 KESKISUURI - Pohja tehty, jäljellä migraatio
 
@@ -116,9 +133,9 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ### 3. 🔄 DocumentFrame.java refaktorointi (IN PROGRESS v2.1.2)
 
-**Status**: 🔄 **ALOITETTU** - Phase 1 & 1b valmiit
+**Status**: 🔄 **ALOITETTU** - Phase 1, 1b, 2, 3 (partial) valmiit
 
-**Toteutettu v2.1.2**:
+**Toteutettu v2.1.2-v2.1.6**:
 
 - ✅ **Phase 1**: DocumentBackupManager.java (193 riviä)
   - Varmuuskopioinnin hallinta eriytetty
@@ -128,21 +145,33 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
   - CSV-viennin hallinta eriytetty
   - CSVExportStarter-rajapinta
   - Tiedostonvalinta ja hakemiston muistaminen
-- ✅ DocumentFrame.java vähennetty: 3,856 → 3,849 riviä (87 riviä kompleksisuutta poistettu)
+- ✅ **Phase 2**: Menu/Toolbar creation (v2.1.4)
+  - ✅ DocumentMenuBuilder.java (453 riviä)
+  - ✅ DocumentToolbarBuilder.java (112 riviä)
+- ✅ **Phase 3**: Helper classes (v2.1.5)
+  - ✅ DocumentListenerHelpers.java (76 riviä)
+  - ✅ EntryTableActions.java (280 riviä)
+- ✅ **Phase 4 (partial)**: Lambda-migraatio aloitettu (v2.1.6)
+  - ✅ 6 anonymous inner class → lambda-lausekkeet
+  - ✅ Field initialization order korjattu
+- ✅ DocumentFrame.java vähennetty: 3,856 → 3,008 riviä (-848 riviä, -22%)
 
 **Jäljellä**:
 
-- [ ] **Phase 2**: Menu/Toolbar creation
-  - [ ] Luo `DocumentMenuBuilder.java`
-  - [ ] Luo `DocumentToolbarBuilder.java`
-- [ ] **Phase 3**: Table management
+- [ ] **Phase 3b**: Table management
   - [ ] Luo `DocumentTableManager.java`
   - [ ] Siirrä cell renderer/editor logiikka
-- [ ] **Phase 4**: Event handling
-  - [ ] Luo `DocumentEventHandler.java`
-  - [ ] Lambda-lausekkeet
+- [ ] **Phase 4**: Event handling (jatkuu)
+  - [ ] Jäljellä olevat anonymous inner classes → lambdas
+  - [ ] Luo `DocumentEventHandler.java` (valinnainen)
 - [ ] **Phase 5**: Print toiminnot
   - [ ] Luo `DocumentPrinter.java`
+- [ ] **Phase 6**: Navigation & State
+  - [ ] Luo `DocumentNavigator.java`
+  - [ ] Luo `DocumentStateManager.java`
+- [ ] **Phase 7**: UI Components
+  - [ ] Luo `DocumentUIBuilder.java`
+  - [ ] Luo `DocumentUIUpdater.java`
 
 **Tavoite**: DocumentFrame < 500 riviä, loput komponenteissa
 
@@ -150,7 +179,7 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ---
 
-### 4. Lambda-lausekkeet anonymous inner class -rakenteiden tilalle
+### 4. 🔄 Lambda-lausekkeet anonymous inner class -rakenteiden tilalle (IN PROGRESS v2.1.6)
 
 **Ongelma**: Koodissa 40+ kohtaa käytetään vanhoja anonymous inner classeja:
 
@@ -166,13 +195,27 @@ button.addActionListener(new ActionListener() {
 button.addActionListener(e -> doSomething());
 ```
 
-**Vaikuttaa tiedostoihin**:
-- `DocumentFrame.java` - kymmeniä kohtia
-- `COADialog.java` - useita kohtia
-- `SettingsDialog.java`
-- `PropertiesDialog.java`
-- `EntryTemplateDialog.java`
-- Ja monissa muissa...
+**Toteutettu v2.1.6**:
+- ✅ DocumentFrame.java: **10 anonymous inner class → lambda** (yhteensä)
+  - AccountCellEditor ActionListener
+  - Search button ActionListener
+  - Recent database menu items (2 kpl)
+  - newDatabaseListener, openDatabaseListener
+  - entryTemplateListener
+  - editDocTypesListener
+  - docTypeListener
+  - printListener (switch-lauseke optimoitu)
+- ✅ Field initialization order korjattu
+- ✅ DocumentFrame: 3,024 → 3,007 riviä (-17 riviä)
+- ✅ printListener optimoitu: if-else → switch-lauseke (modernimpi)
+
+**Jäljellä**:
+- [ ] DocumentFrame.java: ~6+ anonymous inner classes vielä jäljellä (AbstractAction -instanssit ActionMap:issa)
+- [ ] COADialog.java - useita kohtia
+- [ ] SettingsDialog.java
+- [ ] PropertiesDialog.java
+- [ ] EntryTemplateDialog.java
+- [ ] Ja monissa muissa... (~30+ jäljellä)
 
 **Tehtävät**:
 - [ ] Tunnista kaikki ActionListener-käyttökohteet
@@ -277,28 +320,31 @@ panel.add(label, c);
 
 ---
 
-### 8. Deprecated API:n poisto
+### 8. ✅ Deprecated API:n poisto (COMPLETED v2.1.6)
 
 **Ongelma**: Käytössä deprecated metodeja
 
-**Esimerkkejä**:
-```java
-// DocumentFrame.java
-int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-// Deprecated Java 10+, käytä: InputEvent.CTRL_DOWN_MASK tai META_DOWN_MASK
+**Toteutettu v2.1.6**:
+- ✅ DocumentMenuBuilder.java: `getMenuShortcutKeyMask()` korvattu
+  - Käyttää nyt OS-tunnistusta: `InputEvent.META_DOWN_MASK` (Mac) / `InputEvent.CTRL_DOWN_MASK` (Windows/Linux)
+- ✅ DocumentFrame.java line 661: `getMenuShortcutKeyMask()` korvattu
+  - Sama OS-tunnistus kuin DocumentMenuBuilder:issa
+- ✅ DocumentFrame.java lines 2362, 2407: `InputEvent.ALT_MASK` → `InputEvent.ALT_DOWN_MASK`
+  - Korvattu deprecated Java 9+ API modernilla vaihtoehdolla
 
-// Kirjanpito.java - Reflection hack
+**Jäljellä** (ei kriittisiä):
+```java
+// Kirjanpito.java - Reflection hack (ei deprecated, mutta fragile)
 Field awtAppClassNameField = toolkitClass.getDeclaredField("awtAppClassName");
 awtAppClassNameField.setAccessible(true);
 // Fragile, rikkouu module system (Java 9+)
+// Vaihtoehto: Harkitse `-Dawt.appClassName=Tilitin` JVM-argumenttia
 ```
 
 **Tehtävät**:
-- [ ] Etsi kaikki `@Deprecated` API-kutsut
-- [ ] Korvaa modernilla vaihtoehdolla
-- [ ] Linux WM_CLASS: Harkitse `-Dawt.appClassName=Tilitin` JVM-argumenttia
+- [ ] Linux WM_CLASS: Harkitse `-Dawt.appClassName=Tilitin` JVM-argumenttia Kirjanpito.java:lle (valinnainen)
 
-**Prioriteetti**: 🟡 KESKISUURI - Tulevaisuuden Java-versioissa voi rikkoutua
+**Prioriteetti**: 🟢 MATALA - Kaikki deprecated API-kutsut korjattu, jäljellä vain reflection-hack joka ei ole deprecated
 
 ---
 

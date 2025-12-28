@@ -7,6 +7,62 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.1.6] - 2025-12-28
+
+### 🔧 Code Modernization - Quick Wins
+
+**Branch:** `main` / `feature/code-modernization`
+
+### Korjattu
+- **Deprecated API poistettu** - Kaikki deprecated API-kutsut korjattu
+  - ✅ DocumentMenuBuilder.java: `getMenuShortcutKeyMask()` → OS-tunnistus
+  - ✅ DocumentFrame.java line 661: `getMenuShortcutKeyMask()` → OS-tunnistus
+  - ✅ DocumentFrame.java lines 2362, 2407: `InputEvent.ALT_MASK` → `InputEvent.ALT_DOWN_MASK`
+  - Ei enää riippuvainen deprecated API:sta
+  - Kaikki korvaukset käyttävät moderneja Java 9+ API:ja
+
+### Lisätty
+- **UIConstants teemavärit** - 7 uutta theme-aware värimetodia
+  - `getBackgroundColor()` - Paneelien taustavärit
+  - `getForegroundColor()` - Tekstivärit
+  - `getBorderColor()` - Reunusvärit
+  - `getTextFieldBackgroundColor()` - Tekstikenttien taustat
+  - `getTextFieldForegroundColor()` - Tekstikenttien tekstit
+  - `getTableBackgroundColor()` - Taulukoiden taustat
+  - `getTableForegroundColor()` - Taulukoiden tekstit
+  - Kaikki metodit käyttävät `UIManager`-värejä fallbackeilla
+  - Valmiina legacy-dialogien teematukeen
+
+### Muutettu
+- **DocumentFrame.java** - Lambda-migraatio edistynyt
+  - **10 anonymous inner class → lambda-lausekkeet** (yhteensä)
+  - AccountCellEditor ActionListener
+  - Search button ActionListener
+  - Recent database menu items (2 kpl)
+  - newDatabaseListener, openDatabaseListener
+  - entryTemplateListener
+  - editDocTypesListener
+  - docTypeListener
+  - printListener (switch-lauseke optimoitu)
+  - Tiedostokoko: 3,024 → 3,007 riviä (-17 riviä)
+  - Koodi nyt modernimpaa ja luettavampaa
+  - printListener optimoitu if-else → switch-lauseke
+
+### Tekninen
+- Field initialization order korjattu
+  - `sqliteFileFilter` ja listenerit siirretty oikeaan järjestykseen
+  - Ei enää forward reference -virheitä
+- Compilation errors korjattu
+- Kaikki muutokset testattavissa ja yhteensopivia
+- Ei enää deprecated API -varoituksia
+
+### Edistyminen
+- ✅ Deprecated API: **4/4 korjattu** (100% valmis)
+- Lambda-migraatio: **10/16+ DocumentFramessa** (62% valmis)
+- Theme helpers: 7 uutta metodia valmiina käyttöön
+
+---
+
 ## [2.1.5] - 2025-12-28
 
 ### 🏗️ DocumentFrame Phase 3 - Helper Classes

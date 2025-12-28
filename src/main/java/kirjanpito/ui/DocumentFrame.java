@@ -202,6 +202,84 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	// Helper for entry table actions
 	private EntryTableActions entryTableActions;
 
+	// File filter for SQLite databases
+	FileFilter sqliteFileFilter = new FileFilter() {
+		@Override
+		public boolean accept(File file) {
+			return file.isDirectory() || file.getName().toLowerCase().endsWith(".sqlite");
+		}
+
+		@Override
+		public String getDescription() {
+			return "Tilitin-tietokannat (.sqlite)";
+		}
+	};
+
+	// Action listeners - defined early so they can be used in createMenuBar()
+	/* Uusi tietokanta */
+	private ActionListener newDatabaseListener = e -> {
+		File dbDir = model.getDatabaseDir();
+		if (dbDir == null) {
+			dbDir = new File(AppSettings.getInstance().getDirectoryPath());
+		}
+		
+		// Ehdota automaattisesti vapaata nimeä
+		File suggestedFile = generateUniqueFileName(dbDir, "kirjanpito");
+		
+		final JFileChooser fileChooser = new JFileChooser(dbDir);
+		fileChooser.setFileFilter(sqliteFileFilter);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setDialogTitle("Uusi tietokanta");
+		fileChooser.setSelectedFile(suggestedFile);
+		File file = null;
+
+		while (true) {
+			fileChooser.showSaveDialog(DocumentFrame.this);
+			file = fileChooser.getSelectedFile();
+
+			if (file == null) {
+				return;
+			}
+
+			if (!file.getName().toLowerCase().endsWith(".sqlite")) {
+				file = new File(file.getAbsolutePath() + ".sqlite");
+			}
+
+			if (file.exists()) {
+				SwingUtils.showErrorMessage(DocumentFrame.this, String.format(
+						"Tiedosto %s on jo olemassa. Valitse toinen nimi.", file.getAbsolutePath()));
+				// Ehdota seuraavaa vapaata nimeä
+				String currentName = file.getName().replace(".sqlite", "");
+				File nextSuggestion = generateUniqueFileName(file.getParentFile(), currentName);
+				fileChooser.setSelectedFile(nextSuggestion);
+			}
+			else {
+				break;
+			}
+		}
+
+		openSqliteDataSource(file);
+	};
+
+	/* Avaa tietokanta */
+	private ActionListener openDatabaseListener = e -> {
+		final JFileChooser fileChooser = new JFileChooser(model.getDatabaseDir());
+		fileChooser.setFileFilter(sqliteFileFilter);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setDialogTitle("Avaa tietokanta");
+		fileChooser.showOpenDialog(DocumentFrame.this);
+		File file = fileChooser.getSelectedFile();
+
+		if (file == null) {
+			return;
+		}
+
+		openSqliteDataSource(file);
+	};
+
+	/* Tietokanta-asetukset */
+	private ActionListener databaseSettingsListener = e -> showDatabaseSettings();
+
 	private static Logger logger = Logger.getLogger(Kirjanpito.LOGGER_NAME);
 	private static final long serialVersionUID = 1L;
 
@@ -519,11 +597,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		});
 
 		accountCellRenderer = new AccountCellRenderer(registry, tableModel);
-		accountCellEditor = new AccountCellEditor(registry, tableModel, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String q = accountCellEditor.getTextField().getText();
-				showAccountSelection(q);
-			}
+		accountCellEditor = new AccountCellEditor(registry, tableModel, e -> {
+			String q = accountCellEditor.getTextField().getText();
+			showAccountSelection(q);
 		});
 
 		descriptionCellEditor = new DescriptionCellEditor(model);
@@ -582,7 +658,12 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
 
-		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		// Use modern API instead of deprecated getMenuShortcutKeyMask()
+		// Detect OS and use appropriate mask (Ctrl on Windows/Linux, Cmd on Mac)
+		String osName = System.getProperty("os.name").toLowerCase();
+		int shortcutKeyMask = osName.contains("mac") 
+			? InputEvent.META_DOWN_MASK 
+			: InputEvent.CTRL_DOWN_MASK;
 
 		/* Muutetaan enter-näppäimen toiminta. */
 		entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
@@ -739,11 +820,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		JButton button = new JButton("Etsi", new ImageIcon(
 				Resources.loadAsImage("find-16x16.png")));
 
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				searchDocuments();
-			}
-		});
+		button.addActionListener(e -> searchDocuments());
 		button.setMnemonic('H');
 		c.weightx = 0.0;
 		c.fill = GridBagConstraints.BOTH;
@@ -2065,24 +2142,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 				if (index <= 9) {
 					item.setMnemonic(Character.forDigit(index, 10));
 				}
-				item.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						openRecentDatabase(dbUrl);
-					}
-				});
+				item.addActionListener(e -> openRecentDatabase(dbUrl));
 				recentMenu.add(item);
 				index++;
 			}
 			
 			recentMenu.addSeparator();
 			JMenuItem clearItem = new JMenuItem("Tyhjennä lista");
-			clearItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					RecentDatabases.getInstance().clearAll();
-					updateRecentDatabasesMenu();
-				}
+			clearItem.addActionListener(e -> {
+				RecentDatabases.getInstance().clearAll();
+				updateRecentDatabasesMenu();
 			});
 			recentMenu.add(clearItem);
 		}
@@ -2295,7 +2364,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 					if (template.getNumber() >= 1 && template.getNumber() <= 10) {
 						menuItem.setAccelerator(KeyStroke.getKeyStroke(
 								'0' + (template.getNumber() % 10),
-								InputEvent.ALT_MASK));
+								InputEvent.ALT_DOWN_MASK));
 					}
 
 					entryTemplateMenu.add(menuItem);
@@ -2340,7 +2409,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 				if (type.getNumber() >= 1 && type.getNumber() <= 10) {
 					menuItem.setAccelerator(KeyStroke.getKeyStroke(
 							accelerators[type.getNumber() - 1],
-							InputEvent.ALT_MASK));
+							InputEvent.ALT_DOWN_MASK));
 				}
 
 				docTypeMenu.add(menuItem);
@@ -2948,86 +3017,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		return new File(directory, baseName + "_" + System.currentTimeMillis() + ".sqlite");
 	}
 
-	/* Uusi tietokanta */
-	private ActionListener newDatabaseListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			File dbDir = model.getDatabaseDir();
-			if (dbDir == null) {
-				dbDir = new File(AppSettings.getInstance().getDirectoryPath());
-			}
-			
-			// Ehdota automaattisesti vapaata nimeä
-			File suggestedFile = generateUniqueFileName(dbDir, "kirjanpito");
-			
-			final JFileChooser fileChooser = new JFileChooser(dbDir);
-			fileChooser.setFileFilter(sqliteFileFilter);
-			fileChooser.setAcceptAllFileFilterUsed(false);
-			fileChooser.setDialogTitle("Uusi tietokanta");
-			fileChooser.setSelectedFile(suggestedFile);
-			File file = null;
-
-			while (true) {
-				fileChooser.showSaveDialog(DocumentFrame.this);
-				file = fileChooser.getSelectedFile();
-
-				if (file == null) {
-					return;
-				}
-
-				if (!file.getName().toLowerCase().endsWith(".sqlite")) {
-					file = new File(file.getAbsolutePath() + ".sqlite");
-				}
-
-				if (file.exists()) {
-					SwingUtils.showErrorMessage(DocumentFrame.this, String.format(
-							"Tiedosto %s on jo olemassa. Valitse toinen nimi.", file.getAbsolutePath()));
-					// Ehdota seuraavaa vapaata nimeä
-					String currentName = file.getName().replace(".sqlite", "");
-					File nextSuggestion = generateUniqueFileName(file.getParentFile(), currentName);
-					fileChooser.setSelectedFile(nextSuggestion);
-				}
-				else {
-					break;
-				}
-			}
-
-			openSqliteDataSource(file);
-		}
-	};
-
-	/* Avaa tietokanta */
-	private ActionListener openDatabaseListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			final JFileChooser fileChooser = new JFileChooser(model.getDatabaseDir());
-			fileChooser.setFileFilter(sqliteFileFilter);
-			fileChooser.setAcceptAllFileFilterUsed(false);
-			fileChooser.setDialogTitle("Avaa tietokanta");
-			fileChooser.showOpenDialog(DocumentFrame.this);
-			File file = fileChooser.getSelectedFile();
-
-			if (file == null) {
-				return;
-			}
-
-			openSqliteDataSource(file);
-		}
-	};
-
-	FileFilter sqliteFileFilter = new FileFilter() {
-		@Override
-		public boolean accept(File file) {
-			return file.isDirectory() || file.getName().toLowerCase().endsWith(".sqlite");
-		}
-
-		@Override
-		public String getDescription() {
-			return "Tilitin-tietokannat (.sqlite)";
-		}
-	};
-
-	/* Tietokanta-asetukset */
-	private ActionListener databaseSettingsListener = e -> showDatabaseSettings();
-
 	/* Lopeta */
 	private ActionListener quitListener = e -> quit();
 
@@ -3074,13 +3063,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener createEntryTemplateListener = e -> createEntryTemplateFromDocument();
 
 	/* Vientimalli */
-	private ActionListener entryTemplateListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			String command = e.getActionCommand();
-
-			if (command != null) {
-				addEntriesFromTemplate(Integer.parseInt(command));
-			}
+	private ActionListener entryTemplateListener = e -> {
+		String command = e.getActionCommand();
+		if (command != null) {
+			addEntriesFromTemplate(Integer.parseInt(command));
 		}
 	};
 
@@ -3134,11 +3120,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Muokkaa tositelajeja */
-	private ActionListener editDocTypesListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			editDocumentTypes();
-		}
-	};
+	private ActionListener editDocTypesListener = e -> editDocumentTypes();
 
 	/* Kopioi */
 	private AbstractAction copyEntriesAction = new AbstractAction() {
@@ -3159,60 +3141,58 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Tositelaji */
-	private ActionListener docTypeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			String command = e.getActionCommand();
-
-			if (command != null) {
-				setDocumentType(Integer.parseInt(command));
-			}
+	private ActionListener docTypeListener = e -> {
+		String command = e.getActionCommand();
+		if (command != null) {
+			setDocumentType(Integer.parseInt(command));
 		}
 	};
 
 	/* Tilien saldot */
-	private ActionListener printListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			String cmd = e.getActionCommand();
-
-			if (cmd.equals("accountSummary")) {
+	private ActionListener printListener = e -> {
+		String cmd = e.getActionCommand();
+		if (cmd == null) return;
+		
+		switch (cmd) {
+			case "accountSummary":
 				showAccountSummary();
-			}
-			else if (cmd.equals("document")) {
+				break;
+			case "document":
 				showDocumentPrint();
-			}
-			else if (cmd.equals("accountStatement")) {
+				break;
+			case "accountStatement":
 				showAccountStatement();
-			}
-			else if (cmd.equals("incomeStatement")) {
+				break;
+			case "incomeStatement":
 				showIncomeStatement(false);
-			}
-			else if (cmd.equals("incomeStatementDetailed")) {
+				break;
+			case "incomeStatementDetailed":
 				showIncomeStatement(true);
-			}
-			else if (cmd.equals("balanceSheet")) {
+				break;
+			case "balanceSheet":
 				showBalanceSheet(false);
-			}
-			else if (cmd.equals("balanceSheetDetailed")) {
+				break;
+			case "balanceSheetDetailed":
 				showBalanceSheet(true);
-			}
-			else if (cmd.equals("generalJournal")) {
+				break;
+			case "generalJournal":
 				showGeneralJournal();
-			}
-			else if (cmd.equals("generalLedger")) {
+				break;
+			case "generalLedger":
 				showGeneralLedger();
-			}
-			else if (cmd.equals("vatReport")) {
+				break;
+			case "vatReport":
 				showVATReport();
-			}
-			else if (cmd.equals("coa0")) {
+				break;
+			case "coa0":
 				showChartOfAccountsPrint(0);
-			}
-			else if (cmd.equals("coa1")) {
+				break;
+			case "coa1":
 				showChartOfAccountsPrint(1);
-			}
-			else if (cmd.equals("coa2")) {
+				break;
+			case "coa2":
 				showChartOfAccountsPrint(2);
-			}
+				break;
 		}
 	};
 
