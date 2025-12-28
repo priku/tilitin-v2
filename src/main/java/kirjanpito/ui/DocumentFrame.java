@@ -132,10 +132,12 @@ import kirjanpito.util.RegistryAdapter;
  * Tositetietojen muokkausikkuna.
  *
  * @author Tommi Helineva
+ * @version 2.1.0 - Refactored: Extracted backup management to DocumentBackupManager
  */
-public class DocumentFrame extends JFrame implements AccountSelectionListener {
+public class DocumentFrame extends JFrame implements AccountSelectionListener, DocumentBackupManager.DatabaseOpener {
 	protected Registry registry;
 	protected DocumentModel model;
+	private DocumentBackupManager backupManager;
 	protected JMenu entryTemplateMenu;
 	protected JMenu docTypeMenu;
 	protected JMenu gotoMenu;
@@ -983,17 +985,20 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		backupStatusLabel.setBorder(new EtchedBorder());
 		backupStatusLabel.setPreferredSize(new Dimension(120, 0));
 		backupStatusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		updateBackupStatusLabel();
-		
+
+		// Alusta backupManager
+		backupManager = new DocumentBackupManager(this, backupStatusLabel, this);
+		backupManager.updateBackupStatusLabel();
+
 		// Aseta listener backup-statuksen päivitykseen
-		BackupService.getInstance().setStatusListener(status -> updateBackupStatusLabel());
-		
+		BackupService.getInstance().setStatusListener(status -> backupManager.updateBackupStatusLabel());
+
 		// Backup-indikaattoria klikkaamalla avautuu asetukset
 		backupStatusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mouseClicked(java.awt.event.MouseEvent e) {
 				BackupSettingsDialog.show(DocumentFrame.this);
-				updateBackupStatusLabel();
+				backupManager.updateBackupStatusLabel();
 			}
 		});
 		backupStatusLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1011,29 +1016,11 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	
 	/**
 	 * Päivittää backup-indikaattorin tilariville.
+	 * @deprecated Käytä backupManager.updateBackupStatusLabel() suoraan
 	 */
+	@Deprecated
 	private void updateBackupStatusLabel() {
-		BackupService backup = BackupService.getInstance();
-		
-		if (!backup.isEnabled()) {
-			backupStatusLabel.setText("○ Backup");
-			backupStatusLabel.setForeground(java.awt.Color.GRAY);
-		} else if (backup.isAutoBackupEnabled()) {
-			String cloudName = backup.getCloudServiceName();
-			if (cloudName != null) {
-				backupStatusLabel.setText("☁ AutoBackup");
-				backupStatusLabel.setForeground(new java.awt.Color(0, 128, 0));
-				backupStatusLabel.setToolTipText("AutoBackup käytössä • " + cloudName + " • Klikkaa muuttaaksesi");
-			} else {
-				backupStatusLabel.setText("◉ AutoBackup");
-				backupStatusLabel.setForeground(new java.awt.Color(0, 100, 200));
-				backupStatusLabel.setToolTipText("AutoBackup käytössä • Klikkaa muuttaaksesi");
-			}
-		} else {
-			backupStatusLabel.setText("● Backup");
-			backupStatusLabel.setForeground(java.awt.Color.DARK_GRAY);
-			backupStatusLabel.setToolTipText("Varmuuskopiointi käytössä • Klikkaa muuttaaksesi");
-		}
+		backupManager.updateBackupStatusLabel();
 	}
 
 	/**
@@ -2927,88 +2914,14 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	 * Suorittaa varmuuskopioinnin sulkemisen yhteydessä.
 	 */
 	protected void performBackupOnClose() {
-		BackupService backupService = BackupService.getInstance();
-		
-		if (!backupService.isEnabled()) {
-			return;
-		}
-		
-		String uri = backupService.getCurrentDatabase();
-		if (uri == null || !uri.contains("sqlite")) {
-			return;
-		}
-		
-		boolean success = backupService.performBackup(uri);
-		
-		if (!success) {
-			// Näytä varoitus mutta älä estä sulkemista
-			logger.warning("Varmuuskopiointi epäonnistui sulkemisen yhteydessä");
-		}
+		backupManager.performBackupOnClose();
 	}
 
 	/**
 	 * Näyttää dialogin varmuuskopion palauttamiseksi.
 	 */
 	protected void restoreFromBackup() {
-		BackupService backupService = BackupService.getInstance();
-		File backupDir = backupService.getBackupDirectory();
-		
-		if (backupDir == null || !backupDir.exists()) {
-			// Tarjoa mahdollisuus määrittää asetukset suoraan
-			String[] options = {"Määritä asetukset", "Peruuta"};
-			int choice = JOptionPane.showOptionDialog(this,
-				"Varmuuskopiokansiota ei ole määritetty tai se ei ole olemassa.\n\n" +
-				"Haluatko määrittää varmuuskopiointiasetukset nyt?",
-				"Ei varmuuskopioita",
-				JOptionPane.DEFAULT_OPTION,
-				JOptionPane.INFORMATION_MESSAGE,
-				null,
-				options,
-				options[0]);
-			
-			if (choice == 0) {
-				// Avaa asetukset
-				BackupSettingsDialog.show(this);
-				// Tarkista uudelleen
-				backupDir = backupService.getBackupDirectory();
-				if (backupDir == null || !backupDir.exists()) {
-					return;
-				}
-			} else {
-				return;
-			}
-		}
-		
-		// Listaa varmuuskopiot
-		File[] backups = backupService.listAllBackups();
-		
-		if (backups.length == 0) {
-			JOptionPane.showMessageDialog(this,
-				"Varmuuskopiokansiossa ei ole varmuuskopioita.\n\n" +
-				"Kansio: " + backupDir.getAbsolutePath(),
-				"Ei varmuuskopioita",
-				JOptionPane.INFORMATION_MESSAGE);
-			return;
-		}
-		
-		// Näytä valintadialogi
-		RestoreBackupDialog dialog = new RestoreBackupDialog(this, backups, backupService);
-		dialog.setVisible(true);
-		
-		File restoredFile = dialog.getRestoredFile();
-		if (restoredFile != null) {
-			// Avaa palautettu tietokanta
-			int result = JOptionPane.showConfirmDialog(this,
-				"Tietokanta palautettu:\n" + restoredFile.getAbsolutePath() + "\n\n" +
-				"Haluatko avata sen nyt?",
-				"Palautus onnistui",
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
-			
-			if (result == JOptionPane.YES_OPTION) {
-				openSqliteDataSource(restoredFile);
-			}
-		}
+		backupManager.restoreFromBackup();
 	}
 
 	/**

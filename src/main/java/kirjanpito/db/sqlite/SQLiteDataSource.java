@@ -61,6 +61,12 @@ public class SQLiteDataSource implements DataSource {
 		try {
 			conn = DriverManager.getConnection(url);
 			conn.setAutoCommit(false);
+			
+			// Aseta busy_timeout estämään SQLITE_BUSY -virheitä
+			// kun varmuuskopiointi tai toinen prosessi käyttää tietokantaa
+			try (var stmt = conn.createStatement()) {
+				stmt.execute("PRAGMA busy_timeout = 30000"); // 30 sekuntia
+			}
 
 			if (tablesExist) {
 				upgradeDatabase(conn, file);
