@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import kirjanpito.db.AccountDAO;
+import kirjanpito.db.AttachmentDAO;
 import kirjanpito.db.COAHeadingDAO;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.db.DataSource;
@@ -96,6 +97,10 @@ public class MySQLDataSource implements DataSource {
 
 	public DocumentTypeDAO getDocumentTypeDAO(Session session) {
 		return new MySQLDocumentTypeDAO((MySQLSession)session);
+	}
+
+	public AttachmentDAO getAttachmentDAO(Session session) {
+		return new kirjanpito.db.mysql.MySQLAttachmentDAO((MySQLSession)session);
 	}
 
 	public Session openSession() throws DataAccessException {
@@ -193,6 +198,11 @@ public class MySQLDataSource implements DataSource {
 			if (version == 13) {
 				DatabaseUpgradeUtil.upgrade13to14(conn, stmt, false);
 				version = 14;
+			}
+
+			if (version == 14) {
+				DatabaseUpgradeUtil.upgrade14to15(conn, stmt, false);
+				version = 15;
 			}
 
 			stmt.close();

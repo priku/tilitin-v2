@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.logging.Logger;
 
 import kirjanpito.db.AccountDAO;
+import kirjanpito.db.AttachmentDAO;
 import kirjanpito.db.COAHeadingDAO;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.db.DataSource;
@@ -95,6 +96,10 @@ public class PSQLDataSource implements DataSource {
 
 	public DocumentTypeDAO getDocumentTypeDAO(Session session) {
 		return new PSQLDocumentTypeDAO((PSQLSession)session);
+	}
+
+	public AttachmentDAO getAttachmentDAO(Session session) {
+		return new kirjanpito.db.postgresql.PSQLAttachmentDAO((PSQLSession)session);
 	}
 
 	public Session openSession() throws DataAccessException {
@@ -192,6 +197,11 @@ public class PSQLDataSource implements DataSource {
 			if (version == 13) {
 				DatabaseUpgradeUtil.upgrade13to14(conn, stmt, false);
 				version = 14;
+			}
+
+			if (version == 14) {
+				DatabaseUpgradeUtil.upgrade14to15(conn, stmt, false);
+				version = 15;
 			}
 
 			stmt.close();

@@ -246,6 +246,7 @@ public class DocumentMenuBuilder {
         editDocTypesMenuItem = SwingUtils.createMenuItem("Muokkaa", null, 'M',
                 KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcutKeyMask),
                 l.editDocTypesListener);
+        menu.add(editDocTypesMenuItem);
         
         return menu;
     }

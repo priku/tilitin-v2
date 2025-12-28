@@ -7,6 +7,115 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.0] - 2025-12-29
+
+### 📎 PDF-liitteet - Uusi ominaisuus
+
+**Branch:** `feature/pdf-attachments`
+
+### Lisätty
+- **PDF-liitteet tositteisiin** - Täysi tuki PDF-tiedostojen liittämiseen
+  - ✅ Tietokantataulu `attachments` (versio 15)
+  - ✅ Tietokantamigraatio versiosta 14 → 15
+  - ✅ Tuki kaikille tietokannoille (SQLite, MySQL, PostgreSQL)
+  - ✅ DAO-kerros kaikille tietokannoille
+  - ✅ UI-komponentit (AttachmentsPanel, AttachmentsTableModel)
+  - ✅ Integraatio DocumentFrameen
+  - ✅ PDF-validoinnit ja kookontrollit
+  - ✅ Testaussuite (15 testiä, kaikki läpi ✅)
+
+#### Tietokantakerros
+- **Attachment.kt** - Kotlin data class PDF-liitteille
+  - Tiedostokoon validoinnit (10 MB max, 5 MB varoitus)
+  - Tiedostonimen sanitointi
+  - Apumetodit tiedostokoon muotoiluun
+  - Factory-metodi `fromFile()` validoinnilla
+
+- **AttachmentDAO** - Rajapinta CRUD-operaatioille
+  - `findById()`, `findByDocumentId()`
+  - `save()`, `delete()`
+  - `countByDocumentId()`, `getTotalSize()`
+
+- **DAO-toteutukset:**
+  - `SQLiteAttachmentDAO.kt` - SQLite-toteutus
+  - `MySQLAttachmentDAO.kt` - MySQL-toteutus
+  - `PSQLAttachmentDAO.kt` - PostgreSQL-toteutus
+
+- **PdfUtils.kt** - PDF-apufunktiot
+  - PDF-validoinnit Apache PDFBox:lla
+  - Sivumäärän laskenta
+  - Virheenkäsittely korruptoituneille PDF:ille
+
+#### UI-kerros
+- **AttachmentsPanel.java** - Pääpaneeli PDF-liitteiden hallintaan
+  - Listanäkymä JTable:lla
+  - "Lisää PDF" -painike tiedostonvalitsimella
+  - "Poista" -painike vahvistuksella
+  - "Vie tiedostoksi" -painike PDF:ien vientiin
+  - Automaattiset päivitykset dokumentin vaihtuessa
+
+- **AttachmentsTableModel.java** - Taulukkomalli liitteiden näyttämiseen
+  - Sarakkeet: Tiedosto, Koko, Sivut, Lisätty, Kuvaus
+  - Päivämäärän muotoilu
+  - Tiedostokoon muotoilu (B/KB/MB)
+
+#### Integraatio
+- **DocumentFrame.java** - Liitteet-paneeli integroitu
+  - Paneeli näkyy ikkunan alaosassa
+  - Päivittyy automaattisesti dokumenttien välillä navigoidessa
+  - Käyttää Registryä DataSource-pääsyyn
+
+#### Riippuvuudet
+- **Apache PDFBox 3.0.3** - PDF-katseluun ja -validoinnin
+  - JAR-koko kasvu: ~4-5 MB
+  - Java 11+ yhteensopiva
+
+#### Testaus
+- **AttachmentDAOTest.java** - Kattava testaussuite
+  - 15 testitapausta kaikille toiminnallisuuksille
+  - Tietokantamigraation testaus
+  - PDF-apufunktioiden testaus
+  - Kaikki testit läpi ✅
+
+#### Dokumentaatio
+- **PDF-ATTACHMENTS-IMPLEMENTATION.md** - Täydellinen toteutusdokumentaatio
+- **PDF-IMPROVEMENTS-PLAN.md** - Alkuperäinen suunnitelma
+- **PDF-IMPROVEMENTS-PLAN-REVIEW.md** - Arvostelu ja palaute
+- **TEST-PDF-ATTACHMENTS.md** - Testausopas tietokantakerrokselle
+- **QUICK-TEST-GUIDE.md** - Nopea viite manuaaliseen testaamiseen
+- **TEST-SPRINT2-GUIDE.md** - Yksityiskohtainen Sprint 2 -testausopas
+
+### Muutettu
+- **Tietokantaversio:** Päivitetty versiosta 14 → 15
+- **Kaikki SettingsDAO-luokat:** Päivitetty versioon 15
+- **Kaikki DataSource-luokat:** Lisätty `getAttachmentDAO()` -metodi
+- **Kaikki DataSource-luokat:** Lisätty migraatiokutsu versiolle 14 → 15
+- **pom.xml:** Lisätty Apache PDFBox 3.0.3 -riippuvuus
+
+### Tekninen
+- **Kieli:** Kotlin 2.3.0 uusille komponenteille
+- **PDF-kirjastot:** Apache PDFBox 3.0.3 (uusi), iText 5.5.13.4 (olemassa oleva)
+- **Tiedostokoon rajat:** 10 MB maksimi, 5 MB varoituskynnys
+- **Tietokantatuki:** SQLite (pääasiallinen), MySQL, PostgreSQL
+
+### Tiedostot
+- **Uudet tiedostot:** 15 (5 Kotlin, 3 Java, 6 dokumentaatio, 2 testiskripti)
+- **Muokatut tiedostot:** 12 (8 tietokantakerros, 3 skeema, 1 UI, 1 build)
+- **Yhteensä:** 27 tiedostoa muutettu/luotu
+
+### Tunnettuja rajoituksia
+- PDF-katselija ei vielä toteutettu (suunniteltu Sprint 3:lle)
+- Ei drag & drop -tukea (suunniteltu Sprint 4:lle)
+- Ei leikepöytä-tukea (suunniteltu Sprint 4:lle)
+- Ei PDF-välimuistia (suunniteltu Sprint 3:lle)
+- Vain yhden tiedoston valinta kerrallaan
+
+### Seuraavat askeleet
+- Sprint 3: PDF-katselijan toteutus
+- Sprint 4: Välimuisti, drag & drop, leikepöytä-tuki
+
+---
+
 ## [2.1.6] - 2025-12-28
 
 ### 🔧 Code Modernization - Quick Wins

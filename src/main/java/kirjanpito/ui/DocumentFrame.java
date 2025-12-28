@@ -180,6 +180,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private JLabel documentTypeLabel;
 	private JLabel backupStatusLabel;
 	private JTable entryTable;
+	private AttachmentsPanel attachmentsPanel;
 	private TableColumn vatColumn;
 	private EntryTableHeaderRenderer tableHeaderRenderer;
 	private JPanel searchPanel;
@@ -334,6 +335,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		createTable(contentPanel);
 		createTotalRow(bottomPanel);
 		createSearchBar(bottomPanel);
+		createAttachmentsPanel(bottomPanel);
 
 		formatter = new DecimalFormat();
 		formatter.setMinimumFractionDigits(2);
@@ -829,6 +831,17 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		button = new JButton(new ImageIcon(Resources.loadAsImage("close-16x16.png")));
 		button.addActionListener(searchListener);
 		panel.add(button, c);
+	}
+
+	/**
+	 * Creates the attachments panel for displaying PDF attachments.
+	 * 
+	 * @param container parent container
+	 */
+	protected void createAttachmentsPanel(JPanel container) {
+		attachmentsPanel = new AttachmentsPanel(null, 0);
+		attachmentsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("PDF-liitteet"));
+		container.add(attachmentsPanel);
 	}
 
 	/**
@@ -2099,6 +2112,11 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		updateDocumentTypes();
 		updateTableSettings();
 		
+		// Update attachments panel with data source
+		if (attachmentsPanel != null) {
+			attachmentsPanel.setDataSource(registry.getDataSource());
+		}
+		
 		// Tallenna viimeisimpien tietokantojen listaan
 		String dbUrl = AppSettings.getInstance().getString("database.url", "");
 		if (!dbUrl.isEmpty()) {
@@ -2306,6 +2324,12 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		tableModel.fireTableDataChanged();
 		numberTextField.setLockIconVisible(document != null && !documentEditable);
 		setComponentsEnabled(document != null, model.isPeriodEditable(), documentEditable);
+		
+		// Update attachments panel with current document ID
+		if (attachmentsPanel != null) {
+			int documentId = (document != null && document.getId() > 0) ? document.getId() : 0;
+			attachmentsPanel.setDocumentId(documentId);
+		}
 	}
 
 	/**

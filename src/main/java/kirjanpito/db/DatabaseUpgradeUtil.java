@@ -601,4 +601,74 @@ public class DatabaseUpgradeUtil {
 		logger.info("Tietokannan päivittäminen versioon 14 onnistui");
 	}
 
+	/**
+	 * Päivittää tietokannan versiosta 14 versioon 15.
+	 * Lisää attachments-taulun PDF-liitteitä varten.
+	 * 
+	 * @param conn tietokantayhteys
+	 * @param stmt SQL-lauseke
+	 * @param sqlite true jos SQLite, false jos MySQL/PostgreSQL
+	 * @throws SQLException jos päivitys epäonnistuu
+	 */
+	public static void upgrade14to15(Connection conn, Statement stmt, boolean sqlite) throws SQLException {
+		String databaseProduct = conn.getMetaData().getDatabaseProductName().toLowerCase();
+		boolean isPostgreSQL = databaseProduct.contains("postgresql");
+		
+		if (sqlite) {
+			// SQLite: BLOB type
+			stmt.execute("CREATE TABLE IF NOT EXISTS attachments (" +
+				"id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+				"document_id INTEGER NOT NULL," +
+				"filename VARCHAR(255) NOT NULL," +
+				"content_type VARCHAR(100) DEFAULT 'application/pdf'," +
+				"data BLOB NOT NULL," +
+				"file_size INTEGER NOT NULL," +
+				"page_count INTEGER," +
+				"created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+				"description TEXT," +
+				"FOREIGN KEY (document_id) REFERENCES document(id) ON DELETE CASCADE" +
+				")");
+			stmt.execute("CREATE INDEX IF NOT EXISTS idx_attachments_document_id ON attachments(document_id)");
+		} else if (isPostgreSQL) {
+			// PostgreSQL: BYTEA type, sequences
+			stmt.execute("CREATE SEQUENCE IF NOT EXISTS attachments_id_seq");
+			stmt.execute("CREATE TABLE IF NOT EXISTS attachments (" +
+				"id INT4 NOT NULL," +
+				"document_id INT4 NOT NULL," +
+				"filename VARCHAR(255) NOT NULL," +
+				"content_type VARCHAR(100) DEFAULT 'application/pdf'," +
+				"data BYTEA NOT NULL," +
+				"file_size INT4 NOT NULL," +
+				"page_count INT4," +
+				"created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+				"description TEXT," +
+				"PRIMARY KEY (id)," +
+				"FOREIGN KEY (document_id) REFERENCES document(id) ON DELETE CASCADE" +
+				")");
+			stmt.execute("CREATE INDEX idx_attachments_document_id ON attachments(document_id)");
+		} else {
+			// MySQL: LONGBLOB (4 GB limit)
+			stmt.execute("CREATE TABLE IF NOT EXISTS attachments (" +
+				"id INT AUTO_INCREMENT NOT NULL," +
+				"document_id INT NOT NULL," +
+				"filename VARCHAR(255) NOT NULL," +
+				"content_type VARCHAR(100) DEFAULT 'application/pdf'," +
+				"data LONGBLOB NOT NULL," +
+				"file_size INT NOT NULL," +
+				"page_count INT," +
+				"created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+				"description TEXT," +
+				"PRIMARY KEY (id)," +
+				"FOREIGN KEY (document_id) REFERENCES document(id) ON DELETE CASCADE" +
+				") ENGINE=InnoDB");
+			stmt.execute("CREATE INDEX idx_attachments_document_id ON attachments(document_id)");
+		}
+
+		stmt.executeUpdate("UPDATE settings SET version=15");
+		conn.commit();
+
+		Logger logger = Logger.getLogger("kirjanpito.db");
+		logger.info("Tietokannan päivittäminen versioon 15 onnistui (PDF-liitteet lisätty)");
+	}
+
 }
