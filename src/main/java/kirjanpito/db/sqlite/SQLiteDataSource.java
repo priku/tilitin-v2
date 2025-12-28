@@ -15,6 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import kirjanpito.db.AccountDAO;
+// Kotlin DAO import
+// import kirjanpito.db.sqlite.SQLiteAccountDAOKt; // TODO: Phase 3 - enable when ready
 import kirjanpito.db.COAHeadingDAO;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.db.DataSource;
@@ -88,7 +90,10 @@ public class SQLiteDataSource implements DataSource {
 	}
 
 	public AccountDAO getAccountDAO(Session session) {
-		return new SQLiteAccountDAO((SQLiteSession)session);
+		// Phase 3: Kotlin DAO integration - ENABLED
+		return new SQLiteAccountDAOKt((SQLiteSession)session);
+		// Legacy Java implementation:
+		// return new SQLiteAccountDAO((SQLiteSession)session);
 	}
 
 	public COAHeadingDAO getCOAHeadingDAO(Session session) {
