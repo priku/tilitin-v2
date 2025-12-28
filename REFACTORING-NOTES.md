@@ -1,12 +1,18 @@
-# Tilitin 2.1.0 Refactoring Notes
+# Tilitin 2.1.1 Refactoring Notes
 
 ## Overview
 
-This document describes the refactoring work done for version 2.1.0, focusing on breaking down the DocumentFrame "God Object" into smaller, more maintainable components.
+This document describes the refactoring work done for version 2.1.1, focusing on breaking down the DocumentFrame "God Object" into smaller, more maintainable components, plus theme support improvements.
 
 **Branch**: `feature/2.1-documentframe-refactor`
 **Base Version**: 2.0.4
-**Target Version**: 2.1.0
+**Target Version**: 2.1.1
+
+**Includes**:
+- Phase 1: DocumentBackupManager extraction
+- Phase 1b: DocumentExporter extraction
+- CSV export fixes (4 commits)
+- Sprint 1: Theme support for all UI components (2 commits)
 
 ---
 
@@ -483,14 +489,71 @@ All identified issues have been resolved:
 
 ---
 
+## Sprint 1: Theme Support (2 commits)
+
+### Goal
+Remove all hardcoded colors from UI components to enable proper FlatLaf dark/light mode support.
+
+### Changes
+
+#### Commit 26f53de: Fix hardcoded colors
+**Files Modified**: 7
+- `COATableCellRenderer.java` - Theme-aware favorite highlighting and heading colors
+- `DocumentFrame.java` - Theme-aware error indication
+- `DocumentNumberShiftDialog.java` - Theme-aware error styling
+- `AccountCellEditor.java` - Theme-aware borders
+- `CurrencyCellEditor.java` - Theme-aware borders
+- `DateCellEditor.java` - Theme-aware borders
+- `DescriptionCellEditor.java` - Theme-aware borders
+
+**Pattern Used**:
+```java
+Color themeColor = UIManager.getColor("UIManager.key");
+if (themeColor == null) {
+    themeColor = Color.FALLBACK; // Original hardcoded color
+}
+component.setColor(themeColor);
+```
+
+**UIManager Keys**:
+- `List.selectionInactiveBackground` - Favorite account highlighting
+- `Component.accentColor` / `Actions.Red` - Heading emphasis
+- `Actions.Red` - Error indication
+- `text` - Text color
+- `Component.borderColor` - Cell editor borders
+
+#### Commit b3cde1c: Documentation
+- Created `SPRINT1-THEME-SUPPORT.md` with complete technical details
+- Testing guidelines and UIManager key mappings
+
+### Benefits
+- ✅ Full FlatLaf dark/light mode support for all UI components
+- ✅ Proper contrast ratios in both themes
+- ✅ Graceful fallbacks maintain original appearance
+- ✅ No breaking changes
+- ✅ Future-proof for new themes
+
+### Statistics
+- **Files Modified**: 7
+- **Lines Added**: 62
+- **Lines Removed**: 10
+- **Net Change**: +52 lines
+- **UI Theme Coverage**: 100%
+
+### Related Documentation
+- See `SPRINT1-THEME-SUPPORT.md` for complete details
+- Part of `MODERNIZATION-TODO.md` Sprint 1
+
+---
+
 ## Contributors
 
-**Refactoring**: Claude Sonnet 4.5 (DocumentFrame decomposition)
+**Refactoring**: Claude Sonnet 4.5 (DocumentFrame decomposition, Sprint 1 theme support)
 **Backup Improvements**: GitHub Copilot (VACUUM INTO, busy_timeout)
 **Original Author**: Tommi Helineva (DocumentFrame base implementation)
 
 ---
 
-**Document Version**: 1.0
+**Document Version**: 1.1
 **Last Updated**: 2025-12-28
-**Status**: Phase 1 + 1b Complete ✅
+**Status**: Phase 1 + 1b + Sprint 1 Complete ✅
