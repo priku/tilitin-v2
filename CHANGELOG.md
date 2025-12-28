@@ -34,10 +34,11 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 - **DocumentFrame.java** - Refaktorointi jatkuu
   - ✅ Phase 3b: Table management siirretty DocumentTableManager:iin (~75 riviä pois)
   - ✅ Phase 4: Koodin siistiminen ja yksinkertaistaminen
-  - ✅ Poistettu 10 käyttämätöntä importia
+  - ✅ Phase 5: Print operations siirretty DocumentPrinter:iin (~276 riviä pois)
+  - ✅ Poistettu 10 käyttämätöntä importia + 21 print-importia
   - ✅ Yksinkertaistettu wrapperit (getPrevDocumentAction/getNextDocumentAction)
-  - ✅ DocumentFrame: 3,008 → ~2,930 riviä (-78 riviä, -2.6%)
-  - ✅ **Kokonaisprogress:** 3,856 → ~2,930 riviä (-926 riviä, -24%)
+  - ✅ DocumentFrame: 3,008 → ~2,654 riviä (-354 riviä, -11.8%)
+  - ✅ **Kokonaisprogress:** 3,856 → ~2,654 riviä (-1,202 riviä, -31%)
 
 ### Tekninen
 - **DocumentTableManager.java** - Uusi luokka (400 riviä)
@@ -46,6 +47,11 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
   - ColumnMapper-rajapinta sarakeindeksien muuntamiseen
   - updateTableSettings() -metodi ALV-sarakkeen hallintaan
   - mapColumnIndexToView/Model() -metodit
+- **DocumentPrinter.java** - Laajennettu luokka (434 riviä)
+  - PrintCallbacks-rajapinta DocumentFrame:lle
+  - 9 print-metodia (showAccountSummary, showDocumentPrint, jne.)
+  - Print preview -ikkunan hallinta
+  - Kaikki report generation -kutsut
 
 ### Korjattu
 - Keyboard shortcut -konfiguraatio siirretty DocumentTableManager:iin

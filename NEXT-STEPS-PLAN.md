@@ -3,7 +3,7 @@
 
 **Current Version:** 2.2.1  
 **Last Updated:** 2025-12-29  
-**DocumentFrame Size:** ~2,930 lines (target: <500 lines)
+**DocumentFrame Size:** ~2,654 lines (target: <500 lines)
 
 ---
 
@@ -130,19 +130,21 @@
 
 ---
 
-### Phase 5: Print Operations Extraction
+### Phase 5: Print Operations Extraction ✅ (v2.2.1)
 
 **Goal:** Extract all print-related functionality.
 
+**Status:** ✅ COMPLETED
+
 **Tasks:**
-1. **Create `DocumentPrinter.java`**
+1. ✅ **Laajennettu `DocumentPrinter.java`** (434 riviä)
    - Extract print preview logic
    - Extract print dialog handling
    - Extract report generation calls
    - Extract print options management
    - **Estimated:** 200-300 lines
 
-**Expected Result:** DocumentFrame reduced by ~200-300 lines → ~1,400-1,750 lines
+**Expected Result:** ✅ DocumentFrame reduced by ~276 lines → ~2,654 lines (COMPLETED v2.2.1)
 
 ---
 

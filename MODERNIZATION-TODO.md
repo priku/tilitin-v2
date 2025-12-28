@@ -27,7 +27,7 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 - ⚠️ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 4 - tulevaisuus)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
-- ⚠️ DocumentFrame.java on 3,007 riviä (vähennetty -849 riviä, -22%)
+- ⚠️ DocumentFrame.java on ~2,654 riviä (vähennetty -1,202 riviä, -31%)
 - ⚠️ Vanhat Swing-patternit (anonymous inner classes) - 10/40+ korjattu (25%)
 - ❌ Epäjohdonmukainen UI-komponenttisuunnittelu
 
@@ -169,8 +169,11 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - [ ] **Phase 4**: Event handling (jatkuu)
   - [ ] Jäljellä olevat anonymous inner classes → lambdas (jos mahdollista)
   - [ ] Luo `DocumentEventHandler.java` (valinnainen)
-- [ ] **Phase 5**: Print toiminnot
-  - [ ] Luo `DocumentPrinter.java`
+- [x] **Phase 5**: Print toiminnot ✅ (v2.2.1)
+  - [x] Laajennettu `DocumentPrinter.java` (434 riviä)
+  - [x] Kaikki print-metodit siirretty
+  - [x] Print preview -ikkunan hallinta
+  - [x] ~276 riviä pois DocumentFrame:sta
 - [ ] **Phase 6**: Navigation & State
   - [ ] Luo `DocumentNavigator.java`
   - [ ] Luo `DocumentStateManager.java`
