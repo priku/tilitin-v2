@@ -82,8 +82,10 @@ public class CSVExportWorker extends SwingWorker<Void, Void> {
 		}
 		
 		documents = null;
-		
+
 		final CSVWriter writer = new CSVWriter(new FileWriter(file));
+		// Käytä puolipistettä erottimena (Excel Suomi-versio)
+		writer.setDelimiter(';');
 		writer.writeField("Tosite");
 		writer.writeField("Päivämäärä");
 		writer.writeField("Nro");
