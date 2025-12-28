@@ -5,6 +5,7 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 
 ## Status
 **Phase 1: Foundation - COMPLETED ✓**
+**Phase 2: Model Classes - IN PROGRESS 🔄**
 
 ## What Has Been Done
 
@@ -15,10 +16,41 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 - Configured mixed Java/Kotlin compilation
 
 ### 2. Directory Structure
-Created new Kotlin source directory:
+Created Kotlin source directories:
 ```
-src/main/kotlin/kirjanpito/ui/
+src/main/kotlin/kirjanpito/
+├── db/       # Data model classes (Phase 2)
+└── ui/       # UI utilities (Phase 1)
 ```
+
+### 3. Model Classes (Phase 2 - NEW)
+Converted core data models to Kotlin data classes:
+
+#### [Account.kt](src/main/kotlin/kirjanpito/db/Account.kt)
+- `AccountData` - Tilin tiedot
+- Companion object with type constants (TYPE_ASSET, TYPE_LIABILITY, etc.)
+- Helper methods: `isBalanceSheetAccount()`, `hasVat()`, `displayName()`
+
+#### [Document.kt](src/main/kotlin/kirjanpito/db/Document.kt)
+- `DocumentData` - Tositteen tiedot
+- Simplified from 93 lines Java to ~35 lines Kotlin
+
+#### [Entry.kt](src/main/kotlin/kirjanpito/db/Entry.kt)
+- `EntryData` - Viennin tiedot
+- Flag handling with `getFlag()`, `setFlag()`
+- Helper methods: `signedAmount()`, `isEmpty()`, `isValid()`
+
+#### [Period.kt](src/main/kotlin/kirjanpito/db/Period.kt)
+- `PeriodData` - Tilikauden tiedot
+- Helper methods: `containsDate()`, `durationInDays()`
+
+#### [DocumentType.kt](src/main/kotlin/kirjanpito/db/DocumentType.kt)
+- `DocumentTypeData` - Tositelajin tiedot
+- Helper methods: `isInRange()`, `nextNumber()`
+
+#### [COAHeading.kt](src/main/kotlin/kirjanpito/db/COAHeading.kt)
+- `COAHeadingData` - Tilikartan väliotsikon tiedot
+- Helper method: `indentedText()`
 
 ### 3. Kotlin Utility Classes
 Created three modern utility modules in Kotlin:
@@ -67,24 +99,32 @@ java -jar target/tilitin-2.1.1.jar
 
 ## Migration Strategy
 
-### Phase 1: Foundation (COMPLETED)
+### Phase 1: Foundation (COMPLETED ✓)
 - ✓ Configure Maven for Kotlin
 - ✓ Create utility classes
 - ✓ Verify build pipeline
 - ✓ Test Java-Kotlin interoperability
 
-### Phase 2: Incremental Refactoring (NEXT)
-Target for modernization:
+### Phase 2: Model Classes (IN PROGRESS 🔄)
+- ✓ Create Kotlin data classes for db package
+- ✓ AccountData, DocumentData, EntryData, PeriodData
+- ✓ DocumentTypeData, COAHeadingData
+- ⏳ Migrate DAO classes to use new data classes
+- ⏳ Update UI to use Kotlin models
+
+### Phase 3: Dialog Refactoring (PLANNED)
+- [ ] Create BaseDialog abstract class in Kotlin
+- [ ] Convert simple dialogs to Kotlin
+- [ ] Implement common dialog patterns
+
+### Phase 4: DocumentFrame Refactoring (PLANNED)
 1. **DocumentFrame** (3262 lines) - Break down into smaller Kotlin classes
-   - Extract UI builders
-   - Extract business logic
-   - Extract event handlers
+   - [ ] Extract menu builders
+   - [ ] Extract toolbar builders
+   - [ ] Extract event handlers
+   - [ ] Extract table management
 
-2. **Dialog classes** - Convert to Kotlin data classes where appropriate
-
-3. **Model classes** - Leverage Kotlin's data classes and null-safety
-
-### Phase 3: Advanced Features
+### Phase 5: Advanced Features (FUTURE)
 - Use Kotlin coroutines for background tasks
 - Implement type-safe builders for complex UIs
 - Leverage sealed classes for state management
