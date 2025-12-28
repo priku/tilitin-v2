@@ -2,7 +2,7 @@
 ; Modern Windows installer for Tilitin accounting software
 
 #define MyAppName "Tilitin"
-#define MyAppVersion "2.1.6"
+#define MyAppVersion "2.2.0"
 #define MyAppPublisher "Tilitin Project"
 #define MyAppURL "https://github.com/priku/tilitin-modernized"
 #define MyAppExeName "Tilitin 2.0.exe"
