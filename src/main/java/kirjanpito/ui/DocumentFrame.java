@@ -194,6 +194,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private boolean searchEnabled;
 	private BigDecimal debitTotal;
 	private BigDecimal creditTotal;
+	
+	// Builder instances for menu and toolbar
+	private DocumentMenuBuilder menuBuilder;
+	private DocumentToolbarBuilder toolbarBuilder;
 
 	private static Logger logger = Logger.getLogger(Kirjanpito.LOGGER_NAME);
 	private static final long serialVersionUID = 1L;
@@ -280,337 +284,115 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	}
 
 	/**
-	 * Luo ikkunan valikot.
+	 * Luo ikkunan valikot käyttäen DocumentMenuBuilder-luokkaa.
 	 */
 	protected void createMenuBar() {
-		JMenuBar menuBar = new JMenuBar();
-		JMenuItem menuItem;
-		JMenu menu;
-
-		/* Luodaan Tiedosto-valikko. */
-		menu = new JMenu("Tiedosto");
-		menu.setMnemonic('T');
-		menuBar.add(menu);
-
-		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-		newDatabaseMenuItem = SwingUtils.createMenuItem("Uusi…",
-				null, 'U', KeyStroke.getKeyStroke('U', shortcutKeyMask), newDatabaseListener);
-
-		menu.add(newDatabaseMenuItem);
-
-		openDatabaseMenuItem = SwingUtils.createMenuItem("Avaa…",
-				null, 'A', KeyStroke.getKeyStroke('O', shortcutKeyMask),
-				openDatabaseListener);
-
-		menu.add(openDatabaseMenuItem);
-
-		// Viimeisimmät tietokannat -alivalikko
-		recentMenu = new JMenu("Viimeisimmät");
-		recentMenu.setMnemonic('V');
+		menuBuilder = new DocumentMenuBuilder();
+		
+		// Konfiguroi kuuntelijat
+		DocumentMenuBuilder.MenuListeners listeners = new DocumentMenuBuilder.MenuListeners();
+		listeners.newDatabaseListener = newDatabaseListener;
+		listeners.openDatabaseListener = openDatabaseListener;
+		listeners.databaseSettingsListener = databaseSettingsListener;
+		listeners.backupSettingsListener = backupSettingsListener;
+		listeners.restoreBackupListener = restoreBackupListener;
+		listeners.quitListener = quitListener;
+		listeners.copyEntriesAction = copyEntriesAction;
+		listeners.pasteEntriesAction = pasteEntriesAction;
+		listeners.newDocListener = newDocListener;
+		listeners.deleteDocListener = deleteDocListener;
+		listeners.addEntryListener = addEntryListener;
+		listeners.removeEntryListener = removeEntryListener;
+		listeners.editEntryTemplatesListener = editEntryTemplatesListener;
+		listeners.createEntryTemplateListener = createEntryTemplateListener;
+		listeners.chartOfAccountsListener = chartOfAccountsListener;
+		listeners.startingBalancesListener = startingBalancesListener;
+		listeners.propertiesListener = propertiesListener;
+		listeners.settingsListener = settingsListener;
+		listeners.appearanceListener = appearanceListener;
+		listeners.prevDocListener = prevDocListener;
+		listeners.nextDocListener = nextDocListener;
+		listeners.firstDocListener = firstDocListener;
+		listeners.lastDocListener = lastDocListener;
+		listeners.findDocumentByNumberListener = findDocumentByNumberListener;
+		listeners.searchListener = searchListener;
+		listeners.editDocTypesListener = editDocTypesListener;
+		listeners.printListener = printListener;
+		listeners.editReportsListener = editReportsListener;
+		listeners.vatDocumentListener = vatDocumentListener;
+		listeners.setIgnoreFlagToEntryAction = setIgnoreFlagToEntryAction;
+		listeners.balanceComparisonListener = balanceComparisonListener;
+		listeners.numberShiftListener = numberShiftListener;
+		listeners.vatChangeListener = vatChangeListener;
+		listeners.exportListener = exportListener;
+		listeners.helpListener = helpListener;
+		listeners.debugListener = debugListener;
+		listeners.aboutListener = aboutListener;
+		
+		// Rakenna valikkorivi
+		JMenuBar menuBar = menuBuilder.build(listeners);
+		
+		// Hae viitteet menu-objekteihin
+		entryTemplateMenu = menuBuilder.getEntryTemplateMenu();
+		docTypeMenu = menuBuilder.getDocTypeMenu();
+		gotoMenu = menuBuilder.getGotoMenu();
+		reportsMenu = menuBuilder.getReportsMenu();
+		toolsMenu = menuBuilder.getToolsMenu();
+		recentMenu = menuBuilder.getRecentMenu();
+		
+		// Hae viitteet menu item -objekteihin
+		newDatabaseMenuItem = menuBuilder.getNewDatabaseMenuItem();
+		openDatabaseMenuItem = menuBuilder.getOpenDatabaseMenuItem();
+		newDocMenuItem = menuBuilder.getNewDocMenuItem();
+		deleteDocMenuItem = menuBuilder.getDeleteDocMenuItem();
+		addEntryMenuItem = menuBuilder.getAddEntryMenuItem();
+		removeEntryMenuItem = menuBuilder.getRemoveEntryMenuItem();
+		pasteMenuItem = menuBuilder.getPasteMenuItem();
+		coaMenuItem = menuBuilder.getCoaMenuItem();
+		vatDocumentMenuItem = menuBuilder.getVatDocumentMenuItem();
+		editEntryTemplatesMenuItem = menuBuilder.getEditEntryTemplatesMenuItem();
+		createEntryTemplateMenuItem = menuBuilder.getCreateEntryTemplateMenuItem();
+		startingBalancesMenuItem = menuBuilder.getStartingBalancesMenuItem();
+		propertiesMenuItem = menuBuilder.getPropertiesMenuItem();
+		settingsMenuItem = menuBuilder.getSettingsMenuItem();
+		searchMenuItem = menuBuilder.getSearchMenuItem();
+		editDocTypesMenuItem = menuBuilder.getEditDocTypesMenuItem();
+		setIgnoreFlagMenuItem = menuBuilder.getSetIgnoreFlagMenuItem();
+		
+		// Päivitä viimeisimmät tietokannat -valikko
 		updateRecentDatabasesMenu();
-		menu.add(recentMenu);
-
-		menu.add(SwingUtils.createMenuItem("Tietokanta-asetukset…", null, 'T', 
-				KeyStroke.getKeyStroke('D', shortcutKeyMask), databaseSettingsListener));
-		menu.add(SwingUtils.createMenuItem("Varmuuskopiointi…", null, 'V',
-				null, backupSettingsListener));
-		menu.add(SwingUtils.createMenuItem("Palauta varmuuskopiosta…", null, 'P',
-				null, restoreBackupListener));
-
-		menu.addSeparator();
-		menu.add(SwingUtils.createMenuItem("Lopeta", "quit-16x16.png", 'L',
-				KeyStroke.getKeyStroke('Q', shortcutKeyMask),
-				quitListener));
-
-		/* Luodaan Muokkaa-valikko. */
-		menu = new JMenu("Muokkaa");
-		menu.setMnemonic('M');
-		menuBar.add(menu);
-
-		menu.add(SwingUtils.createMenuItem("Kopioi", null, 'K',
-				KeyStroke.getKeyStroke(KeyEvent.VK_C,
-						shortcutKeyMask), copyEntriesAction));
-
-		pasteMenuItem = SwingUtils.createMenuItem("Liitä", null, 'L',
-				KeyStroke.getKeyStroke(KeyEvent.VK_V,
-						shortcutKeyMask), pasteEntriesAction);
-
-		menu.add(pasteMenuItem);
-		menu.addSeparator();
-
-		newDocMenuItem = SwingUtils.createMenuItem("Uusi tosite", "document-new-16x16.png", 'U',
-				KeyStroke.getKeyStroke('N', shortcutKeyMask),
-				newDocListener);
-
-		deleteDocMenuItem = SwingUtils.createMenuItem("Poista tosite", "delete-16x16.png", 'P',
-				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, shortcutKeyMask), deleteDocListener);
-
-		menu.add(newDocMenuItem);
-		menu.add(deleteDocMenuItem);
-		menu.addSeparator();
-
-		addEntryMenuItem = SwingUtils.createMenuItem("Lisää vienti",
-				"list-add-16x16.png", 'L',
-				KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0), addEntryListener);
-
-		removeEntryMenuItem = SwingUtils.createMenuItem("Poista vienti",
-				"list-remove-16x16.png", 'o',
-				KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK), removeEntryListener);
-
-		entryTemplateMenu = new JMenu("Vientimallit");
-		editEntryTemplatesMenuItem = SwingUtils.createMenuItem("Muokkaa", null, 'M',
-				KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcutKeyMask),
-				editEntryTemplatesListener);
-
-		createEntryTemplateMenuItem = SwingUtils.createMenuItem("Luo tositteesta", null, 'K',
-				KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcutKeyMask),
-				createEntryTemplateListener);
-
-		menu.add(addEntryMenuItem);
-		menu.add(removeEntryMenuItem);
-		menu.add(entryTemplateMenu);
-
-		menu.addSeparator();
-
-		coaMenuItem = SwingUtils.createMenuItem("Tilikartta…", null, 'T',
-				KeyStroke.getKeyStroke(KeyEvent.VK_T,
-						shortcutKeyMask), chartOfAccountsListener);
-
-		startingBalancesMenuItem = SwingUtils.createMenuItem("Alkusaldot…", null, 's',
-				KeyStroke.getKeyStroke('B', shortcutKeyMask), startingBalancesListener);
-
-		propertiesMenuItem = SwingUtils.createMenuItem("Perustiedot…", null, 'e',
-				KeyStroke.getKeyStroke('P', shortcutKeyMask), propertiesListener);
-
-		settingsMenuItem = SwingUtils.createMenuItem("Kirjausasetukset…", null, 'K',
-				KeyStroke.getKeyStroke('S', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), settingsListener);
-
-		JMenuItem appearanceMenuItem = SwingUtils.createMenuItem("Ulkoasu…", null, 'U',
-				KeyStroke.getKeyStroke('A', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), appearanceListener);
-
-		menu.add(coaMenuItem);
-		menu.add(startingBalancesMenuItem);
-		menu.add(propertiesMenuItem);
-		menu.add(settingsMenuItem);
-		menu.add(appearanceMenuItem);
-
-		/* Luodaan Siirry-valikko. */
-		menu = gotoMenu = new JMenu("Siirry");
-		menu.setMnemonic('S');
-		menuBar.add(menu);
-
-		menu.add(SwingUtils.createMenuItem("Edellinen", "go-previous-16x16.png", 'E',
-				KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0),
-				prevDocListener));
-
-		menu.add(SwingUtils.createMenuItem("Seuraava", "go-next-16x16.png", 'S',
-				KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0),
-				nextDocListener));
-
-		menu.addSeparator();
-
-		menu.add(SwingUtils.createMenuItem("Ensimmäinen", "go-first-16x16.png", 'n',
-				KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP,
-						shortcutKeyMask), firstDocListener));
-
-		menu.add(SwingUtils.createMenuItem("Viimeinen", "go-last-16x16.png", 'V',
-				KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN,
-						shortcutKeyMask), lastDocListener));
-
-		menu.addSeparator();
-
-		menu.add(SwingUtils.createMenuItem("Hae numerolla…",
-				null, 'n', KeyStroke.getKeyStroke(KeyEvent.VK_G,
-						shortcutKeyMask), findDocumentByNumberListener));
-
-		searchMenuItem = new JCheckBoxMenuItem("Etsi…");
-		searchMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-				shortcutKeyMask));
-		searchMenuItem.addActionListener(searchListener);
-		menu.add(searchMenuItem);
-
-		/* Luodaan Tositelaji-valikko. */
-		menu = docTypeMenu = new JMenu("Tositelaji");
-		menu.setMnemonic('l');
-		menuBar.add(menu);
-
-		editDocTypesMenuItem = SwingUtils.createMenuItem("Muokkaa", null, 'M',
-				KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcutKeyMask),
-				editDocTypesListener);
-
-		/* Luodaan Tulosteet-valikko. */
-		menu = reportsMenu = new JMenu("Tulosteet");
-		menu.setMnemonic('u');
-		menuBar.add(menu);
-
-		menuItem = SwingUtils.createMenuItem("Tilien saldot", null, 's',
-				KeyStroke.getKeyStroke(KeyEvent.VK_1, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("accountSummary");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Tosite", null, 'O',
-				KeyStroke.getKeyStroke(KeyEvent.VK_2, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("document");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Tiliote", null, 'T',
-				KeyStroke.getKeyStroke(KeyEvent.VK_3, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("accountStatement");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Tuloslaskelma", null, 'u',
-				KeyStroke.getKeyStroke(KeyEvent.VK_4, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("incomeStatement");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Tuloslaskelma erittelyin", null, 'e',
-				KeyStroke.getKeyStroke(KeyEvent.VK_5, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("incomeStatementDetailed");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Tase", null, 'a',
-				KeyStroke.getKeyStroke(KeyEvent.VK_6, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("balanceSheet");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Tase erittelyin", null, 'e',
-				KeyStroke.getKeyStroke(KeyEvent.VK_7, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("balanceSheetDetailed");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Päiväkirja", null, 'P',
-				KeyStroke.getKeyStroke(KeyEvent.VK_8, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("generalJournal");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Pääkirja", null, 'k',
-				KeyStroke.getKeyStroke(KeyEvent.VK_9, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("generalLedger");
-		menu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("ALV-laskelma tileittäin", null, 'V',
-				KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcutKeyMask), printListener);
-		menuItem.setActionCommand("vatReport");
-		menu.add(menuItem);
-
-		JMenu submenu = new JMenu("Tilikartta");
-		submenu.setMnemonic('r');
-		menu.add(submenu);
-
-		menuItem = SwingUtils.createMenuItem("Vain käytössä olevat tilit", null, 'V', null, printListener);
-		menuItem.setActionCommand("coa1");
-		submenu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Vain suosikkitilit", null, 's', null, printListener);
-		menuItem.setActionCommand("coa2");
-		submenu.add(menuItem);
-
-		menuItem = SwingUtils.createMenuItem("Kaikki tilit", null, 'k', null, printListener);
-		menuItem.setActionCommand("coa0");
-		submenu.add(menuItem);
-
-		menu.addSeparator();
-		menu.add(SwingUtils.createMenuItem("Muokkaa", null, 'M', null, editReportsListener));
-
-		/* Luodaan Työkalut-valikko. */
-		menu = toolsMenu = new JMenu("Työkalut");
-		menu.setMnemonic('y');
-		menuBar.add(menu);
-
-		vatDocumentMenuItem = SwingUtils.createMenuItem("ALV-tilien päättäminen",
-				null, 'p', KeyStroke.getKeyStroke(KeyEvent.VK_R,
-						shortcutKeyMask), vatDocumentListener);
-
-		menu.add(vatDocumentMenuItem);
-
-		setIgnoreFlagMenuItem = SwingUtils.createMenuItem("Ohita vienti ALV-laskelmassa", null, 'O',
-				KeyStroke.getKeyStroke(KeyEvent.VK_H, shortcutKeyMask),
-				setIgnoreFlagToEntryAction);
-
-		menu.add(setIgnoreFlagMenuItem);
-
-		menu.add(SwingUtils.createMenuItem("Tilien saldojen vertailu", null, 'T',
-				null, balanceComparisonListener));
-
-		menu.add(SwingUtils.createMenuItem("Muuta tositenumeroita", null, 'n',
-				null, numberShiftListener));
-
-		menu.add(SwingUtils.createMenuItem("ALV-kantojen muutokset", null, 'm',
-				null, vatChangeListener));
-
-		menu.add(SwingUtils.createMenuItem("Vie tiedostoon",
-				null, 'V', KeyStroke.getKeyStroke('E', shortcutKeyMask), exportListener));
-
-		/* Luodaan Ohje-valikko. */
-		menu = new JMenu("Ohje");
-		menu.setMnemonic('O');
-		menuBar.add(menu);
-
-		menu.add(SwingUtils.createMenuItem("Sisältö", null, 'S',
-				KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0),
-				helpListener));
-
-		menu.add(SwingUtils.createMenuItem("Virheenjäljitystietoja", null, 'V',
-				null, debugListener));
-
-		if (!System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
-			// Macilla tämä menee sovellusvalikkoon (setAboutAction)
-			menu.add(SwingUtils.createMenuItem("Tietoja ohjelmasta", null, 'T',
-					null, aboutListener));
-		}
-
+		
 		setJMenuBar(menuBar);
 	}
 
 	/**
-	 * Luo ikkunan työkalurivin.
+	 * Luo ikkunan työkalurivin käyttäen DocumentToolbarBuilder-luokkaa.
 	 */
 	protected void createToolBar() {
-		JToolBar toolBar = new JToolBar();
-		toolBar.setFloatable(false);
-		toolBar.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
-
-		// Navigointi-osio
-		prevButton = SwingUtils.createToolButton("go-previous-22x22.png",
-				"Edellinen tosite (Page Up)", prevDocListener, false);
-
-		nextButton = SwingUtils.createToolButton("go-next-22x22.png",
-				"Seuraava tosite (Page Down)", nextDocListener, false);
-
-		toolBar.add(prevButton);
-		toolBar.add(nextButton);
-		toolBar.addSeparator(new Dimension(16, 0));
-
-		// Tosite-osio
-		newDocButton = SwingUtils.createToolButton("document-new-22x22.png",
-				"Uusi tosite (Ctrl+N)", newDocListener, true);
-
-		toolBar.add(newDocButton);
-		toolBar.addSeparator(new Dimension(16, 0));
-
-		// Vienti-osio
-		addEntryButton = SwingUtils.createToolButton("list-add-22x22.png",
-				"Lisää vienti (F8)", addEntryListener, true);
-
-		removeEntryButton = SwingUtils.createToolButton("list-remove-22x22.png",
-				"Poista vienti", removeEntryListener, true);
-
-		toolBar.add(addEntryButton);
-		toolBar.add(removeEntryButton);
-		toolBar.addSeparator(new Dimension(16, 0));
-
-		// Haku-osio
-		findByNumberButton = SwingUtils.createToolButton("jump-22x22.png",
-				"Hae numerolla (Ctrl+G)", findDocumentByNumberListener, true);
-
-		searchButton = SwingUtils.createToolButton("find-22x22.png",
-				"Etsi (Ctrl+F)", searchListener, true);
-
-		toolBar.add(findByNumberButton);
-		toolBar.add(searchButton);
-
+		toolbarBuilder = new DocumentToolbarBuilder();
+		
+		// Konfiguroi kuuntelijat
+		DocumentToolbarBuilder.ToolbarListeners listeners = new DocumentToolbarBuilder.ToolbarListeners();
+		listeners.prevDocListener = prevDocListener;
+		listeners.nextDocListener = nextDocListener;
+		listeners.newDocListener = newDocListener;
+		listeners.addEntryListener = addEntryListener;
+		listeners.removeEntryListener = removeEntryListener;
+		listeners.findDocumentByNumberListener = findDocumentByNumberListener;
+		listeners.searchListener = searchListener;
+		
+		// Rakenna työkalurivi ja lisää ikkunaan
+		JToolBar toolBar = toolbarBuilder.build(listeners);
 		add(toolBar, BorderLayout.PAGE_START);
+		
+		// Hae viitteet painike-objekteihin
+		prevButton = toolbarBuilder.getPrevButton();
+		nextButton = toolbarBuilder.getNextButton();
+		newDocButton = toolbarBuilder.getNewDocButton();
+		addEntryButton = toolbarBuilder.getAddEntryButton();
+		removeEntryButton = toolbarBuilder.getRemoveEntryButton();
+		findByNumberButton = toolbarBuilder.getFindByNumberButton();
+		searchButton = toolbarBuilder.getSearchButton();
 	}
 
 	/**

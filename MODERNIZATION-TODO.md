@@ -32,7 +32,7 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ## 🟢 VALMIS - Kotlin Modernisaatio
 
-**Status**: Phase 1 ✅ | Phase 2 ✅ | Phase 2.5 ✅ | Phase 3 🔄 IN PROGRESS
+**Status**: Phase 1 ✅ | Phase 2 ✅ | Phase 2.5 ✅ | Phase 3 ✅ **COMPLETED**
 
 **Tulokset**:
 
@@ -40,13 +40,18 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - ✅ 6 data classes (Account, Document, Entry, Period, DocumentType, COAHeading)
 - ✅ 3 utility classes (SwingExtensions, ValidationUtils, DialogUtils)
 - ✅ DAO Foundation (DatabaseExtensions, SQLAccountDAOKt, SQLiteAccountDAOKt)
+- ✅ **Phase 3 AccountDAO integraatio** - SQLiteAccountDAOKt käytössä tuotannossa
 - **Koodi vähennetty**: 1,081 → 538 riviä Kotlin (50% vähemmän)
 
-**Seuraavaksi (Phase 3)**:
+**Phase 3 valmis (v2.1.3)**:
+- ✅ SQLiteDataSource käyttää SQLiteAccountDAOKt
+- ✅ Testattu ja toimii tuotannossa
+- ⚠️ Vanhat Java DAO-tiedostot säilytetty fallbackina (poistetaan v2.2.0)
 
-- [ ] Integroi Kotlin DAO:t sovellukseen (päivitä DataSource-luokat)
-- [ ] Poista vanhat Java DAO-tiedostot
-- [ ] Build & testaa
+**Seuraavaksi (Phase 4 - Tulevaisuus)**:
+- [ ] Entry DAO migraatio Kotliniin
+- [ ] Document DAO migraatio Kotliniin
+- [ ] Poista vanhat Java DAO fallbackit
 
 📖 **Yksityiskohtainen dokumentaatio**: [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md)
 
