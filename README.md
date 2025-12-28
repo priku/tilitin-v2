@@ -53,13 +53,19 @@ Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Sep
 
 **Dokumentaatio:**
 
-- [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) - Kehityssuunnitelma ja sprintit
-- [TESTAUS.md](TESTAUS.md) - Testausraportit ja ohjeet
-- [BUILDING.md](BUILDING.md) - Build-ohjeet
+### Käyttäjille
+
+- **[USER-GUIDE.md](USER-GUIDE.md)** - 📖 Kattava käyttäjän opas (aloita tästä!)
 - [CHANGELOG.md](CHANGELOG.md) - Muutosloki
+
+### Kehittäjille
+
+- [BUILDING.md](BUILDING.md) - Build-ohjeet
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Kehittäjäohjeet
-- [IKONI-MODERNISOINTI.md](IKONI-MODERNISOINTI.md) - Ikoni-suunnitelma (v2.1+)
-- [GITHUB-RELEASE-PUUTTUU.md](GITHUB-RELEASE-PUUTTUU.md) - Release-julkaisuohjeet
+- [PROJEKTISUUNNITELMA.md](PROJEKTISUUNNITELMA.md) - Kehityssuunnitelma
+- [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md) - Kotlin-migraation tekninen dokumentaatio
+- [MODERNIZATION-TODO.md](MODERNIZATION-TODO.md) - Modernisaation roadmap
+- [TESTAUS.md](TESTAUS.md) - Testausraportit
 
 ## Asennus
 
