@@ -6,6 +6,7 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 ## Status
 **Phase 1: Foundation - COMPLETED ✓**
 **Phase 2: Model Classes - COMPLETED ✓**
+**Phase 2.5: DAO Foundation - IN PROGRESS 🔄**
 **Phase 3: DAO Migration - PLANNED 📋**
 
 ## What Has Been Done
@@ -126,8 +127,37 @@ java -jar target/tilitin-2.1.1.jar
 - [ ] Migrate SQLAccountDAO to Kotlin
 - [ ] Migrate SQLEntryDAO to Kotlin
 - [ ] Migrate SQLDocumentDAO to Kotlin
-- [ ] Create DatabaseExtensions.kt for ResultSet mapping
+- [x] Create DatabaseExtensions.kt for ResultSet mapping
+- [x] Create SQLAccountDAOKt abstract base class
+- [x] Create SQLiteAccountDAOKt implementation
 - [ ] Update UI to use Kotlin models
+
+### Phase 2.5: DAO Foundation (IN PROGRESS 🔄)
+
+Created database extension utilities and Kotlin DAO base classes:
+
+#### [DatabaseExtensions.kt](src/main/kotlin/kirjanpito/db/DatabaseExtensions.kt)
+ResultSet and PreparedStatement extension functions:
+- `ResultSet.getIntOrNull()`, `getIntOrMinusOne()` - Null-safe int getters
+- `ResultSet.getStringOrEmpty()`, `getBigDecimalOrZero()` - Safe defaults
+- `ResultSet.toAccountData()`, `toAccountDataSQLite()` - Row mapping
+- `PreparedStatement.setIntOrNull()`, `setAccountValues()` - Parameter setting
+- `ResultSet.mapToList()` - Iterate and map results
+- `withDataAccess()` - SQLException to DataAccessException wrapper
+- Java ↔ Kotlin conversion: `Account.toAccountData()`, `AccountData.toAccount()`
+
+#### [SQLAccountDAOKt.kt](src/main/kotlin/kirjanpito/db/sql/SQLAccountDAOKt.kt)
+Abstract Kotlin base class for Account DAO:
+- Implements `AccountDAO` interface
+- Uses `withDataAccess {}` for exception handling
+- Uses Kotlin `use {}` for auto-closing resources
+- 166 lines vs 225 Java lines (26% reduction)
+
+#### [SQLiteAccountDAOKt.kt](src/main/kotlin/kirjanpito/db/sqlite/SQLiteAccountDAOKt.kt)
+SQLite-specific implementation:
+- Multi-line SQL queries as companion constants
+- Override for SQLite-specific vatRate handling (TEXT vs DECIMAL)
+- 83 lines vs 91 Java lines (9% reduction)
 
 ### Phase 4: Dialog Refactoring (FUTURE)
 
