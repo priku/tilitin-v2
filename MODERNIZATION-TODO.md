@@ -2,9 +2,9 @@
 
 Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointitehtävistä Windows-modernisaatioprojektissa.
 
-**Projektin tila**: v2.0.3 kehitteillä (feature/windows-modernization)
+**Projektin tila**: v2.1.1 kehitteillä (feature/2.1-documentframe-refactor)
 **Viimeksi päivitetty**: 2025-12-28
-**Analyysi perustuu**: 186 Java-tiedoston kattavaan koodianalyysiin
+**Analyysi perustuu**: 186 Java-tiedoston + Kotlin-modernisaation kattavaan analyysiin
 
 ---
 
@@ -16,13 +16,65 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - ✅ Backup-järjestelmä pilvipalvelutunnistuksella
 - ✅ AppearanceDialog live-esikatselulla
 - ✅ Ikonit modernisoitu (256x256 asti)
+- ✅ Kotlin 2.3.0 + Java 25 päivitys
+- ✅ Kotlin data classes (Account, Document, Entry, Period, DocumentType, COAHeading)
+- ✅ Kotlin utility classes (SwingExtensions, ValidationUtils, DialogUtils)
 
 **Jäljellä olevia haasteita:**
+
+- ❌ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 3)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
 - ❌ DocumentFrame.java on 37KB monolittti
 - ❌ Vanhat Swing-patternit (anonymous inner classes)
 - ❌ Epäjohdonmukainen UI-komponenttisuunnittelu
-- ❌ Puutteellinen teematuki vanhemmissa komponenteissa
+
+---
+
+## 🟢 VALMIS - Kotlin Modernisaatio (v2.1.1)
+
+### ✅ Phase 1: Foundation (COMPLETED)
+
+- **Kotlin 2.3.0** lisätty projektiin (tuki Java 25:lle)
+- **Maven-konfiguraatio** päivitetty (jvmTarget=25)
+- **Kotlin utility classes** luotu:
+  - `SwingExtensions.kt` - GridBagConstraints helpers, dialog extensions
+  - `ValidationUtils.kt` - Null-safe validation
+  - `DialogUtils.kt` - File choosers, EDT utilities
+- **Build pipeline** toimii (Java + Kotlin mixed compilation)
+
+### ✅ Phase 2: Model Classes (COMPLETED)
+
+- **6 Kotlin data classes** luotu:
+  - `AccountData` - Tilin tiedot + helper methods
+  - `DocumentData` - Tositteen tiedot
+  - `EntryData` - Viennin tiedot + validation
+  - `PeriodData` - Tilikauden tiedot
+  - `DocumentTypeData` - Tositelajin tiedot
+  - `COAHeadingData` - Tilikartan väliotsikko
+- **Koodi vähennetty**: ~764 riviä Java → ~300 riviä Kotlin (60% vähemmän)
+- **Helper methods** lisätty: `isBalanceSheetAccount()`, `hasVat()`, `displayName()`, etc.
+
+### 🔄 Phase 3: DAO Migration (NEXT)
+
+**Tavoite**: Migroi DAO-luokat käyttämään Kotlin data classeja
+
+**Tehtävät**:
+
+- [ ] Luo `DatabaseExtensions.kt` (ResultSet mapping helpers)
+- [ ] Migroi `SQLAccountDAO.java` → `SQLAccountDAO.kt`
+- [ ] Migroi `SQLEntryDAO.java` → `SQLEntryDAO.kt`
+- [ ] Migroi `SQLDocumentDAO.java` → `SQLDocumentDAO.kt`
+- [ ] Päivitä UI-komponentit käyttämään Kotlin-malleja
+- [ ] Testaa yhteensopivuus
+
+**Hyödyt**:
+
+- Null-safety SQL-kyselyissä
+- Vähemmän boilerplate-koodia (try-catch, resource management)
+- Extension functions ResultSet-käsittelyyn
+- Type-safe database operations
+
+**Dokumentaatio**: Katso [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md) täydellisestä suunnitelmasta
 
 ---
 

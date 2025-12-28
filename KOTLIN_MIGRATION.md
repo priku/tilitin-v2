@@ -5,25 +5,31 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 
 ## Status
 **Phase 1: Foundation - COMPLETED ✓**
-**Phase 2: Model Classes - IN PROGRESS 🔄**
+**Phase 2: Model Classes - COMPLETED ✓**
+**Phase 3: DAO Migration - PLANNED 📋**
 
 ## What Has Been Done
 
 ### 1. Maven Configuration
-- Added Kotlin 2.1.10 support to [pom.xml](pom.xml)
-- Configured kotlin-maven-plugin with Java 25 target
-- Added kotlin-stdlib dependency
+
+- Upgraded to Kotlin 2.3.0 (from 2.1.10) to support Java 25
+- Configured kotlin-maven-plugin with Java 25 target (jvmTarget=25)
+- Added kotlin-stdlib dependency (version 2.3.0)
 - Configured mixed Java/Kotlin compilation
+- Maven compiler release set to 25
 
 ### 2. Directory Structure
+
 Created Kotlin source directories:
+
 ```
 src/main/kotlin/kirjanpito/
 ├── db/       # Data model classes (Phase 2)
 └── ui/       # UI utilities (Phase 1)
 ```
 
-### 3. Model Classes (Phase 2 - NEW)
+### 3. Model Classes (Phase 2 - COMPLETED ✓)
+
 Converted core data models to Kotlin data classes:
 
 #### [Account.kt](src/main/kotlin/kirjanpito/db/Account.kt)
@@ -52,7 +58,8 @@ Converted core data models to Kotlin data classes:
 - `COAHeadingData` - Tilikartan väliotsikon tiedot
 - Helper method: `indentedText()`
 
-### 3. Kotlin Utility Classes
+### 4. Kotlin Utility Classes
+
 Created three modern utility modules in Kotlin:
 
 #### [SwingExtensions.kt](src/main/kotlin/kirjanpito/ui/SwingExtensions.kt)
@@ -81,9 +88,10 @@ Dialog and threading utilities:
 ## Build Configuration
 
 ### Prerequisites
+
 - Java 25 (Eclipse Adoptium JDK)
 - Maven 3.9+
-- Kotlin 2.1.10 (auto-downloaded by Maven)
+- Kotlin 2.3.0 (auto-downloaded by Maven)
 
 ### Build Commands
 ```bash
@@ -105,26 +113,38 @@ java -jar target/tilitin-2.1.1.jar
 - ✓ Verify build pipeline
 - ✓ Test Java-Kotlin interoperability
 
-### Phase 2: Model Classes (IN PROGRESS 🔄)
+### Phase 2: Model Classes (COMPLETED ✓)
+
 - ✓ Create Kotlin data classes for db package
 - ✓ AccountData, DocumentData, EntryData, PeriodData
 - ✓ DocumentTypeData, COAHeadingData
-- ⏳ Migrate DAO classes to use new data classes
-- ⏳ Update UI to use Kotlin models
+- ✓ All model classes converted to Kotlin
+- ✓ Helper methods and validation added
 
-### Phase 3: Dialog Refactoring (PLANNED)
+### Phase 3: DAO Migration (PLANNED 📋)
+
+- [ ] Migrate SQLAccountDAO to Kotlin
+- [ ] Migrate SQLEntryDAO to Kotlin
+- [ ] Migrate SQLDocumentDAO to Kotlin
+- [ ] Create DatabaseExtensions.kt for ResultSet mapping
+- [ ] Update UI to use Kotlin models
+
+### Phase 4: Dialog Refactoring (FUTURE)
+
 - [ ] Create BaseDialog abstract class in Kotlin
 - [ ] Convert simple dialogs to Kotlin
 - [ ] Implement common dialog patterns
 
-### Phase 4: DocumentFrame Refactoring (PLANNED)
+### Phase 5: DocumentFrame Refactoring (FUTURE)
+
 1. **DocumentFrame** (3262 lines) - Break down into smaller Kotlin classes
    - [ ] Extract menu builders
    - [ ] Extract toolbar builders
    - [ ] Extract event handlers
    - [ ] Extract table management
 
-### Phase 5: Advanced Features (FUTURE)
+### Phase 6: Advanced Features (FUTURE)
+
 - Use Kotlin coroutines for background tasks
 - Implement type-safe builders for complex UIs
 - Leverage sealed classes for state management
