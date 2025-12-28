@@ -1,8 +1,11 @@
 package kirjanpito.models;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -83,7 +86,17 @@ public class CSVExportWorker extends SwingWorker<Void, Void> {
 		
 		documents = null;
 
-		final CSVWriter writer = new CSVWriter(new FileWriter(file));
+		// Luo FileOutputStream ja kirjoita UTF-8 BOM (Byte Order Mark)
+		// jotta Excel tunnistaa merkistön oikein
+		FileOutputStream fos = new FileOutputStream(file);
+		fos.write(0xEF); // UTF-8 BOM
+		fos.write(0xBB);
+		fos.write(0xBF);
+
+		OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+		BufferedWriter bw = new BufferedWriter(osw);
+
+		final CSVWriter writer = new CSVWriter(bw);
 		// Käytä puolipistettä erottimena (Excel Suomi-versio)
 		writer.setDelimiter(';');
 		writer.writeField("Tosite");
