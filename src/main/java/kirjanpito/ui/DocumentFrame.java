@@ -3241,18 +3241,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Tietokanta-asetukset */
-	private ActionListener databaseSettingsListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showDatabaseSettings();
-		}
-	};
+	private ActionListener databaseSettingsListener = e -> showDatabaseSettings();
 
 	/* Lopeta */
-	private ActionListener quitListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			quit();
-		}
-	};
+	private ActionListener quitListener = e -> quit();
 
 	/* Edellinen tosite */
 	private AbstractAction prevDocListener = new AbstractAction() {
@@ -3273,60 +3265,28 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Ensimmäinen tosite */
-	private ActionListener firstDocListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			goToDocument(DocumentModel.FETCH_FIRST);
-		}
-	};
+	private ActionListener firstDocListener = e -> goToDocument(DocumentModel.FETCH_FIRST);
 
 	/* Viimeinen tosite */
-	private ActionListener lastDocListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			goToDocument(DocumentModel.FETCH_LAST);
-		}
-	};
+	private ActionListener lastDocListener = e -> goToDocument(DocumentModel.FETCH_LAST);
 
 	/* Hae numerolla */
-	private ActionListener findDocumentByNumberListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			findDocumentByNumber();
-		}
-	};
+	private ActionListener findDocumentByNumberListener = e -> findDocumentByNumber();
 
 	/* Etsi */
-	private ActionListener searchListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			toggleSearchPanel();
-		}
-	};
+	private ActionListener searchListener = e -> toggleSearchPanel();
 
 	/* Uusi tosite */
-	private ActionListener newDocListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			createDocument();
-		}
-	};
+	private ActionListener newDocListener = e -> createDocument();
 
 	/* Poista tosite */
-	private ActionListener deleteDocListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			deleteDocument();
-		}
-	};
+	private ActionListener deleteDocListener = e -> deleteDocument();
 
 	/* Muokkaa vientimalleja */
-	private ActionListener editEntryTemplatesListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			editEntryTemplates();
-		}
-	};
+	private ActionListener editEntryTemplatesListener = e -> editEntryTemplates();
 
 	/* Luo vientimalli tositteesta */
-	private ActionListener createEntryTemplateListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			createEntryTemplateFromDocument();
-		}
-	};
+	private ActionListener createEntryTemplateListener = e -> createEntryTemplateFromDocument();
 
 	/* Vientimalli */
 	private ActionListener entryTemplateListener = new ActionListener() {
@@ -3340,60 +3300,28 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Vie */
-	private ActionListener exportListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			export();
-		}
-	};
+	private ActionListener exportListener = e -> export();
 
 	/* Tilikartta */
-	private ActionListener chartOfAccountsListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showChartOfAccounts();
-		}
-	};
+	private ActionListener chartOfAccountsListener = e -> showChartOfAccounts();
 
 	/* Alkusaldot */
-	private ActionListener startingBalancesListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showStartingBalances();
-		}
-	};
+	private ActionListener startingBalancesListener = e -> showStartingBalances();
 
 	/* Perustiedot */
-	private ActionListener propertiesListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showProperties();
-		}
-	};
+	private ActionListener propertiesListener = e -> showProperties();
 
 	/* Kirjausasetukset */
-	private ActionListener settingsListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showSettings();
-		}
-	};
+	private ActionListener settingsListener = e -> showSettings();
 
 	/* Ulkoasu */
-	private ActionListener appearanceListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showAppearanceDialog();
-		}
-	};
+	private ActionListener appearanceListener = e -> showAppearanceDialog();
 
 	/* Varmuuskopiointiasetukset */
-	private ActionListener backupSettingsListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			BackupSettingsDialog.show(DocumentFrame.this);
-		}
-	};
+	private ActionListener backupSettingsListener = e -> BackupSettingsDialog.show(DocumentFrame.this);
 
 	/* Palauta varmuuskopiosta */
-	private ActionListener restoreBackupListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			restoreFromBackup();
-		}
-	};
+	private ActionListener restoreBackupListener = e -> restoreFromBackup();
 
 	/* Lisää vienti */
 	private AbstractAction addEntryListener = new AbstractAction() {
@@ -3504,25 +3432,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Muokkaa tulosteita */
-	private ActionListener editReportsListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			editReports();
-		}
-	};
+	private ActionListener editReportsListener = e -> editReports();
 
 	/* Tilien saldojen vertailu */
-	private ActionListener balanceComparisonListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showBalanceComparison();
-		}
-	};
+	private ActionListener balanceComparisonListener = e -> showBalanceComparison();
 
 	/* ALV-tilien päättäminen */
-	private ActionListener vatDocumentListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			createVATDocument();
-		}
-	};
+	private ActionListener vatDocumentListener = e -> createVATDocument();
 
 	/* Ohita vienti ALV-laskelmassa */
 	private AbstractAction setIgnoreFlagToEntryAction = new AbstractAction() {
@@ -3559,39 +3475,19 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Muuta tositenumeroita */
-	private ActionListener numberShiftListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showDocumentNumberShiftDialog();
-		}
-	};
+	private ActionListener numberShiftListener = e -> showDocumentNumberShiftDialog();
 
 	/* ALV-kantojen muutokset */
-	private ActionListener vatChangeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showVATChangeDialog();
-		}
-	};
+	private ActionListener vatChangeListener = e -> showVATChangeDialog();
 
 	/* Ohje */
-	private ActionListener helpListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showHelp();
-		}
-	};
+	private ActionListener helpListener = e -> showHelp();
 
 	/* Virheenjäljitystietoja */
-	private ActionListener debugListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showLogMessages();
-		}
-	};
+	private ActionListener debugListener = e -> showLogMessages();
 
 	/* Tietoja ohjelmasta */
-	private ActionListener aboutListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			showAboutDialog();
-		}
-	};
+	private ActionListener aboutListener = e -> showAboutDialog();
 
 	private AbstractAction prevCellAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
