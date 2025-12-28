@@ -198,6 +198,9 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	// Builder instances for menu and toolbar
 	private DocumentMenuBuilder menuBuilder;
 	private DocumentToolbarBuilder toolbarBuilder;
+	
+	// Helper for entry table actions
+	private EntryTableActions entryTableActions;
 
 	private static Logger logger = Logger.getLogger(Kirjanpito.LOGGER_NAME);
 	private static final long serialVersionUID = 1L;

@@ -7,6 +7,35 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.1.5] - 2025-12-28
+
+### 🏗️ DocumentFrame Phase 3 - Helper Classes
+
+**Branch:** `feature/2.2-listener-extraction`
+
+### Lisätty
+- **DocumentListenerHelpers.java** (76 riviä) - Kuuntelijoiden apuluokka
+  - `InitializationWorkerListener` - Tietokannan alustuksen kuuntelija
+  - `InitializationCallback` - Callback-rajapinta alustuksen jälkeisiin toimenpiteisiin
+- **EntryTableActions.java** (280 riviä) - Taulukkotoimintojen apuluokka
+  - `createPrevCellAction()` - Edellinen solu (Shift+Tab)
+  - `createNextCellAction()` - Seuraava solu (Tab)
+  - `createToggleDebitCreditAction()` - Debet/kredit vaihto (*)
+  - `createPreviousRowAction()` - Edellinen rivi (Up)
+  - `createRemoveSuffixAction()` - Päätteen poisto (Ctrl+Backspace)
+  - `createSetIgnoreFlagToEntryAction()` - ALV-ohitus
+
+### Muutettu
+- **DocumentFrame.java** - Valmisteltu käyttämään apuluokkia
+  - Lisätty `entryTableActions` kenttä
+
+### Tekninen
+- ColumnMapper-rajapinta sarakeindeksien muuntamiseen
+- EntryTableCallback-rajapinta DocumentFrame-toimintojen kutsumiseen
+- Valmiina täydelliseen refaktorointiin myöhemmin
+
+---
+
 ## [2.1.4] - 2025-12-28
 
 ### 🏗️ DocumentFrame Phase 2 - Builder Pattern
