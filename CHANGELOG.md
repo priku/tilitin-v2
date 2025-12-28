@@ -7,6 +7,37 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.0.3] - 2025-12-28
+
+### 💾 Backup System Release
+
+**Lataukset:** https://github.com/priku/tilitin-modernized/releases/tag/v2.0.3
+
+| Tiedosto | Koko | Kuvaus |
+|----------|------|--------|
+| `Tilitin-2.0.3-setup.exe` | ~57 MB | ⭐ Suositus! Moderni asennusohjelma |
+| `tilitin-2.0.3.jar` | ~25 MB | JAR (vaatii Java 25+) |
+
+### Lisätty
+- **Moderni varmuuskopiointijärjestelmä** - BackupSettingsDialog
+  - Per-tietokanta backup-sijainnit (ei enää globaalia kansiota)
+  - Automaattinen pilvipalvelutunnistus (Google Drive, OneDrive, Dropbox, iCloud)
+  - USB-asemien tunnistus irrotettaville tallennusvälineille
+  - AutoBackup - Word-tyylinen automaattinen varmuuskopiointi (1-60 min välein)
+  - Manuaalinen "Tee nyt" - varmuuskopioi heti kaikkiin sijainteihin
+- **DatabaseBackupConfigDialog** - Yksittäisen tietokannan sijaintien hallinta
+- **RestoreBackupDialog** - Varmuuskopion palautus
+- **BackupService** - Taustalla toimiva varmuuskopiointipalvelu
+- **CloudStorageDetector** - Pilvipalveluiden ja USB-asemien tunnistus
+- **BackupLocation & DatabaseBackupConfig** - Uudet malliluokat
+
+### Muutettu
+- Valikko: Tiedosto → Varmuuskopiointiasetukset
+- Varmuuskopiot sisältävät hash-tunnisteen polusta (ei sekoitu)
+- Siivotaan automaattisesti vanhat kopiot (säilytä 1-100 versiota)
+
+---
+
 ## [2.0.2] - 2025-12-28
 
 ### 🎨 Icon Modernization Release
