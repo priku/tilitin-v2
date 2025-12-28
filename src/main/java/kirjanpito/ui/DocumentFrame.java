@@ -78,6 +78,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.DefaultCaret;
 
+import kirjanpito.util.BackupService;
+
 import kirjanpito.db.Account;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.db.Document;
@@ -173,6 +175,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	private JLabel documentLabel;
 	private JLabel periodLabel;
 	private JLabel documentTypeLabel;
+	private JLabel backupStatusLabel;
 	private JTable entryTable;
 	private TableColumn vatColumn;
 	private EntryTableHeaderRenderer tableHeaderRenderer;
@@ -304,6 +307,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 
 		menu.add(SwingUtils.createMenuItem("Tietokanta-asetukset…", null, 'T', 
 				KeyStroke.getKeyStroke('D', shortcutKeyMask), databaseSettingsListener));
+		menu.add(SwingUtils.createMenuItem("Varmuuskopiointi…", null, 'V',
+				null, backupSettingsListener));
+		menu.add(SwingUtils.createMenuItem("Palauta varmuuskopiosta…", null, 'P',
+				null, restoreBackupListener));
 
 		menu.addSeparator();
 		menu.add(SwingUtils.createMenuItem("Lopeta", "quit-16x16.png", 'L',
@@ -970,10 +977,63 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		documentTypeLabel = new JLabel();
 		documentTypeLabel.setBorder(new EtchedBorder());
 		documentTypeLabel.setPreferredSize(new Dimension(200, 0));
+		
+		// Backup-indikaattori (Word AutoSave -tyylinen)
+		backupStatusLabel = new JLabel();
+		backupStatusLabel.setBorder(new EtchedBorder());
+		backupStatusLabel.setPreferredSize(new Dimension(120, 0));
+		backupStatusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		updateBackupStatusLabel();
+		
+		// Aseta listener backup-statuksen päivitykseen
+		BackupService.getInstance().setStatusListener(status -> updateBackupStatusLabel());
+		
+		// Backup-indikaattoria klikkaamalla avautuu asetukset
+		backupStatusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+				BackupSettingsDialog.show(DocumentFrame.this);
+				updateBackupStatusLabel();
+			}
+		});
+		backupStatusLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		backupStatusLabel.setToolTipText("Klikkaa muuttaaksesi varmuuskopiointiasetuksia");
+		
+		JPanel rightPanel = new JPanel(new BorderLayout());
+		rightPanel.add(backupStatusLabel, BorderLayout.WEST);
+		rightPanel.add(documentTypeLabel, BorderLayout.CENTER);
+		
 		statusBarPanel.add(documentLabel, BorderLayout.WEST);
 		statusBarPanel.add(periodLabel, BorderLayout.CENTER);
-		statusBarPanel.add(documentTypeLabel, BorderLayout.EAST);
+		statusBarPanel.add(rightPanel, BorderLayout.EAST);
 		add(statusBarPanel, BorderLayout.PAGE_END);
+	}
+	
+	/**
+	 * Päivittää backup-indikaattorin tilariville.
+	 */
+	private void updateBackupStatusLabel() {
+		BackupService backup = BackupService.getInstance();
+		
+		if (!backup.isEnabled()) {
+			backupStatusLabel.setText("○ Backup");
+			backupStatusLabel.setForeground(java.awt.Color.GRAY);
+		} else if (backup.isAutoBackupEnabled()) {
+			String cloudName = backup.getCloudServiceName();
+			if (cloudName != null) {
+				backupStatusLabel.setText("☁ AutoBackup");
+				backupStatusLabel.setForeground(new java.awt.Color(0, 128, 0));
+				backupStatusLabel.setToolTipText("AutoBackup käytössä • " + cloudName + " • Klikkaa muuttaaksesi");
+			} else {
+				backupStatusLabel.setText("◉ AutoBackup");
+				backupStatusLabel.setForeground(new java.awt.Color(0, 100, 200));
+				backupStatusLabel.setToolTipText("AutoBackup käytössä • Klikkaa muuttaaksesi");
+			}
+		} else {
+			backupStatusLabel.setText("● Backup");
+			backupStatusLabel.setForeground(java.awt.Color.DARK_GRAY);
+			backupStatusLabel.setToolTipText("Varmuuskopiointi käytössä • Klikkaa muuttaaksesi");
+		}
 	}
 
 	/**
@@ -986,6 +1046,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 			}
 
 			saveDocumentTypeIfChanged();
+			
+			// Suorita varmuuskopiointi ennen sulkemista
+			performBackupOnClose();
+			
+			// Pysäytä AutoBackup
+			BackupService.getInstance().stopAutoBackup();
+			
 			model.closeDataSource();
 		}
 
@@ -2190,6 +2257,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		if (!dbUrl.isEmpty()) {
 			RecentDatabases.getInstance().addDatabase(dbUrl);
 			updateRecentDatabasesMenu();
+			
+			// Käynnistä AutoBackup jos käytössä
+			BackupService.getInstance().setCurrentDatabase(dbUrl);
+			updateBackupStatusLabel();
 		}
 	}
 
@@ -2853,6 +2924,94 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	}
 
 	/**
+	 * Suorittaa varmuuskopioinnin sulkemisen yhteydessä.
+	 */
+	protected void performBackupOnClose() {
+		BackupService backupService = BackupService.getInstance();
+		
+		if (!backupService.isEnabled()) {
+			return;
+		}
+		
+		String uri = backupService.getCurrentDatabase();
+		if (uri == null || !uri.contains("sqlite")) {
+			return;
+		}
+		
+		boolean success = backupService.performBackup(uri);
+		
+		if (!success) {
+			// Näytä varoitus mutta älä estä sulkemista
+			logger.warning("Varmuuskopiointi epäonnistui sulkemisen yhteydessä");
+		}
+	}
+
+	/**
+	 * Näyttää dialogin varmuuskopion palauttamiseksi.
+	 */
+	protected void restoreFromBackup() {
+		BackupService backupService = BackupService.getInstance();
+		File backupDir = backupService.getBackupDirectory();
+		
+		if (backupDir == null || !backupDir.exists()) {
+			// Tarjoa mahdollisuus määrittää asetukset suoraan
+			String[] options = {"Määritä asetukset", "Peruuta"};
+			int choice = JOptionPane.showOptionDialog(this,
+				"Varmuuskopiokansiota ei ole määritetty tai se ei ole olemassa.\n\n" +
+				"Haluatko määrittää varmuuskopiointiasetukset nyt?",
+				"Ei varmuuskopioita",
+				JOptionPane.DEFAULT_OPTION,
+				JOptionPane.INFORMATION_MESSAGE,
+				null,
+				options,
+				options[0]);
+			
+			if (choice == 0) {
+				// Avaa asetukset
+				BackupSettingsDialog.show(this);
+				// Tarkista uudelleen
+				backupDir = backupService.getBackupDirectory();
+				if (backupDir == null || !backupDir.exists()) {
+					return;
+				}
+			} else {
+				return;
+			}
+		}
+		
+		// Listaa varmuuskopiot
+		File[] backups = backupService.listAllBackups();
+		
+		if (backups.length == 0) {
+			JOptionPane.showMessageDialog(this,
+				"Varmuuskopiokansiossa ei ole varmuuskopioita.\n\n" +
+				"Kansio: " + backupDir.getAbsolutePath(),
+				"Ei varmuuskopioita",
+				JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		
+		// Näytä valintadialogi
+		RestoreBackupDialog dialog = new RestoreBackupDialog(this, backups, backupService);
+		dialog.setVisible(true);
+		
+		File restoredFile = dialog.getRestoredFile();
+		if (restoredFile != null) {
+			// Avaa palautettu tietokanta
+			int result = JOptionPane.showConfirmDialog(this,
+				"Tietokanta palautettu:\n" + restoredFile.getAbsolutePath() + "\n\n" +
+				"Haluatko avata sen nyt?",
+				"Palautus onnistui",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+			
+			if (result == JOptionPane.YES_OPTION) {
+				openSqliteDataSource(restoredFile);
+			}
+		}
+	}
+
+	/**
 	 * Etsii tositelajin, johon tositenumero <code>number</code> kuuluu.
 	 *
 	 * @param number tositenumero
@@ -2981,13 +3140,46 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 		}
 	};
 
+	/**
+	 * Generoi vapaan tiedostonimen tietokannalle.
+	 * Jos "kirjanpito.sqlite" on olemassa, ehdottaa "kirjanpito_2.sqlite" jne.
+	 */
+	private File generateUniqueFileName(File directory, String baseName) {
+		File file = new File(directory, baseName + ".sqlite");
+		if (!file.exists()) {
+			return file;
+		}
+		
+		int counter = 2;
+		while (true) {
+			file = new File(directory, baseName + "_" + counter + ".sqlite");
+			if (!file.exists()) {
+				return file;
+			}
+			counter++;
+			if (counter > 1000) { // Turvarajoitus
+				break;
+			}
+		}
+		return new File(directory, baseName + "_" + System.currentTimeMillis() + ".sqlite");
+	}
+
 	/* Uusi tietokanta */
 	private ActionListener newDatabaseListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			final JFileChooser fileChooser = new JFileChooser(model.getDatabaseDir());
+			File dbDir = model.getDatabaseDir();
+			if (dbDir == null) {
+				dbDir = new File(AppSettings.getInstance().getDirectoryPath());
+			}
+			
+			// Ehdota automaattisesti vapaata nimeä
+			File suggestedFile = generateUniqueFileName(dbDir, "kirjanpito");
+			
+			final JFileChooser fileChooser = new JFileChooser(dbDir);
 			fileChooser.setFileFilter(sqliteFileFilter);
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			fileChooser.setDialogTitle("Uusi tietokanta");
+			fileChooser.setSelectedFile(suggestedFile);
 			File file = null;
 
 			while (true) {
@@ -3005,6 +3197,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 				if (file.exists()) {
 					SwingUtils.showErrorMessage(DocumentFrame.this, String.format(
 							"Tiedosto %s on jo olemassa. Valitse toinen nimi.", file.getAbsolutePath()));
+					// Ehdota seuraavaa vapaata nimeä
+					String currentName = file.getName().replace(".sqlite", "");
+					File nextSuggestion = generateUniqueFileName(file.getParentFile(), currentName);
+					fileChooser.setSelectedFile(nextSuggestion);
 				}
 				else {
 					break;
@@ -3183,6 +3379,20 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener {
 	private ActionListener appearanceListener = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			showAppearanceDialog();
+		}
+	};
+
+	/* Varmuuskopiointiasetukset */
+	private ActionListener backupSettingsListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			BackupSettingsDialog.show(DocumentFrame.this);
+		}
+	};
+
+	/* Palauta varmuuskopiosta */
+	private ActionListener restoreBackupListener = new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			restoreFromBackup();
 		}
 	};
 
