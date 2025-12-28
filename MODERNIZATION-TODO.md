@@ -1,10 +1,56 @@
 # Tilitin Modernization TODO
 
-Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointitehtävistä Windows-modernisaatioprojektissa.
+Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointitehtävistä sekä sovelluksen moderniusarvion.
 
-**Projektin tila**: v2.1.6 kehitteillä (feature/code-modernization)
-**Viimeksi päivitetty**: 2025-12-28
-**Analyysi perustuu**: 186 Java-tiedoston + Kotlin-modernisaation kattavaan analyysiin
+**Projektin tila**: v2.2.0 julkaistu (master)
+**Viimeksi päivitetty**: 2025-06-27
+**Analyysi perustuu**: 201 Java-tiedoston + 17 Kotlin-tiedoston kattavaan analyysiin
+
+---
+
+## 📊 Moderniusarvio (v2.2.0)
+
+### Kokonaisarvio: **75% moderni** ⭐⭐⭐⭐
+
+Sovellus on selkeästi modernisoitu, mutta alkuperäinen Swing-arkkitehtuuri rajoittaa kokonaisarviota.
+
+### ✅ Vahvuudet (Moderni - 80%)
+
+| Osa-alue | Tila | Kuvaus |
+|----------|------|--------|
+| **Java-versio** | ✅ Erinomainen | Java 25 (uusin LTS-linja) |
+| **Kotlin-versio** | ✅ Erinomainen | Kotlin 2.3.0 (uusin) |
+| **UI-teema** | ✅ Hyvä | FlatLaf dark/light mode |
+| **PDF-käsittely** | ✅ Erinomainen | Apache PDFBox 3.0.3 (uusin) |
+| **CI/CD** | ✅ Hyvä | GitHub Actions automaattibuildit |
+| **Dokumentaatio** | ✅ Hyvä | 16 ajantasaista markdown-tiedostoa |
+| **Koodin laatu** | ✅ Hyvä | Listener extraction, data classes |
+| **Riippuvuudet** | ✅ Hyvä | Kaikki päivitetty viimeisimpään |
+
+### ⚠️ Kehityskohteet (Tarvitsee työtä)
+
+| Osa-alue | Tila | Ongelma | Ratkaisu |
+|----------|------|---------|----------|
+| **UI-kehys** | ⚠️ Vanha | Swing (20+ vuotta vanha) | JavaFX / Compose Desktop |
+| **Kotlin-osuus** | ⚠️ Matala | 7.8% (17/218 tiedostoa) | Tavoite 50%+ |
+| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame ~2,900 riviä | Pilkkominen osiin |
+| **Testit** | ❌ Puuttuu | Ei yksikkötestejä | JUnit 5 / Kotest |
+
+### 📈 Modernisoinnin eteneminen
+
+```
+Vuosi 2023 (v1.x):  ████░░░░░░░░░░░░░░░░ 20% - Alkuperäinen Java 8 koodi
+Vuosi 2024 (v2.0):  ██████████░░░░░░░░░░ 50% - Java 25, FlatLaf, refaktorointi
+Vuosi 2025 (v2.2):  ███████████████░░░░░ 75% - Kotlin, PDF-liitteet, CI/CD
+Tavoite (v3.0):     ████████████████████ 100% - JavaFX/Compose, 50%+ Kotlin
+```
+
+### 🎯 Seuraavat askeleet modernisoinnissa
+
+1. **Kotlin-migraatio** - DAO-kerros Kotliniin (+10%)
+2. **DocumentFrame pilkkominen** - Arkkitehtuurin parantaminen (+5%)
+3. **Yksikkötestit** - JUnit 5 / Kotest käyttöön (+5%)
+4. **JavaFX/Compose** - UI-modernisaatio tulevaisuudessa (+15%)
 
 ---
 
@@ -19,17 +65,18 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - ✅ Kotlin 2.3.0 + Java 25 päivitys
 - ✅ Kotlin data classes (Account, Document, Entry, Period, DocumentType, COAHeading)
 - ✅ Kotlin utility classes (SwingExtensions, ValidationUtils, DialogUtils)
-- ✅ UIConstants theme-aware värimetodit (7 uutta metodia v2.1.6)
-- ✅ Deprecated API korjattu DocumentMenuBuilder:issa (v2.1.6)
-- ✅ Lambda-migraatio aloitettu: 6 anonymous inner class → lambda (v2.1.6)
+- ✅ UIConstants theme-aware värimetodit
+- ✅ Lambda-migraatio edennyt
+- ✅ PDF-liitteet tositteihin (v2.2.0)
+- ✅ GitHub Actions CI/CD pipeline
 
 **Jäljellä olevia haasteita:**
 
 - ⚠️ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 4 - tulevaisuus)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
-- ⚠️ DocumentFrame.java on ~2,654 riviä (vähennetty -1,202 riviä, -31%)
-- ⚠️ Vanhat Swing-patternit (anonymous inner classes) - 10/40+ korjattu (25%)
-- ❌ Epäjohdonmukainen UI-komponenttisuunnittelu
+- ⚠️ DocumentFrame.java on ~2,900 riviä (pilkottava pienemmäksi)
+- ⚠️ Vanhat Swing-patternit (anonymous inner classes)
+- ❌ Yksikkötestit puuttuvat kokonaan
 
 ---
 
