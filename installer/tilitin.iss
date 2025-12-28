@@ -2,7 +2,7 @@
 ; Modern Windows installer for Tilitin accounting software
 
 #define MyAppName "Tilitin"
-#define MyAppVersion "2.1.1"
+#define MyAppVersion "2.1.2"
 #define MyAppPublisher "Tilitin Project"
 #define MyAppURL "https://github.com/priku/tilitin-modernized"
 #define MyAppExeName "Tilitin 2.0.exe"
@@ -25,7 +25,7 @@ AllowNoIcons=yes
 LicenseFile=..\COPYING
 ; Output settings
 OutputDir=..\dist\installer
-OutputBaseFilename=Tilitin-2.1.1-setup
+OutputBaseFilename=Tilitin-2.1.2-setup
 ; Compression
 Compression=lzma2/ultra64
 SolidCompression=yes

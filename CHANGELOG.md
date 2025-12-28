@@ -7,9 +7,9 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
-## [2.1.1] - 2025-12-28
+## [2.1.2] - 2025-12-28
 
-### 🏗️ DocumentFrame Refactoring (Phase 1 + 1b)
+### 🚀 Kotlin Modernization + DocumentFrame Refactoring
 
 **Branch:** `feature/2.1-documentframe-refactor`
 

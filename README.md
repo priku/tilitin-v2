@@ -1,4 +1,4 @@
-# Tilitin 2.0
+# Tilitin 2.1
 
 [![Build Status](https://github.com/priku/tilitin-modernized/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-modernized/actions)
 [![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://adoptium.net/)
@@ -10,12 +10,15 @@ sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
-## 🚀 Versio 2.0.4 - Foundation Sprint
+## 🚀 Versio 2.1.2 - Kotlin Modernization
 
-**Uutta versiossa 2.0.4:**
+**Uutta versiossa 2.1.2:**
 
-- 🏗️ **UIConstants** - Keskitetyt UI-vakiot (värit, fontit, marginaalit)
-- 📦 **BaseDialog** - Yhtenäinen pohjaluokka dialogeille
+- 🦜 **Kotlin 2.3.0** - Moderni Kotlin-tuki Java 25:lle
+- 📊 **Kotlin Data Classes** - AccountData, DocumentData, EntryData, PeriodData
+- 🗃️ **DAO Foundation** - DatabaseExtensions.kt, SQLAccountDAOKt
+- 🏗️ **DocumentFrame Refactoring** - DocumentBackupManager, DocumentExporter
+- 💾 **CSV-vienti** - Täydellinen Excel-yhteensopivuus (UTF-8 BOM)
 
 **Versiossa 2.0.3:**
 
