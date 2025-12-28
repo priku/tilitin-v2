@@ -30,7 +30,7 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ---
 
-## 🟢 VALMIS - Kotlin Modernisaatio (v2.1.1)
+## 🟢 VALMIS - Kotlin Modernisaatio
 
 ### ✅ Phase 1: Foundation (COMPLETED)
 
@@ -45,27 +45,39 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 ### ✅ Phase 2: Model Classes (COMPLETED)
 
 - **6 Kotlin data classes** luotu:
-  - `AccountData` - Tilin tiedot + helper methods
-  - `DocumentData` - Tositteen tiedot
-  - `EntryData` - Viennin tiedot + validation
-  - `PeriodData` - Tilikauden tiedot
-  - `DocumentTypeData` - Tositelajin tiedot
-  - `COAHeadingData` - Tilikartan väliotsikko
+  - `Account.kt` - Tilin tiedot + helper methods
+  - `Document.kt` - Tositteen tiedot
+  - `Entry.kt` - Viennin tiedot + validation
+  - `Period.kt` - Tilikauden tiedot
+  - `DocumentType.kt` - Tositelajin tiedot
+  - `COAHeading.kt` - Tilikartan väliotsikko
 - **Koodi vähennetty**: ~764 riviä Java → ~300 riviä Kotlin (60% vähemmän)
 - **Helper methods** lisätty: `isBalanceSheetAccount()`, `hasVat()`, `displayName()`, etc.
 
-### 🔄 Phase 3: DAO Migration (NEXT)
+### ✅ Phase 2.5: DAO Foundation (COMPLETED)
 
-**Tavoite**: Migroi DAO-luokat käyttämään Kotlin data classeja
+- **DatabaseExtensions.kt** - ResultSet/PreparedStatement extension functions
+  - `getIntOrNull()`, `getIntOrMinusOne()` - Null-safe getters
+  - `toAccountData()` - Row mapping helpers
+  - `withDataAccess()` - SQLException wrapping
+- **SQLAccountDAOKt.kt** - Abstract Kotlin base (158 lines vs 224 Java, 29% reduction)
+- **SQLiteAccountDAOKt.kt** - SQLite implementation (80 lines vs 93 Java, 14% reduction)
+- **Koodi vähennetty**: 317 riviä Java → 238 riviä Kotlin (25% vähemmän)
+
+### 🔄 Phase 3: DAO Integration (NEXT)
+
+**Tavoite**: Integroi Kotlin DAO-luokat sovellukseen
 
 **Tehtävät**:
 
-- [ ] Luo `DatabaseExtensions.kt` (ResultSet mapping helpers)
-- [ ] Migroi `SQLAccountDAO.java` → `SQLAccountDAO.kt`
-- [ ] Migroi `SQLEntryDAO.java` → `SQLEntryDAO.kt`
-- [ ] Migroi `SQLDocumentDAO.java` → `SQLDocumentDAO.kt`
-- [ ] Päivitä UI-komponentit käyttämään Kotlin-malleja
-- [ ] Testaa yhteensopivuus
+- [ ] Päivitä `SQLiteDataSource.java` käyttämään `SQLiteAccountDAOKt`
+- [ ] Päivitä `MySQLDataSource.java` (jos olemassa)
+- [ ] Päivitä `PSQLDataSource.java` (jos olemassa)
+- [ ] Poista vanhat Java DAO-tiedostot:
+  - [ ] `SQLAccountDAO.java`
+  - [ ] `SQLiteAccountDAO.java`
+- [ ] Build & testaa sovellus
+- [ ] Merkitse Phase 2.5 valmiiksi KOTLIN_MIGRATION.md:ssä
 
 **Hyödyt**:
 
@@ -73,6 +85,7 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 - Vähemmän boilerplate-koodia (try-catch, resource management)
 - Extension functions ResultSet-käsittelyyn
 - Type-safe database operations
+- 25% vähemmän koodia ylläpidettäväksi
 
 **Dokumentaatio**: Katso [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md) täydellisestä suunnitelmasta
 
@@ -115,93 +128,55 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ---
 
-### 2. Yhtenäinen spacing-järjestelmä
+### 2. ✅ Yhtenäinen spacing-järjestelmä (COMPLETED v2.0.4)
 
-**Ongelma**: Jokainen dialogi käyttää omia marginaaleja ja padding-arvoja. Ei yhtenäistä design systemiä.
+**Status**: ✅ **VALMIS** - UIConstants.java luotu ja käytössä
 
-**Esimerkkejä epäjohdonmukaisuudesta**:
-```java
-// SettingsDialog.java
-BorderFactory.createEmptyBorder(4, 4, 4, 4)
+**Toteutettu**:
 
-// COADialog.java
-BorderFactory.createEmptyBorder(8, 8, 8, 8)
+- ✅ `UIConstants.java` luotu v2.0.4:ssä
+- ✅ Standardoidut spacing-vakiot (5px perusyksikkö)
+- ✅ Valmiit Insets ja Border objektit
+- ✅ Käytössä uusissa dialogeissa (BackupSettingsDialog, RestoreBackupDialog, etc.)
 
-// BackupSettingsDialog.java (uusi)
-BorderFactory.createEmptyBorder(15, 15, 15, 15)
-```
+**Jäljellä**:
 
-**Ratkaisu**: Luo `UIConstants.java`
+- [ ] Päivitä 19 vanhaa dialogia käyttämään UIConstants-vakioita
+- [ ] Korvaa hardkoodatut marginaalit UIConstants-viittauksilla
 
-**Tehtävät**:
-- [ ] Luo `src/main/java/kirjanpito/ui/UIConstants.java`
-- [ ] Määrittele standardit:
-  ```java
-  public class UIConstants {
-      // Spacing
-      public static final int DIALOG_PADDING = 15;
-      public static final int COMPONENT_SPACING = 10;
-      public static final int SECTION_SPACING = 20;
-
-      // Borders
-      public static final Border DIALOG_BORDER =
-          BorderFactory.createEmptyBorder(DIALOG_PADDING, DIALOG_PADDING,
-                                         DIALOG_PADDING, DIALOG_PADDING);
-
-      // Common GridBagConstraints
-      public static final Insets DEFAULT_INSETS = new Insets(5, 5, 5, 5);
-      public static final Insets NO_INSETS = new Insets(0, 0, 0, 0);
-
-      // Component sizes
-      public static final Dimension BUTTON_SIZE = new Dimension(100, 30);
-      public static final Dimension SMALL_BUTTON_SIZE = new Dimension(80, 25);
-  }
-  ```
-- [ ] Päivitä kaikki dialogit käyttämään näitä vakioita
-- [ ] Dokumentoi design-päätökset
-
-**Prioriteetti**: 🔴 KORKEA - Yhtenäinen UX edellyttää tätä
+**Prioriteetti**: 🟡 KESKISUURI - Pohja tehty, jäljellä migraatio
 
 ---
 
-### 3. DocumentFrame.java refaktorointi
+### 3. 🔄 DocumentFrame.java refaktorointi (IN PROGRESS v2.1.2)
 
-**Ongelma**: `DocumentFrame.java` on 37,313 tavua (37KB), sisältää:
-- Menu bar creation
-- Toolbar creation
-- Table management
-- Event listeners (kymmeniä)
-- Window state management
-- Print logic
-- Export logic
-- Report generation
-- Ja paljon muuta...
+**Status**: 🔄 **ALOITETTU** - Phase 1 & 1b valmiit
 
-**Tämä rikkoo**:
-- Single Responsibility Principle
-- Maintainability
-- Testability
+**Toteutettu v2.1.2**:
 
-**Tehtävät**:
-- [ ] **Vaihe 1**: Erota menu/toolbar creation omiin luokkiinsa
+- ✅ **Phase 1**: DocumentBackupManager.java (193 riviä)
+  - Varmuuskopioinnin hallinta eriytetty
+  - DatabaseOpener callback-rajapinta
+  - Testattava arkkitehtuuri
+- ✅ **Phase 1b**: DocumentExporter.java (83 riviä)
+  - CSV-viennin hallinta eriytetty
+  - CSVExportStarter-rajapinta
+  - Tiedostonvalinta ja hakemiston muistaminen
+- ✅ DocumentFrame.java vähennetty: 3,856 → 3,849 riviä (87 riviä kompleksisuutta poistettu)
+
+**Jäljellä**:
+
+- [ ] **Phase 2**: Menu/Toolbar creation
   - [ ] Luo `DocumentMenuBuilder.java`
   - [ ] Luo `DocumentToolbarBuilder.java`
-
-- [ ] **Vaihe 2**: Erota table management
+- [ ] **Phase 3**: Table management
   - [ ] Luo `DocumentTableManager.java`
   - [ ] Siirrä cell renderer/editor logiikka
-
-- [ ] **Vaihe 3**: Erota event handling
+- [ ] **Phase 4**: Event handling
   - [ ] Luo `DocumentEventHandler.java`
-  - [ ] Käytä lambda-lausekkeita
-
-- [ ] **Vaihe 4**: Erota export/print toiminnot
-  - [ ] Luo `DocumentExporter.java`
+  - [ ] Lambda-lausekkeet
+- [ ] **Phase 5**: Print toiminnot
   - [ ] Luo `DocumentPrinter.java`
-
-- [ ] **Vaihe 5**: Erota backup-integraatio
-  - [ ] Luo `DocumentBackupManager.java`
-  - [ ] Tarkempi statusinäyttö (ei vain label)
 
 **Tavoite**: DocumentFrame < 500 riviä, loput komponenteissa
 
@@ -245,44 +220,25 @@ button.addActionListener(e -> doSomething());
 
 ## 🟡 Keskisuuri prioriteetti - Parantaa laatua
 
-### 5. Yhtenäinen BaseDialog-pohjaluokka
+### 5. ✅ Yhtenäinen BaseDialog-pohjaluokka (COMPLETED v2.0.4)
 
-**Ongelma**: Jokainen dialogi toteuttaa omat `create()`, `createButtons()` jne. metodit. Paljon copypaste-koodia.
+**Status**: ✅ **VALMIS** - BaseDialog.java luotu ja käytössä
 
-**Ratkaisu**: Luo abstrakti pohjaluokka
+**Toteutettu v2.0.4**:
 
-**Tehtävät**:
-- [ ] Luo `src/main/java/kirjanpito/ui/BaseDialog.java`:
-  ```java
-  public abstract class BaseDialog extends JDialog {
-      protected BaseDialog(Frame owner, String title) {
-          super(owner, title, true);
-          setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-      }
+- ✅ `BaseDialog.java` luotu abstraktina pohjaluokkana
+- ✅ Standardirakenne: BorderLayout (content + button panel)
+- ✅ Standardipainikkeet: OK, Cancel, Apply (valinnainen)
+- ✅ Keyboard shortcuts: ESC = Cancel, Enter = OK
+- ✅ UIConstants-integraatio
+- ✅ RestoreBackupDialog konvertoitu käyttämään BaseDialog:ia
 
-      protected void initialize() {
-          setLayout(new BorderLayout());
-          add(createContentPanel(), BorderLayout.CENTER);
-          add(createButtonPanel(), BorderLayout.SOUTH);
-          pack();
-          setLocationRelativeTo(getOwner());
-      }
+**Jäljellä**:
 
-      protected abstract JPanel createContentPanel();
+- [ ] Migroi 19 vanhaa dialogia käyttämään BaseDialog-pohjaluokkaa
+- [ ] Dokumentoi pattern kehittäjille
 
-      protected JPanel createButtonPanel() {
-          // Standardit OK/Cancel/Apply napit
-      }
-
-      protected void applyTheme() {
-          // FlatLaf theming
-      }
-  }
-  ```
-- [ ] Refaktoroi ainakin 5 dialogia käyttämään tätä
-- [ ] Dokumentoi pattern muille kehittäjille
-
-**Prioriteetti**: 🟡 KESKISUURI - Vähentää copypastea, helpottaa ylläpitoa
+**Prioriteetti**: 🟡 KESKISUURI - Pohja tehty, jäljellä migraatio
 
 ---
 
