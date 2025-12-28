@@ -9,6 +9,7 @@ import java.util.Date;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.DefaultCaret;
@@ -31,7 +32,12 @@ public class DateCellEditor extends AbstractCellEditor
 		formatter = new SimpleDateFormat("d.M.yyyy");
 		textField = new DateTextField();
 		textField.setCaret(new DefaultCaret());
-		textField.setBorder(new LineBorder(Color.BLACK));
+		// Käytä teeman mukaista border-väriä
+		Color borderColor = UIManager.getColor("Component.borderColor");
+		if (borderColor == null) {
+			borderColor = Color.BLACK; // Fallback
+		}
+		textField.setBorder(new LineBorder(borderColor));
 	}
 	
 	public Component getTableCellEditorComponent(JTable table, Object value,

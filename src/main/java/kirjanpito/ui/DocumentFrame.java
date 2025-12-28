@@ -66,6 +66,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker.StateValue;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.TableModelEvent;
@@ -2476,8 +2477,13 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		BigDecimal difference = creditTotal.subtract(debitTotal).abs();
 		debitTotalLabel.setText(formatter.format(debitTotal));
 		creditTotalLabel.setText(formatter.format(creditTotal));
+		// Käytä teeman mukaista error-väriä epätasapainon korostamiseen
+		Color errorColor = UIManager.getColor("Actions.Red");
+		if (errorColor == null) {
+			errorColor = Color.RED; // Fallback
+		}
 		differenceLabel.setForeground(difference.compareTo(BigDecimal.ZERO) == 0 ?
-				debitTotalLabel.getForeground() : Color.RED);
+				debitTotalLabel.getForeground() : errorColor);
 		differenceLabel.setText(formatter.format(difference));
 	}
 
