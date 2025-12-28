@@ -347,4 +347,88 @@ public final class UIConstants {
     public static int getSpacing(int multiplier) {
         return UNIT * multiplier;
     }
+
+    // ========== THEME-AWARE COLORS ==========
+    
+    /**
+     * Palauttaa teeman mukaisen "success" värin (vihreä).
+     * Käytetään onnistuneissa operaatioissa ja autobackup-indikaattorissa.
+     * 
+     * @return success-väri teemasta tai fallback
+     */
+    public static java.awt.Color getSuccessColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Actions.Green");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("Component.accentColor");
+        }
+        if (color == null) {
+            color = new java.awt.Color(0, 128, 0); // Dark green fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen "info" värin (sininen).
+     * Käytetään informatiivisissa indikaattoreissa.
+     * 
+     * @return info-väri teemasta tai fallback
+     */
+    public static java.awt.Color getInfoColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Actions.Blue");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("Component.linkColor");
+        }
+        if (color == null) {
+            color = new java.awt.Color(0, 100, 200); // Blue fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen "error" värin (punainen).
+     * Käytetään virheiden ja epätasapainon korostamiseen.
+     * 
+     * @return error-väri teemasta tai fallback
+     */
+    public static java.awt.Color getErrorColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Actions.Red");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("Component.errorFocusColor");
+        }
+        if (color == null) {
+            color = java.awt.Color.RED; // Red fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen "warning" värin (oranssi/keltainen).
+     * Käytetään varoituksissa.
+     * 
+     * @return warning-väri teemasta tai fallback
+     */
+    public static java.awt.Color getWarningColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Actions.Yellow");
+        if (color == null) {
+            color = javax.swing.UIManager.getColor("Component.warningFocusColor");
+        }
+        if (color == null) {
+            color = new java.awt.Color(200, 150, 0); // Orange fallback
+        }
+        return color;
+    }
+    
+    /**
+     * Palauttaa teeman mukaisen "muted/disabled" värin (harmaa).
+     * Käytetään deaktivoiduissa elementeissä.
+     * 
+     * @return muted-väri teemasta tai fallback
+     */
+    public static java.awt.Color getMutedColor() {
+        java.awt.Color color = javax.swing.UIManager.getColor("Label.disabledForeground");
+        if (color == null) {
+            color = java.awt.Color.GRAY;
+        }
+        return color;
+    }
 }

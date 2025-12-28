@@ -1023,21 +1023,21 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		
 		if (!backup.isEnabled()) {
 			backupStatusLabel.setText("○ Backup");
-			backupStatusLabel.setForeground(java.awt.Color.GRAY);
+			backupStatusLabel.setForeground(UIConstants.getMutedColor());
 		} else if (backup.isAutoBackupEnabled()) {
 			String cloudName = backup.getCloudServiceName();
 			if (cloudName != null) {
 				backupStatusLabel.setText("☁ AutoBackup");
-				backupStatusLabel.setForeground(new java.awt.Color(0, 128, 0));
+				backupStatusLabel.setForeground(UIConstants.getSuccessColor());
 				backupStatusLabel.setToolTipText("AutoBackup käytössä • " + cloudName + " • Klikkaa muuttaaksesi");
 			} else {
 				backupStatusLabel.setText("◉ AutoBackup");
-				backupStatusLabel.setForeground(new java.awt.Color(0, 100, 200));
+				backupStatusLabel.setForeground(UIConstants.getInfoColor());
 				backupStatusLabel.setToolTipText("AutoBackup käytössä • Klikkaa muuttaaksesi");
 			}
 		} else {
 			backupStatusLabel.setText("● Backup");
-			backupStatusLabel.setForeground(java.awt.Color.DARK_GRAY);
+			backupStatusLabel.setForeground(UIConstants.getMutedColor());
 			backupStatusLabel.setToolTipText("Varmuuskopiointi käytössä • Klikkaa muuttaaksesi");
 		}
 	}

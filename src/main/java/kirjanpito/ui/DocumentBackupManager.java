@@ -1,6 +1,5 @@
 package kirjanpito.ui;
 
-import java.awt.Color;
 import java.awt.Frame;
 import java.io.File;
 import java.util.logging.Logger;
@@ -58,22 +57,22 @@ public class DocumentBackupManager {
 
         if (!backup.isEnabled()) {
             backupStatusLabel.setText("○ Backup");
-            backupStatusLabel.setForeground(Color.GRAY);
+            backupStatusLabel.setForeground(UIConstants.getMutedColor());
             backupStatusLabel.setToolTipText(null);
         } else if (backup.isAutoBackupEnabled()) {
             String cloudName = backup.getCloudServiceName();
             if (cloudName != null) {
                 backupStatusLabel.setText("☁ AutoBackup");
-                backupStatusLabel.setForeground(new Color(0, 128, 0)); // Dark green
+                backupStatusLabel.setForeground(UIConstants.getSuccessColor());
                 backupStatusLabel.setToolTipText("AutoBackup käytössä • " + cloudName + " • Klikkaa muuttaaksesi");
             } else {
                 backupStatusLabel.setText("◉ AutoBackup");
-                backupStatusLabel.setForeground(new Color(0, 100, 200)); // Blue
+                backupStatusLabel.setForeground(UIConstants.getInfoColor());
                 backupStatusLabel.setToolTipText("AutoBackup käytössä • Klikkaa muuttaaksesi");
             }
         } else {
             backupStatusLabel.setText("● Backup");
-            backupStatusLabel.setForeground(Color.DARK_GRAY);
+            backupStatusLabel.setForeground(UIConstants.getMutedColor());
             backupStatusLabel.setToolTipText("Varmuuskopiointi käytössä • Klikkaa muuttaaksesi");
         }
     }
