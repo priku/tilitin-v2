@@ -56,7 +56,7 @@ for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml 
 
 echo.
 echo ============================================
-echo   Build Complete!
+echo   Build Complete
 echo ============================================
 echo.
 echo Installer created:
@@ -66,4 +66,6 @@ echo.
 echo Location: dist\installer\Tilitin-%VERSION%-setup.exe
 echo.
 
-pause
+REM Skip pause in CI environment
+if "%CI%"=="" pause
+exit /b 0
