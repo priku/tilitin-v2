@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
@@ -297,10 +298,15 @@ public class DocumentNumberShiftDialog extends JDialog {
         getStyle(StyleContext.DEFAULT_STYLE);
 
 		Style regular = doc.addStyle("regular", def);
-		
+
 		Style error = doc.addStyle("error", regular);
-		StyleConstants.setBackground(error, Color.red);
-		StyleConstants.setForeground(error, Color.white);
+		// Käytä teeman mukaisia error-värejä
+		Color errorBg = UIManager.getColor("Actions.Red");
+		Color errorFg = UIManager.getColor("text"); // Teeman mukainen tekstiväri
+		if (errorBg == null) errorBg = Color.red;
+		if (errorFg == null) errorFg = Color.white;
+		StyleConstants.setBackground(error, errorBg);
+		StyleConstants.setForeground(error, errorFg);
 	}
 	
 	private ChangeListener changeListener = new ChangeListener() {

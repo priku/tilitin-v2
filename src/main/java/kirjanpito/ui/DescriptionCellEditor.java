@@ -10,6 +10,7 @@ import java.util.EventObject;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.DefaultCaret;
@@ -28,7 +29,12 @@ public class DescriptionCellEditor extends AbstractCellEditor
 	public DescriptionCellEditor(DocumentModel documentModel) {
 		textField = new JTextField();
 		textField.setCaret(new DefaultCaret());
-		textField.setBorder(new LineBorder(Color.BLACK));
+		// Käytä teeman mukaista border-väriä
+		Color borderColor = UIManager.getColor("Component.borderColor");
+		if (borderColor == null) {
+			borderColor = Color.BLACK; // Fallback
+		}
+		textField.setBorder(new LineBorder(borderColor));
 		textField.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_F12) {
