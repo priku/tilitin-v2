@@ -5,9 +5,14 @@ sivuillaan: <https://helineva.net/tilitin/>
 
 Ohjelmaan on vuonna 2024 tehnyt pieniä ajanmukaistuksia ja korjauksia Jouni Seppänen.
 
-## 🚀 Versio 2.0.3 - Backup System
+## 🚀 Versio 2.0.4 - Foundation Sprint
 
-**Uutta versiossa 2.0.3:**
+**Uutta versiossa 2.0.4:**
+
+- 🏗️ **UIConstants** - Keskitetyt UI-vakiot (värit, fontit, marginaalit)
+- 📦 **BaseDialog** - Yhtenäinen pohjaluokka dialogeille
+
+**Versiossa 2.0.3:**
 
 - 💾 **Varmuuskopiointijärjestelmä** - Per-tietokanta sijainnit
 - ☁️ **Pilvipalvelutunnistus** - Google Drive, OneDrive, Dropbox, iCloud

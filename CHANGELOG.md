@@ -7,6 +7,26 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.0.4] - 2025-12-28
+
+### 🏗️ Foundation Sprint
+
+**Lataukset:** https://github.com/priku/tilitin-modernized/releases/tag/v2.0.4
+
+| Tiedosto | Koko | Kuvaus |
+|----------|------|--------|
+| `Tilitin-2.0.4-setup.exe` | ~57 MB | ⭐ Suositus! Moderni asennusohjelma |
+| `tilitin-2.0.4.jar` | ~25 MB | JAR (vaatii Java 25+) |
+
+### Lisätty
+- **UIConstants** - Keskitetyt UI-vakiot (värit, fontit, marginaalit)
+- **BaseDialog** - Yhtenäinen pohjaluokka kaikille dialogeille
+
+### Muutettu
+- Installer-skripti päivitetty versiolle 2.0.4
+
+---
+
 ## [2.0.3] - 2025-12-28
 
 ### 💾 Backup System Release
