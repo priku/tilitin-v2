@@ -32,62 +32,23 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ## 🟢 VALMIS - Kotlin Modernisaatio
 
-### ✅ Phase 1: Foundation (COMPLETED)
+**Status**: Phase 1 ✅ | Phase 2 ✅ | Phase 2.5 ✅ | Phase 3 🔄 IN PROGRESS
 
-- **Kotlin 2.3.0** lisätty projektiin (tuki Java 25:lle)
-- **Maven-konfiguraatio** päivitetty (jvmTarget=25)
-- **Kotlin utility classes** luotu:
-  - `SwingExtensions.kt` - GridBagConstraints helpers, dialog extensions
-  - `ValidationUtils.kt` - Null-safe validation
-  - `DialogUtils.kt` - File choosers, EDT utilities
-- **Build pipeline** toimii (Java + Kotlin mixed compilation)
+**Tulokset**:
 
-### ✅ Phase 2: Model Classes (COMPLETED)
+- ✅ Kotlin 2.3.0 + Java 25 toiminnassa
+- ✅ 6 data classes (Account, Document, Entry, Period, DocumentType, COAHeading)
+- ✅ 3 utility classes (SwingExtensions, ValidationUtils, DialogUtils)
+- ✅ DAO Foundation (DatabaseExtensions, SQLAccountDAOKt, SQLiteAccountDAOKt)
+- **Koodi vähennetty**: 1,081 → 538 riviä Kotlin (50% vähemmän)
 
-- **6 Kotlin data classes** luotu:
-  - `Account.kt` - Tilin tiedot + helper methods
-  - `Document.kt` - Tositteen tiedot
-  - `Entry.kt` - Viennin tiedot + validation
-  - `Period.kt` - Tilikauden tiedot
-  - `DocumentType.kt` - Tositelajin tiedot
-  - `COAHeading.kt` - Tilikartan väliotsikko
-- **Koodi vähennetty**: ~764 riviä Java → ~300 riviä Kotlin (60% vähemmän)
-- **Helper methods** lisätty: `isBalanceSheetAccount()`, `hasVat()`, `displayName()`, etc.
+**Seuraavaksi (Phase 3)**:
 
-### ✅ Phase 2.5: DAO Foundation (COMPLETED)
+- [ ] Integroi Kotlin DAO:t sovellukseen (päivitä DataSource-luokat)
+- [ ] Poista vanhat Java DAO-tiedostot
+- [ ] Build & testaa
 
-- **DatabaseExtensions.kt** - ResultSet/PreparedStatement extension functions
-  - `getIntOrNull()`, `getIntOrMinusOne()` - Null-safe getters
-  - `toAccountData()` - Row mapping helpers
-  - `withDataAccess()` - SQLException wrapping
-- **SQLAccountDAOKt.kt** - Abstract Kotlin base (158 lines vs 224 Java, 29% reduction)
-- **SQLiteAccountDAOKt.kt** - SQLite implementation (80 lines vs 93 Java, 14% reduction)
-- **Koodi vähennetty**: 317 riviä Java → 238 riviä Kotlin (25% vähemmän)
-
-### 🔄 Phase 3: DAO Integration (NEXT)
-
-**Tavoite**: Integroi Kotlin DAO-luokat sovellukseen
-
-**Tehtävät**:
-
-- [ ] Päivitä `SQLiteDataSource.java` käyttämään `SQLiteAccountDAOKt`
-- [ ] Päivitä `MySQLDataSource.java` (jos olemassa)
-- [ ] Päivitä `PSQLDataSource.java` (jos olemassa)
-- [ ] Poista vanhat Java DAO-tiedostot:
-  - [ ] `SQLAccountDAO.java`
-  - [ ] `SQLiteAccountDAO.java`
-- [ ] Build & testaa sovellus
-- [ ] Merkitse Phase 2.5 valmiiksi KOTLIN_MIGRATION.md:ssä
-
-**Hyödyt**:
-
-- Null-safety SQL-kyselyissä
-- Vähemmän boilerplate-koodia (try-catch, resource management)
-- Extension functions ResultSet-käsittelyyn
-- Type-safe database operations
-- 25% vähemmän koodia ylläpidettäväksi
-
-**Dokumentaatio**: Katso [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md) täydellisestä suunnitelmasta
+📖 **Yksityiskohtainen dokumentaatio**: [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md)
 
 ---
 
