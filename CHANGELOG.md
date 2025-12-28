@@ -7,6 +7,63 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.1.0] - 2025-12-28
+
+### 🏗️ DocumentFrame Refactoring (Phase 1 + 1b)
+
+**Branch:** `feature/2.1-documentframe-refactor`
+
+### Lisätty
+- **DocumentBackupManager** (193 riviä) - Varmuuskopioinnin hallinta
+  - Eriytetty backup-logiikka omaksi komponentiksi
+  - Testattava arkkitehtuuri callback-rajapintojen kautta
+  - DatabaseOpener-rajapinta tietokannan avaukselle
+- **DocumentExporter** (83 riviä) - CSV-viennin hallinta
+  - Eriytetty export-logiikka omaksi komponentiksi
+  - CSVExportStarter-rajapinta viennin käynnistykselle
+  - Tiedostonvalinta ja hakemiston muistaminen
+
+### Korjattu
+- **CSV-vienti** - Täydellinen Excel-yhteensopivuus
+  - ✅ Desimaalierottaja: piste (.) kansainvälisen standardin mukaan
+  - ✅ Kenttäerottaja: puolipiste (;) suomalaisen Excelin mukaan
+  - ✅ Merkistökoodaus: UTF-8 BOM ääkkösten (ä, ö, å) tueksi
+  - ✅ Tiedostopääte: automaattinen .csv-lisäys
+  - ✅ Ei tuhanserottimia numeroissa
+- **Varmuuskopiointi** (GitHub Copilot)
+  - SQLite VACUUM INTO -komento turvalliseen varmuuskopiointiin
+  - Ei tiedostolukituksia kopioinnin aikana
+  - Fallback perinteiseen file copy -metodiin
+  - PRAGMA busy_timeout (30s) SQLITE_BUSY -virheiden estoon
+
+### Muutettu
+- **DocumentFrame.java** - Yksinkertaistettu (-88 riviä)
+  - Delegoi backup-operaatiot DocumentBackupManager:lle
+  - Delegoi CSV-viennin DocumentExporter:lle
+  - @Deprecated export() - säilyy yhteensopivuuden vuoksi
+  - Implements DatabaseOpener, CSVExportStarter
+
+### Tekninen velka
+- DocumentFrame edelleen 3,849 riviä (God Object)
+- Jatkotyö: Phase 2-7 (Menu, Toolbar, Table, Print managers)
+
+### Dokumentaatio
+- `REFACTORING-NOTES.md` - Yksityiskohtainen refaktorointidokumentaatio
+- Inline-kommentit suomeksi ja englanniksi
+- Kattavat commit-viestit
+
+### Git-kommitit
+```
+20a9b46 fix: CSV export UTF-8 with BOM encoding
+cb892b5 fix: Auto-append .csv extension
+b7d2427 fix: Semicolon delimiter for Finnish Excel
+0cd28c4 fix: Dot decimal separator
+83fbe1a refactor: Phase 1b DocumentExporter
+0a8b447 refactor: Phase 1 DocumentBackupManager
+```
+
+---
+
 ## [2.0.4] - 2025-12-28
 
 ### 🏗️ Foundation Sprint
