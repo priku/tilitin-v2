@@ -7,7 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +31,8 @@ import javax.swing.SpinnerNumberModel;
 
 import kirjanpito.util.BackupService;
 import kirjanpito.util.RecentDatabases;
+
+import static kirjanpito.ui.UIConstants.*;
 
 /**
  * Dialogi varmuuskopiointiasetuksille - Word AutoSave -tyylinen.
@@ -60,14 +61,14 @@ public class BackupSettingsDialog extends JDialog {
     }
     
     private void initComponents() {
-        setLayout(new BorderLayout(10, 10));
-        
+        setLayout(new BorderLayout(COMPONENT_SPACING, COMPONENT_SPACING));
+
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 5, 15));
-        
+        mainPanel.setBorder(DIALOG_TOP_BORDER);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(3, 5, 3, 5);
+        gbc.insets = TIGHT_INSETS;
         
         // Käytössä-valinta (checkbox + label samassa paneelissa)
         gbc.gridx = 0;
@@ -140,30 +141,29 @@ public class BackupSettingsDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         databasesPanel = new JPanel();
         databasesPanel.setLayout(new BoxLayout(databasesPanel, BoxLayout.Y_AXIS));
-        databasesPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         databasesPanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(javax.swing.UIManager.getColor("Component.borderColor")),
-            BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+            CONTENT_BORDER));
         mainPanel.add(databasesPanel, gbc);
         
         // Viimeisin varmuuskopio ja tee nyt -painike
         gbc.gridy = 5;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 5, 3, 5);
+        gbc.insets = SECTION_INSETS;
         lastBackupLabel = createSelectableLabel();
         mainPanel.add(lastBackupLabel, gbc);
-        
+
         gbc.gridx = 2;
         gbc.gridwidth = 1;
         backupNowButton = new JButton("Tee nyt");
         backupNowButton.addActionListener(e -> performBackupNow());
         mainPanel.add(backupNowButton, gbc);
-        
+
         // Infoteksti
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 3;
-        gbc.insets = new Insets(10, 5, 5, 5);
+        gbc.insets = SECTION_INSETS;
         javax.swing.JTextArea infoArea = new javax.swing.JTextArea(
             "💡 Määritä backup-sijainnit 'Sijainnit...' napista. 'Tee nyt' varmuuskopioi heti.");
         infoArea.setEditable(false);

@@ -5,13 +5,9 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -25,9 +21,14 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import kirjanpito.util.AppSettings;
 
+import static kirjanpito.ui.UIConstants.*;
+
 /**
  * Ulkoasun asetukset -dialogi.
  * Mahdollistaa teeman vaihdon lennossa.
+ *
+ * @since 2.0.2
+ * @version 2.0.4 - Updated to use UIConstants and lambda expressions
  */
 public class AppearanceDialog extends JDialog {
     private JComboBox<String> themeComboBox;
@@ -49,6 +50,7 @@ public class AppearanceDialog extends JDialog {
     public void create() {
         setLayout(new BorderLayout());
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
                 revertTheme();
                 dispose();
@@ -65,35 +67,30 @@ public class AppearanceDialog extends JDialog {
     
     private void createContentPanel() {
         GridBagConstraints c;
-        
+
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 10, 15));
+        panel.setBorder(DIALOG_BORDER);
         add(panel, BorderLayout.CENTER);
-        
+
         // Teema-label
         c = new GridBagConstraints();
-        c.insets = new Insets(0, 0, 10, 10);
+        c.insets = createInsets(0, 0, COMPONENT_SPACING, COMPONENT_SPACING);
         c.anchor = GridBagConstraints.WEST;
         panel.add(new JLabel("Teema:"), c);
-        
+
         // Teema-pudotusvalikko
         themeComboBox = new JComboBox<>(THEME_NAMES);
         themeComboBox.setPreferredSize(new Dimension(150, 25));
-        themeComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                previewTheme();
-            }
-        });
-        
+        themeComboBox.addActionListener(e -> previewTheme());
+
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 0;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
-        c.insets = new Insets(0, 0, 10, 0);
+        c.insets = createInsets(0, 0, COMPONENT_SPACING, 0);
         panel.add(themeComboBox, c);
-        
+
         // Info-teksti
         JLabel infoLabel = new JLabel("<html><i>Teema vaihtuu heti esikatselua varten.</i></html>");
         c = new GridBagConstraints();
@@ -101,46 +98,42 @@ public class AppearanceDialog extends JDialog {
         c.gridy = 1;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(5, 0, 0, 0);
+        c.insets = createInsets(UNIT, 0, 0, 0);
         panel.add(infoLabel, c);
     }
     
     private void createButtonPanel() {
         GridBagConstraints c;
-        
+
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 15, 15, 15));
+        panel.setBorder(BUTTON_PANEL_BORDER);
         add(panel, BorderLayout.SOUTH);
-        
+
         okButton = new JButton("OK");
         okButton.setMnemonic('O');
-        okButton.setPreferredSize(new Dimension(100, 30));
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                saveSettings();
-                dispose();
-            }
+        okButton.setPreferredSize(BUTTON_SIZE);
+        okButton.addActionListener(e -> {
+            saveSettings();
+            dispose();
         });
-        
+
         cancelButton = new JButton("Peruuta");
         cancelButton.setMnemonic('P');
-        cancelButton.setPreferredSize(new Dimension(100, 30));
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                revertTheme();
-                dispose();
-            }
+        cancelButton.setPreferredSize(BUTTON_SIZE);
+        cancelButton.addActionListener(e -> {
+            revertTheme();
+            dispose();
         });
-        
+
         c = new GridBagConstraints();
         c.weightx = 1.0;
         c.anchor = GridBagConstraints.EAST;
-        c.insets = new Insets(0, 0, 0, 5);
+        c.insets = createInsets(0, 0, 0, UNIT);
         panel.add(cancelButton, c);
-        
+
         c = new GridBagConstraints();
         panel.add(okButton, c);
-        
+
         rootPane.setDefaultButton(okButton);
     }
     
