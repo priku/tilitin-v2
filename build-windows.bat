@@ -42,13 +42,13 @@ echo Versio: %VERSION%
 REM Suorita jPackage
 jpackage ^
   --input target ^
-  --name "Tilitin 2.0" ^
+  --name "Tilitin" ^
   --main-jar tilitin-%VERSION%.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type app-image ^
   --app-version %VERSION% ^
   --vendor "Tilitin Project" ^
-  --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
+  --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille - CSV-tuonti" ^
   --icon src\main\resources\tilitin.ico ^
   --java-options "--enable-native-access=ALL-UNNAMED" ^
   --dest dist\windows

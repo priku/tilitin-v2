@@ -54,17 +54,17 @@ set UPGRADE_UUID=12345678-90AB-CDEF-1234-567890ABCDEF
 REM Suorita jPackage MSI-tyypillä
 jpackage ^
   --input target ^
-  --name "Tilitin 2.0" ^
-  --main-jar tilitin-2.0.2.jar ^
+  --name "Tilitin" ^
+  --main-jar tilitin-2.2.1.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type msi ^
-  --app-version 2.0.2 ^
+  --app-version 2.2.1 ^
   --vendor "Tilitin Project" ^
-  --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
+  --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille - CSV-tuonti" ^
   --icon src\main\resources\tilitin.ico ^
   --java-options "--enable-native-access=ALL-UNNAMED" ^
   --win-menu ^
-  --win-menu-group "Tilitin 2.0" ^
+  --win-menu-group "Tilitin" ^
   --win-shortcut ^
   --win-dir-chooser ^
   --win-per-user-install ^
@@ -85,12 +85,12 @@ echo ========================================
 echo  MSI INSTALLER LUOTU!
 echo ========================================
 echo.
-echo Asennusohjelma: dist\installer\Tilitin 2.0-2.0.1.msi
+echo Asennusohjelma: dist\installer\Tilitin-2.2.1.msi
 echo.
 echo Voit testata asennusta tuplaklikkaamalla MSI-tiedostoa.
 echo.
 echo HUOM: Allekirjoita MSI ennen julkaisua:
-echo   signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD "dist\installer\Tilitin 2.0-2.0.1.msi"
+echo   signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD "dist\installer\Tilitin-2.2.1.msi"
 echo.
 
 pause
