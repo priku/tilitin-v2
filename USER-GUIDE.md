@@ -866,25 +866,29 @@ Sijainnit:
 
 | Näppäin | Toiminto |
 |---------|----------|
+| **Ctrl+O** | Avaa tietokanta |
 | **Ctrl+N** | Uusi tosite |
-| **Ctrl+S** | Tallenna tosite |
 | **Ctrl+C** | Kopioi viennit |
 | **Ctrl+V** | Liitä viennit |
 | **Ctrl+F** | Hae tosite |
+| **Ctrl+G** | Siirry tositteeseen |
 | **Ctrl+I** | Tuo CSV-tiedostosta |
 | **Ctrl+E** | Vie tiedostoon |
+| **Ctrl+T** | Tilikartta |
+| **Ctrl+Shift+P** | Perustiedot |
+| **Ctrl+Shift+S** | Kirjausasetukset |
+| **Ctrl+Shift+V** | ALV-tilien päättäminen |
 | **Ctrl+Q** | Lopeta ohjelma |
+| **F1** | Ohje |
 
 ### Navigointi
 
 | Näppäin | Toiminto |
 |---------|----------|
-| **Ctrl+Left** | Edellinen tosite |
-| **Ctrl+Right** | Seuraava tosite |
-| **Home** | Ensimmäinen tosite |
-| **End** | Viimeinen tosite |
-| **PgUp** | Edellinen sivu (raporteissa) |
-| **PgDown** | Seuraava sivu (raporteissa) |
+| **PgUp** | Edellinen tosite |
+| **PgDown** | Seuraava tosite |
+| **Ctrl+PgUp** | Ensimmäinen tosite |
+| **Ctrl+PgDown** | Viimeinen tosite |
 
 ### Vientitaulukko
 

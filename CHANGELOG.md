@@ -7,6 +7,23 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.3] - 2025-12-29
+
+### 🔧 Pikanäppäinkorjaukset
+
+**Tila:** ✅ Valmis
+
+### Korjattu
+- **Ctrl+P** → **Ctrl+Shift+P** (Perustiedot) - Vapautettu Ctrl+P tulevaa tulostustoimintoa varten
+- **Ctrl+R** → **Ctrl+Shift+V** (ALV-tilien päättäminen) - R on yleensä Refresh/Replace
+- **Ctrl+H** → Poistettu (Ohita ALV-laskelmassa) - H on yleensä History/Replace
+
+### Dokumentaatio
+- USER-GUIDE.md pikanäppäimet päivitetty vastaamaan Windows-standardeja
+- CSV-tuonti dokumentoitu USER-GUIDE.md:hen
+
+---
+
 ## [2.2.2] - 2025-12-29
 
 ### 🚀 Multi-platform Release & CSV-tuonti

@@ -178,7 +178,7 @@ public class DocumentMenuBuilder {
                 KeyStroke.getKeyStroke('B', shortcutKeyMask), l.startingBalancesListener);
         
         propertiesMenuItem = SwingUtils.createMenuItem("Perustiedot…", null, 'e',
-                KeyStroke.getKeyStroke('P', shortcutKeyMask), l.propertiesListener);
+                KeyStroke.getKeyStroke('P', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), l.propertiesListener);
         
         settingsMenuItem = SwingUtils.createMenuItem("Kirjausasetukset…", null, 'K',
                 KeyStroke.getKeyStroke('S', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), 
@@ -340,12 +340,12 @@ public class DocumentMenuBuilder {
         menu.setMnemonic('y');
         
         vatDocumentMenuItem = SwingUtils.createMenuItem("ALV-tilien päättäminen",
-                null, 'p', KeyStroke.getKeyStroke(KeyEvent.VK_R, shortcutKeyMask), 
+                null, 'p', KeyStroke.getKeyStroke('V', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), 
                 l.vatDocumentListener);
         menu.add(vatDocumentMenuItem);
         
         setIgnoreFlagMenuItem = SwingUtils.createMenuItem("Ohita vienti ALV-laskelmassa", null, 'O',
-                KeyStroke.getKeyStroke(KeyEvent.VK_H, shortcutKeyMask),
+                null,
                 l.setIgnoreFlagToEntryAction);
         menu.add(setIgnoreFlagMenuItem);
         
