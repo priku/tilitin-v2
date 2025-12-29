@@ -157,6 +157,7 @@
 - **Tositenumeroiden muutos** - Massapäivitys tositenumeroille
 - **Saldojen vertailu** - Vertaa tilien saldoja eri ajanjaksoilla
 - **CSV-vienti** - Vie kaikki kirjaukset CSV-muotoon (Excel-yhteensopiva)
+- **CSV-tuonti** - Tuo tilitapahtumia CSV-tiedostosta (Ctrl+I)
 - **PDF-tulosteet** - Tulosta raportit PDF-muotoon
 - **Tilikarttojen tuonti** - Tuo valmiita tilikarttoja
 
@@ -299,6 +300,7 @@ Tai luo tilikartta manuaalisesti:
 - Tilien saldojen vertailu
 - Muuta tositenumeroita
 - Vie tiedostoon (CSV)
+- Tuo CSV-tiedostosta (Ctrl+I)
 
 #### Ohje
 - Sisältö
@@ -869,6 +871,8 @@ Sijainnit:
 | **Ctrl+C** | Kopioi viennit |
 | **Ctrl+V** | Liitä viennit |
 | **Ctrl+F** | Hae tosite |
+| **Ctrl+I** | Tuo CSV-tiedostosta |
+| **Ctrl+E** | Vie tiedostoon |
 | **Ctrl+Q** | Lopeta ohjelma |
 
 ### Navigointi
@@ -979,6 +983,17 @@ V: **Työkalut → ALV-kantojen muutokset** - Massapäivitys kaikkiin tileihin k
 
 **K: Mitä ALV-koodia käytän EU-myyntiin?**
 V: ALV-koodi 4 (Verollinen myynti EU). Muista ALV-numero ja yhteenvetoilmoitus.
+
+### CSV-tuonti
+
+**K: Miten tuon pankkitilitapahtumia CSV-tiedostosta?**
+V: **Työkalut → Tuo CSV-tiedostosta** (Ctrl+I). Valitse tiedosto, määritä sarakkeiden vastaavuudet, esikatsele ja tuo.
+
+**K: Mitä CSV-muotoja tuetaan?**
+V: Procountor-muoto tunnistetaan automaattisesti. Muille voit määrittää sarakkeet manuaalisesti (päivämäärä, summa, selite, tili).
+
+**K: Voiko CSV-tuonnin esikatsella ennen tuontia?**
+V: Kyllä, dialogi näyttää esikatselun riveistä ennen tuontia. Voit tarkistaa sarakkeiden vastaavuudet.
 
 ### Raportit
 
