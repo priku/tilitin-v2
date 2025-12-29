@@ -219,12 +219,19 @@ class CsvImportDialog(
             selectedFile = file
             columns = CsvColumnAnalyzer.analyzeColumns(csvData!!)
 
+            // Check if this is Procountor format and apply preset mappings
+            if (ProcountorCsvPreset.isProcountorFormat(csvData!!)) {
+                columns = ProcountorCsvPreset.applyProcountorMappings(columns)
+                statusLabel.text = "Ladattu: ${file.name} (Procountor-muoto tunnistettu)"
+            } else {
+                statusLabel.text = "Ladattu: ${file.name}"
+            }
+
             // Update UI
             updatePreviewTable()
             updateMappingTable()
             updateInfoLabels()
 
-            statusLabel.text = "Ladattu: ${file.name}"
             importButton.isEnabled = true
 
         } catch (e: Exception) {

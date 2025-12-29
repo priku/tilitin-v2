@@ -1,0 +1,6 @@
+Tyyppi;Numero;Päivämäärä;Arvopäivä;Maksuväline;Summa;Vastaanottaja;Nimi;Viesti;Viite;Arkistointitunnus;Tila;ALV;Tilinumero;IBAN
+Myynti;12345;2024-12-15;2024-12-15;Tilisiirto;1500,00;Asiakas Oy;TestData;Myyntilasku 101;;SALE-2024-001;Maksettu;;1910;FI12345678901234567
+Osto;12346;2024-12-16;2024-12-16;Tilisiirto;-850,50;Toimittaja Oy;TestData;Vuokra joulukuu;;RENT-2024-12;Maksettu;;4000;FI98765432109876543
+Myynti;12347;2024-12-17;2024-12-17;Tilisiirto;2500,00;Toinen Asiakas;TestData;Konsultointipalvelu;;CONS-2024-002;Maksettu;;1910;FI11111111111111111
+Osto;12348;2024-12-18;2024-12-18;Tilisiirto;-125,00;Verkkokauppa;TestData;Toimistotarvikkeet;;SUPP-2024-123;Maksettu;;4310;FI22222222222222222
+Myynti;12349;2024-12-20;2024-12-20;Tilisiirto;750,00;Kolmas Asiakas;TestData;Pientyö;;SMALL-2024-003;Maksettu;;1910;FI33333333333333333
