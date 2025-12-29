@@ -1129,15 +1129,28 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			return;
 		}
 		
+		// Tallenna nykyinen tosite ennen tuontia
+		if (!saveDocumentIfChanged()) {
+			return;
+		}
+		
 		kirjanpito.ui.dialogs.CsvImportDialog dialog = 
-			new kirjanpito.ui.dialogs.CsvImportDialog(this);
+			new kirjanpito.ui.dialogs.CsvImportDialog(this, registry);
 		dialog.setVisible(true);
 		
-		// TODO: Käsittele tuontitulos kun tuontilogiikka on toteutettu
+		// Päivitä näkymä tuonnin jälkeen
 		if (dialog.getImportResult() != null && dialog.getImportResult().getSuccess()) {
-			// Päivitä näkymä tuonnin jälkeen
-			updatePosition();
-			updateDocument();
+			try {
+				// Siirry viimeiseen tositteeseen (äskön tuotu)
+				model.goToDocument(model.getDocumentCount() - 1);
+				updatePosition();
+				updateDocument();
+				updateTotalRow();
+			} catch (Exception e) {
+				// Ignore, just update current view
+				updatePosition();
+				updateDocument();
+			}
 		}
 	}
 

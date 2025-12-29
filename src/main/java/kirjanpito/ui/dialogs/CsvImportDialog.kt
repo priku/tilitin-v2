@@ -1,5 +1,6 @@
 package kirjanpito.ui.dialogs
 
+import kirjanpito.util.Registry
 import kirjanpito.util.csv.*
 import java.awt.*
 import java.io.File
@@ -19,7 +20,8 @@ import javax.swing.table.DefaultTableCellRenderer
  * - Preview of CSV data
  */
 class CsvImportDialog(
-    parent: JFrame
+    parent: JFrame,
+    private val registry: Registry
 ) : JDialog(parent, "CSV-tuonti", true) {
 
     private var csvData: CsvData? = null
@@ -36,6 +38,9 @@ class CsvImportDialog(
     private val fileButton = JButton("Valitse tiedosto...")
     private val importButton = JButton("Tuo kirjaukset")
     private val cancelButton = JButton("Peruuta")
+    
+    // Account selection for entries without mapped account
+    private val accountComboBox = JComboBox<AccountItem>()
 
     // Import results
     data class ImportResult(
@@ -47,6 +52,12 @@ class CsvImportDialog(
 
     var importResult: ImportResult? = null
         private set
+    
+    // Helper class for account combo box
+    private data class AccountItem(val id: Int, val number: String, val name: String) {
+        override fun toString() = "$number $name"
+    }
+
 
     init {
         layout = BorderLayout(10, 10)
@@ -116,14 +127,51 @@ class CsvImportDialog(
 
         contentPanel.add(splitPane, BorderLayout.CENTER)
 
-        // Bottom panel: Buttons
-        val bottomPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 10, 0))
+        // Bottom panel: Account selection and buttons
+        val bottomPanel = JPanel(BorderLayout(10, 5))
         bottomPanel.border = BorderFactory.createEmptyBorder(10, 0, 0, 0)
-        bottomPanel.add(importButton)
-        bottomPanel.add(cancelButton)
+        
+        // Account selection panel
+        val accountPanel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
+        accountPanel.add(JLabel("Oletustili (pankkitili):"))
+        populateAccountComboBox()
+        accountComboBox.preferredSize = Dimension(300, 25)
+        accountPanel.add(accountComboBox)
+        bottomPanel.add(accountPanel, BorderLayout.WEST)
+        
+        // Buttons panel
+        val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 10, 0))
+        buttonPanel.add(importButton)
+        buttonPanel.add(cancelButton)
+        bottomPanel.add(buttonPanel, BorderLayout.EAST)
+        
         contentPanel.add(bottomPanel, BorderLayout.SOUTH)
 
         add(contentPanel)
+    }
+    
+    private fun populateAccountComboBox() {
+        accountComboBox.removeAllItems()
+        
+        // Add bank accounts (type 1 = rahoitusomaisuus / financial assets)
+        // Look for accounts starting with 19 (pankkitilit)
+        for (account in registry.accounts) {
+            if (account.number.startsWith("19") || 
+                account.number.startsWith("17") ||
+                account.name.lowercase().contains("pankki") ||
+                account.name.lowercase().contains("kassa")) {
+                accountComboBox.addItem(AccountItem(account.id, account.number, account.name))
+            }
+        }
+        
+        // If no bank accounts found, add all asset accounts
+        if (accountComboBox.itemCount == 0) {
+            for (account in registry.accounts) {
+                if (account.number.startsWith("1")) {
+                    accountComboBox.addItem(AccountItem(account.id, account.number, account.name))
+                }
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -330,34 +378,91 @@ class CsvImportDialog(
             )
             return
         }
-
-        // TODO: Implement actual import logic
-        // For now, just show success message with parsed data info
         
-        val successCount = data.dataRows.size
-        val message = "CSV-tiedosto analysoitu onnistuneesti.\n\n" +
-                "Rivejä: $successCount\n" +
-                "Päivämäärä-sarake: ${dateColumn.header}\n" +
-                (debitColumn?.let { "Debet-sarake: ${it.header}\n" } ?: "") +
-                (creditColumn?.let { "Kredit-sarake: ${it.header}\n" } ?: "") +
-                (amountColumn?.let { "Summa-sarake: ${it.header}\n" } ?: "") +
-                "\nTuontilogiikka toteutetaan seuraavassa vaiheessa."
-
-        importResult = ImportResult(
-            success = true,
-            importedCount = successCount,
-            errorCount = 0,
-            errors = emptyList()
-        )
-
-        JOptionPane.showMessageDialog(
+        // Get selected default account
+        val selectedAccount = accountComboBox.selectedItem as? AccountItem
+        if (selectedAccount == null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Valitse oletustili (pankkitili) ennen tuontia.",
+                "Tili puuttuu",
+                JOptionPane.WARNING_MESSAGE
+            )
+            return
+        }
+        
+        // Confirm import
+        val confirmMessage = "Tuodaanko ${data.dataRows.size} riviä?\n\n" +
+                "Oletustili: ${selectedAccount.number} ${selectedAccount.name}"
+        
+        val confirm = JOptionPane.showConfirmDialog(
             this,
-            message,
-            "Analyysi valmis",
-            JOptionPane.INFORMATION_MESSAGE
+            confirmMessage,
+            "Vahvista tuonti",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
         )
-
-        dispose()
+        
+        if (confirm != JOptionPane.YES_OPTION) {
+            return
+        }
+        
+        // Perform import
+        cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
+        importButton.isEnabled = false
+        
+        try {
+            val importer = CsvImporter(registry)
+            val result = importer.import(data, columns, selectedAccount.id)
+            
+            cursor = Cursor.getDefaultCursor()
+            
+            if (result.success) {
+                val message = "Tuonti onnistui!\n\n" +
+                        "Luotuja tositteita: ${result.documentsCreated}\n" +
+                        "Luotuja vientejä: ${result.entriesCreated}" +
+                        (if (result.warnings.isNotEmpty()) "\n\nVaroituksia: ${result.warnings.size}" else "")
+                
+                JOptionPane.showMessageDialog(
+                    this,
+                    message,
+                    "Tuonti valmis",
+                    JOptionPane.INFORMATION_MESSAGE
+                )
+                
+                importResult = ImportResult(
+                    success = true,
+                    importedCount = result.entriesCreated,
+                    errorCount = result.errors.size,
+                    errors = result.errors
+                )
+                
+                dispose()
+            } else {
+                val errorMessage = "Tuonti epäonnistui:\n\n" +
+                        result.errors.take(5).joinToString("\n") +
+                        (if (result.errors.size > 5) "\n...ja ${result.errors.size - 5} muuta virhettä" else "")
+                
+                JOptionPane.showMessageDialog(
+                    this,
+                    errorMessage,
+                    "Tuontivirhe",
+                    JOptionPane.ERROR_MESSAGE
+                )
+                
+                importButton.isEnabled = true
+            }
+        } catch (e: Exception) {
+            cursor = Cursor.getDefaultCursor()
+            importButton.isEnabled = true
+            
+            JOptionPane.showMessageDialog(
+                this,
+                "Odottamaton virhe: ${e.message}",
+                "Virhe",
+                JOptionPane.ERROR_MESSAGE
+            )
+        }
     }
 
     /**
