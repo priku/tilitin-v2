@@ -2,16 +2,21 @@
 setlocal enabledelayedexpansion
 
 echo ============================================
-echo   Tilitin 2.0 - Modern Installer Builder
+echo   Tilitin - Modern Installer Builder
 echo ============================================
 echo.
 
+REM Hae versio pom.xml:stä
+for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+echo Versio: %VERSION%
+
 REM Check if jPackage output exists
-if not exist "dist\windows\Tilitin 2.0\Tilitin 2.0.exe" (
+if not exist "dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe" (
     echo [ERROR] jPackage output not found!
+    echo Expected: dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe
     echo Please run build-windows.bat first.
     echo.
-    pause
+    if "%CI%"=="" pause
     exit /b 1
 )
 

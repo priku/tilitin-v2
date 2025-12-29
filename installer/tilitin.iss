@@ -2,11 +2,11 @@
 ; Modern Windows installer for Tilitin accounting software
 
 #define MyAppName "Tilitin"
-#define MyAppVersion "2.2.0"
+#define MyAppVersion "2.2.1"
 #define MyAppPublisher "Tilitin Project"
 #define MyAppURL "https://github.com/priku/tilitin-modernized"
-#define MyAppExeName "Tilitin 2.0.exe"
-#define MyAppDescription "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille"
+#define MyAppExeName "Tilitin 2.2.1.exe"
+#define MyAppDescription "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille - CSV-tuonti"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -61,7 +61,7 @@ Name: "startmenuicon"; Description: "{cm:CreateStartMenuEntry}"; GroupDescriptio
 
 [Files]
 ; Main application files (from jPackage output)
-Source: "..\dist\windows\Tilitin 2.0\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\dist\windows\Tilitin {#MyAppVersion}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

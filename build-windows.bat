@@ -42,7 +42,7 @@ echo Versio: %VERSION%
 REM Suorita jPackage
 jpackage ^
   --input target ^
-  --name "Tilitin" ^
+  --name "Tilitin %VERSION%" ^
   --main-jar tilitin-%VERSION%.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type app-image ^
@@ -55,7 +55,7 @@ jpackage ^
 
 if errorlevel 1 (
     echo [VIRHE] jPackage-paketointi epäonnistui!
-    pause
+    if "%CI%"=="" pause
     exit /b 1
 )
 
