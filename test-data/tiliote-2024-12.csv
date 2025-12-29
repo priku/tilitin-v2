@@ -1,0 +1,14 @@
+Päivämäärä;Saaja/Maksaja;Selite;Viite;Summa;Saldo
+2024-12-02;Toimitila Oy;Vuokra joulukuu 2024;1234567890;-1500,00;8500,00
+2024-12-03;Asiakas ABC Oy;Myyntilasku 2024-156;2024156;2500,00;11000,00
+2024-12-05;Sähköyhtiö Energia;Sähkölasku 11/2024;98765432;-245,50;10754,50
+2024-12-08;Toimistotarvike Oy;Toimistotarvikkeet;TT-2024-889;-89,90;10664,60
+2024-12-10;Asiakas XYZ Ab;Konsultointipalvelut;KP2024-42;3200,00;13864,60
+2024-12-12;Vakuutusyhtiö Turva;Yritysvakuutus Q4;VAK-2024-4;-450,00;13414,60
+2024-12-15;Palkat joulukuu;Palkanmaksu 12/2024;;-4500,00;8914,60
+2024-12-15;Verottaja;Ennakonpidätys 12/2024;1122334455;-890,00;8024,60
+2024-12-18;Asiakas Firma Ky;Myyntilasku 2024-157;2024157;1850,00;9874,60
+2024-12-20;IT-Palvelut Oy;Ohjelmistolisenssit 2025;IT2025-001;-299,00;9575,60
+2024-12-22;Lounasravintola;Edustuskulut;LOUNAS-122;-125,40;9450,20
+2024-12-27;Asiakas DEF Oy;Vuosihuoltosopimus;VHS-2025;4800,00;14250,20
+2024-12-30;Pankki;Tilinhoidon palvelumaksu;;-12,50;14237,70
