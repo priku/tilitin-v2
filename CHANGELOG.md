@@ -7,6 +7,40 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.2] - 2025-12-29
+
+### 🚀 Multi-platform Release & CSV-tuonti
+
+**Branch:** `feature/csv-import` merged to `master`  
+**Toteutusaika:** 2025-12-29  
+**Tila:** ✅ Valmis
+
+### Lisätty
+- **Multi-platform julkaisu** - GitHub Actions rakentaa automaattisesti:
+  - 🪟 Windows Installer (.exe) - jPackage + Inno Setup
+  - 🍎 macOS Package (.dmg) - natiivi Mac-asennus
+  - 🐧 Linux DEB (.deb) - Debian/Ubuntu
+  - 🐧 Linux RPM (.rpm) - Fedora/Red Hat
+- **CSV-tuonti (Kotlin)** - Moderni tilitapahtumien tuonti
+  - `CsvImportDialog.kt` - Käyttöliittymä CSV-tuontiin
+  - `CsvParser.kt` - CSV-tiedostojen jäsennys
+  - `CsvImporter.kt` - Tuontilogiikka
+  - `CsvColumnAnalyzer.kt` - Sarakkeiden automaattinen tunnistus
+  - `ProcountorCsvPreset.kt` - Procountor-muodon esiasetukset
+- **Test-data** - Testitiedostot CSV-tuonnin testaamiseen
+
+### Muutettu
+- **GitHub Actions workflow** - Optimoitu rakenne:
+  - JAR rakennetaan kerran Ubuntulla (nopeampi, halvempi)
+  - CHANGELOG parsing AWK:lla (ei PowerShell)
+  - Artifact sharing jobien välillä
+
+### Tekninen
+- Release notes luetaan automaattisesti CHANGELOG.md:stä
+- Kaikki paketit ladataan samaan GitHub Releaseen
+
+---
+
 ## [2.2.1] - 2025-12-29
 
 ### 🏗️ DocumentFrame Refactoring - Phase 3b, 4 & 5
