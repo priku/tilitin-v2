@@ -2,6 +2,8 @@ package kirjanpito.ui;
 
 import java.awt.event.ActionListener;
 
+import kirjanpito.models.DocumentModel;
+
 /**
  * Handles menu action listeners for DocumentFrame.
  *
@@ -34,6 +36,22 @@ public class DocumentMenuHandler {
 	// ========================================
 	// GO MENU LISTENERS
 	// ========================================
+
+	public ActionListener getPrevDocListener() {
+		return e -> frame.goToDocument(DocumentModel.FETCH_PREVIOUS);
+	}
+
+	public ActionListener getNextDocListener() {
+		return e -> frame.goToDocument(DocumentModel.FETCH_NEXT);
+	}
+
+	public ActionListener getFirstDocListener() {
+		return e -> frame.goToDocument(DocumentModel.FETCH_FIRST);
+	}
+
+	public ActionListener getLastDocListener() {
+		return e -> frame.goToDocument(DocumentModel.FETCH_LAST);
+	}
 
 	public ActionListener getFindDocumentByNumberListener() {
 		return e -> frame.findDocumentByNumber();

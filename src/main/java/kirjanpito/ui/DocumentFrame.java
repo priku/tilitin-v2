@@ -2658,16 +2658,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	// --- Go Menu ---
 
 	/* Edellinen tosite */
-	private ActionListener prevDocListener = e -> goToDocument(DocumentModel.FETCH_PREVIOUS);
+	private ActionListener prevDocListener = menuHandler.getPrevDocListener();
 
 	/* Seuraava tosite */
-	private ActionListener nextDocListener = e -> goToDocument(DocumentModel.FETCH_NEXT);
+	private ActionListener nextDocListener = menuHandler.getNextDocListener();
 
 	/* Ensimmäinen tosite */
-	private ActionListener firstDocListener = e -> goToDocument(DocumentModel.FETCH_FIRST);
+	private ActionListener firstDocListener = menuHandler.getFirstDocListener();
 
 	/* Viimeinen tosite */
-	private ActionListener lastDocListener = e -> goToDocument(DocumentModel.FETCH_LAST);
+	private ActionListener lastDocListener = menuHandler.getLastDocListener();
 
 	/* Hae numerolla */
 	private ActionListener findDocumentByNumberListener = menuHandler.getFindDocumentByNumberListener();
