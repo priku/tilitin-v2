@@ -45,22 +45,24 @@
    - ✅ Inno Setup installer
    - ✅ MSI installer
 
-### ❌ Remaining Issues
+### ❌ Remaining Issues (TODO - Not Yet Started)
 
-- **DocumentFrame:** Still 3,024 lines (God Object)
+- **DocumentFrame:** Still 3,093 lines (God Object) - **NO REFACTORING DONE YET**
 - **Legacy Dialogs:** 19 dialogs need theme support
 - **Anonymous Inner Classes:** ~10+ in DocumentFrame, 40+ total
 - **Hardcoded Colors:** Many instances across legacy dialogs
-- **Deprecated APIs:** Some usage still present
+- **Unit Tests:** No unit tests exist
 
 ---
 
 ## 🎯 Strategic Priorities
 
-### Priority 1: Complete DocumentFrame Refactoring (CRITICAL)
-**Why:** DocumentFrame is still a 3,024-line God Object, making maintenance difficult.
+### Priority 1: DocumentFrame Refactoring (CRITICAL - NOT STARTED)
+**Why:** DocumentFrame is 3,093 lines (God Object), making maintenance difficult.
 
-**Target:** Reduce to <500 lines by extracting remaining functionality.
+**Current Status:** No refactoring has been done yet. DocumentFrame is identical in both tilitin-v2 and tilitin-modernized.
+
+**Target:** Reduce to <500 lines by extracting functionality into separate components.
 
 ### Priority 2: Theme Support for Legacy Dialogs (HIGH)
 **Why:** Dark mode looks broken in 19 dialogs, affecting user experience.
@@ -76,9 +78,11 @@
 
 ## 📋 Detailed Action Plan
 
-## SPRINT 1: Complete DocumentFrame Refactoring (2-3 weeks)
+## SPRINT 1: START DocumentFrame Refactoring (NOT STARTED - PLANNED)
 
-### Phase 3b: Table Management Extraction
+**IMPORTANT:** No refactoring sprints have been completed yet. All phases below are TODO.
+
+### Phase 1: Entry Table Management Extraction (PLANNED)
 
 **Goal:** Extract table-related code from DocumentFrame.
 

@@ -8,7 +8,7 @@ Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointit
 
 ---
 
-## 📊 Moderniusarvio (v2.2.0)
+## 📊 Moderniusarvio (v2.0.3)
 
 ### Kokonaisarvio: **75% moderni** ⭐⭐⭐⭐
 
@@ -70,11 +70,11 @@ Tavoite (v3.0):     ████████████████████
 - ✅ PDF-liitteet tositteihin (v2.2.0)
 - ✅ GitHub Actions CI/CD pipeline
 
-**Jäljellä olevia haasteita:**
+**Jäljellä olevia haasteita (TODO - Ei vielä aloitettu):**
 
-- ⚠️ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 4 - tulevaisuus)
+- ❌ **DocumentFrame.java on 3,093 riviä** - EI REFAKTOROINTIA TEHTY (pilkottava alle 500 riviin)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
-- ⚠️ DocumentFrame.java on ~2,900 riviä (pilkottava pienemmäksi)
+- ⚠️ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 4 - tulevaisuus)
 - ⚠️ Vanhat Swing-patternit (anonymous inner classes)
 - ❌ Yksikkötestit puuttuvat kokonaan
 
