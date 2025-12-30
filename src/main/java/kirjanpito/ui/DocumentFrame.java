@@ -107,6 +107,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	protected Registry registry;
 	protected DocumentModel model;
 	private DocumentExporter documentExporter;
+	private DocumentMenuHandler menuHandler;
 	protected JMenu entryTemplateMenu;
 	protected JMenu docTypeMenu;
 	protected JMenu gotoMenu;
@@ -292,6 +293,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		super(Kirjanpito.APP_NAME);
 		this.registry = registry;
 		this.model = model;
+		this.menuHandler = new DocumentMenuHandler(this);
 		this.debitTotal = BigDecimal.ZERO;
 		this.creditTotal = BigDecimal.ZERO;
 		registry.addListener(registryListener);
@@ -2491,7 +2493,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/**
 	 * Näyttää dialogin varmuuskopion palauttamiseksi.
 	 */
-	protected void restoreFromBackup() {
+	public void restoreFromBackup() {
 		BackupService backupService = BackupService.getInstance();
 		File backupDir = backupService.getBackupDirectory();
 		
@@ -2651,7 +2653,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	// Also includes: newDatabaseListener, openDatabaseListener, databaseSettingsListener (defined at line 193)
 
 	/* Lopeta */
-	private ActionListener quitListener = e -> quit();
+	private ActionListener quitListener = menuHandler.getQuitListener();
 
 	// --- Go Menu ---
 
@@ -2668,24 +2670,24 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener lastDocListener = e -> goToDocument(DocumentModel.FETCH_LAST);
 
 	/* Hae numerolla */
-	private ActionListener findDocumentByNumberListener = e -> findDocumentByNumber();
+	private ActionListener findDocumentByNumberListener = menuHandler.getFindDocumentByNumberListener();
 
 	/* Etsi */
-	private ActionListener searchListener = e -> toggleSearchPanel();
+	private ActionListener searchListener = menuHandler.getSearchListener();
 
 	// --- Edit Menu ---
 
 	/* Uusi tosite */
-	private ActionListener newDocListener = e -> createDocument();
+	private ActionListener newDocListener = menuHandler.getNewDocListener();
 
 	/* Poista tosite */
-	private ActionListener deleteDocListener = e -> deleteDocument();
+	private ActionListener deleteDocListener = menuHandler.getDeleteDocListener();
 
 	/* Muokkaa vientimalleja */
-	private ActionListener editEntryTemplatesListener = e -> editEntryTemplates();
+	private ActionListener editEntryTemplatesListener = menuHandler.getEditEntryTemplatesListener();
 
 	/* Luo vientimalli tositteesta */
-	private ActionListener createEntryTemplateListener = e -> createEntryTemplateFromDocument();
+	private ActionListener createEntryTemplateListener = menuHandler.getCreateEntryTemplateListener();
 
 	/* Vientimalli */
 	private ActionListener entryTemplateListener = e -> {
@@ -2698,31 +2700,31 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	// --- Settings Menu ---
 
 	/* Vie */
-	private ActionListener exportListener = e -> export();
+	private ActionListener exportListener = menuHandler.getExportListener();
 
 	/* Tuo CSV */
-	private ActionListener csvImportListener = e -> showCsvImportDialog();
+	private ActionListener csvImportListener = menuHandler.getCsvImportListener();
 
 	/* Tilikartta */
-	private ActionListener chartOfAccountsListener = e -> showChartOfAccounts();
+	private ActionListener chartOfAccountsListener = menuHandler.getChartOfAccountsListener();
 
 	/* Alkusaldot */
-	private ActionListener startingBalancesListener = e -> showStartingBalances();
+	private ActionListener startingBalancesListener = menuHandler.getStartingBalancesListener();
 
 	/* Perustiedot */
-	private ActionListener propertiesListener = e -> showProperties();
+	private ActionListener propertiesListener = menuHandler.getPropertiesListener();
 
 	/* Kirjausasetukset */
-	private ActionListener settingsListener = e -> showSettings();
+	private ActionListener settingsListener = menuHandler.getSettingsListener();
 
 	/* Ulkoasu */
-	private ActionListener appearanceListener = e -> showAppearanceDialog();
+	private ActionListener appearanceListener = menuHandler.getAppearanceListener();
 
 	/* Varmuuskopiointiasetukset */
 	private ActionListener backupSettingsListener = e -> BackupSettingsDialog.show(DocumentFrame.this);
 
 	/* Palauta varmuuskopiosta */
-	private ActionListener restoreBackupListener = e -> restoreFromBackup();
+	private ActionListener restoreBackupListener = menuHandler.getRestoreBackupListener();
 
 	// --- Edit Menu Entry Actions (Ctrl+N, Ctrl+D) ---
 
@@ -2754,7 +2756,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	// --- Document Type Menu ---
 
 	/* Muokkaa tositelajeja */
-	private ActionListener editDocTypesListener = e -> editDocumentTypes();
+	private ActionListener editDocTypesListener = menuHandler.getEditDocTypesListener();
 
 	// --- Entry Table Actions (Ctrl+C, Ctrl+V) ---
 
@@ -2835,15 +2837,15 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Muokkaa tulosteita */
-	private ActionListener editReportsListener = e -> editReports();
+	private ActionListener editReportsListener = menuHandler.getEditReportsListener();
 
 	// --- Tools Menu ---
 
 	/* Tilien saldojen vertailu */
-	private ActionListener balanceComparisonListener = e -> showBalanceComparison();
+	private ActionListener balanceComparisonListener = menuHandler.getBalanceComparisonListener();
 
 	/* ALV-tilien päättäminen */
-	private ActionListener vatDocumentListener = e -> createVATDocument();
+	private ActionListener vatDocumentListener = menuHandler.getVatDocumentListener();
 
 	/* Ohita vienti ALV-laskelmassa */
 	private AbstractAction setIgnoreFlagToEntryAction = new AbstractAction() {
@@ -2880,21 +2882,21 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	};
 
 	/* Muuta tositenumeroita */
-	private ActionListener numberShiftListener = e -> showDocumentNumberShiftDialog();
+	private ActionListener numberShiftListener = menuHandler.getNumberShiftListener();
 
 	/* ALV-kantojen muutokset */
-	private ActionListener vatChangeListener = e -> showVATChangeDialog();
+	private ActionListener vatChangeListener = menuHandler.getVatChangeListener();
 
 	// --- Help Menu ---
 
 	/* Ohje */
-	private ActionListener helpListener = e -> showHelp();
+	private ActionListener helpListener = menuHandler.getHelpListener();
 
 	/* Virheenjäljitystietoja */
-	private ActionListener debugListener = e -> showLogMessages();
+	private ActionListener debugListener = menuHandler.getDebugListener();
 
 	/* Tietoja ohjelmasta */
-	private ActionListener aboutListener = e -> showAboutDialog();
+	private ActionListener aboutListener = menuHandler.getAboutListener();
 
 	// --- Entry Table Navigation Actions (Shift+Enter, Enter, Tab) ---
 
