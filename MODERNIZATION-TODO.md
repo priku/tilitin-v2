@@ -2,9 +2,9 @@
 
 Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointitehtävistä sekä sovelluksen moderniusarvion.
 
-**Projektin tila**: v2.2.0 julkaistu (master)
-**Viimeksi päivitetty**: 2025-06-27
-**Analyysi perustuu**: 201 Java-tiedoston + 17 Kotlin-tiedoston kattavaan analyysiin
+**Projektin tila**: v2.0.3 (synced from tilitin-v2)
+**Viimeksi päivitetty**: 2025-12-30
+**Analyysi perustuu**: 202 Java-tiedoston + 22 Kotlin-tiedoston kattavaan analyysiin
 
 ---
 
@@ -32,8 +32,8 @@ Sovellus on selkeästi modernisoitu, mutta alkuperäinen Swing-arkkitehtuuri raj
 | Osa-alue | Tila | Ongelma | Ratkaisu |
 |----------|------|---------|----------|
 | **UI-kehys** | ⚠️ Vanha | Swing (20+ vuotta vanha) | JavaFX / Compose Desktop |
-| **Kotlin-osuus** | ⚠️ Matala | 7.8% (17/218 tiedostoa) | Tavoite 50%+ |
-| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame ~2,900 riviä | Pilkkominen osiin |
+| **Kotlin-osuus** | ⚠️ Matala | 9.8% (22/224 tiedostoa) | Tavoite 50%+ |
+| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame 3,093 riviä | Pilkkominen osiin |
 | **Testit** | ❌ Puuttuu | Ei yksikkötestejä | JUnit 5 / Kotest |
 
 ### 📈 Modernisoinnin eteneminen
@@ -41,7 +41,7 @@ Sovellus on selkeästi modernisoitu, mutta alkuperäinen Swing-arkkitehtuuri raj
 ```
 Vuosi 2023 (v1.x):  ████░░░░░░░░░░░░░░░░ 20% - Alkuperäinen Java 8 koodi
 Vuosi 2024 (v2.0):  ██████████░░░░░░░░░░ 50% - Java 25, FlatLaf, refaktorointi
-Vuosi 2025 (v2.2):  ███████████████░░░░░ 75% - Kotlin, PDF-liitteet, CI/CD
+Vuosi 2025 (v2.0.3): ███████████████░░░░░ 75% - Synced from tilitin-v2, CSV, PDF
 Tavoite (v3.0):     ████████████████████ 100% - JavaFX/Compose, 50%+ Kotlin
 ```
 

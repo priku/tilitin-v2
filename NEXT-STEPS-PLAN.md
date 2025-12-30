@@ -1,9 +1,9 @@
 # Tilitin - Next Steps Plan
 ## Comprehensive Development Roadmap
 
-**Current Version:** 2.2.1  
-**Last Updated:** 2025-12-29  
-**DocumentFrame Size:** ~2,654 lines (target: <500 lines)
+**Current Version:** 2.0.3  
+**Last Updated:** 2025-12-30  
+**DocumentFrame Size:** 3,093 lines (synced from tilitin-v2)
 
 ---
 
@@ -19,22 +19,21 @@
    - ✅ UIConstants foundation
    - ✅ BaseDialog foundation
 
-2. **Kotlin Migration (Phase 1-3)**
+3. **Kotlin Migration**
+   - ✅ 22 Kotlin files total (9.8% of codebase)
    - ✅ 6 data classes (Account, Document, Entry, Period, DocumentType, COAHeading)
-   - ✅ 3 utility classes (SwingExtensions, ValidationUtils, DialogUtils)
-   - ✅ DAO foundation (DatabaseExtensions, SQLAccountDAOKt)
-   - ✅ SQLiteAccountDAOKt in production
+   - ✅ 4 utility classes (SwingExtensions, ValidationUtils, DialogUtils, PdfUtils)
+   - ✅ 5 CSV utilities (CsvImportDialog, CsvParser, CsvImporter, CsvColumnAnalyzer, ProcountorCsvPreset)
+   - ✅ 6 DAO classes (SQLAccountDAOKt, SQLiteAccountDAOKt, SQLiteAttachmentDAO, MySQLAttachmentDAO, PSQLAttachmentDAO, DatabaseExtensions)
+   - ✅ Attachment model
 
-3. **DocumentFrame Refactoring (Partial)**
-   - ✅ Phase 1: DocumentBackupManager (193 lines)
-   - ✅ Phase 1b: DocumentExporter (83 lines)
-   - ✅ Phase 2: DocumentMenuBuilder (453 lines)
-   - ✅ Phase 2: DocumentToolbarBuilder (112 lines)
-   - ✅ Phase 3: DocumentListenerHelpers (76 lines)
-   - ✅ Phase 3: EntryTableActions (280 lines)
-   - ✅ Phase 3b: DocumentTableManager (400 lines)
-   - ✅ Phase 4: Code cleanup (imports, wrappers)
-   - **Progress:** 3,856 → ~2,930 lines (-24%)
+4. **Code Synced from tilitin-v2**
+   - ✅ Full codebase synchronized (370 files)
+   - ✅ OpenCSV 5.12.0 added
+   - ✅ FileBasedAttachmentDAO.java added
+   - ✅ Database upgrade utilities updated
+   - ✅ All improvements from v2 included
+   - **Status:** Clean merge completed (commit bc30321)
 
 4. **Backup System**
    - ✅ Per-database backup locations
