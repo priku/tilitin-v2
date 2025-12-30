@@ -37,10 +37,13 @@ public class MainController implements Initializable {
     @FXML private Menu recentDatabasesMenu;
     
     @FXML private TextField documentNumberField;
+    @FXML private TextField searchField;
     @FXML private Label totalDocumentsLabel;
+    @FXML private Label periodIndicator;
     @FXML private DatePicker datePicker;
-    @FXML private TextField docNumberField;
+    @FXML private Label docNumberDisplay;
     @FXML private ComboBox<DocumentType> docTypeCombo;
+    @FXML private Label balanceStatusLabel;
     
     @FXML private TableView<EntryRow> entryTable;
     @FXML private TableColumn<EntryRow, Integer> rowNumCol;
@@ -134,9 +137,6 @@ public class MainController implements Initializable {
         boolean hasDatabase = dataSource != null;
         boolean hasDocument = currentDocument != null;
         
-        // Päivitä toolbar-napit
-        // (TODO: bindaa FXML:ssä)
-        
         // Päivitä kentät
         if (hasDocument) {
             // Päivämäärä
@@ -147,7 +147,8 @@ public class MainController implements Initializable {
             }
             
             // Tositenumero
-            docNumberField.setText(String.valueOf(currentDocument.getNumber()));
+            docNumberDisplay.setText(String.valueOf(currentDocument.getNumber()));
+            documentNumberField.setText(String.valueOf(currentDocument.getNumber()));
             
             // Viennit
             loadEntries();
@@ -155,8 +156,9 @@ public class MainController implements Initializable {
             // Summat
             updateTotals();
         } else {
-            datePicker.setValue(null);
-            docNumberField.setText("");
+            datePicker.setValue(LocalDate.now());
+            docNumberDisplay.setText("-");
+            documentNumberField.setText("");
             entries.clear();
             updateTotals();
         }
@@ -164,8 +166,10 @@ public class MainController implements Initializable {
         // Status bar
         if (hasDatabase && databaseName != null) {
             databaseLabel.setText(databaseName);
+            periodIndicator.setText("📊 Tilikausi aktiivinen");
         } else {
             databaseLabel.setText("Ei tietokantaa");
+            periodIndicator.setText("");
         }
     }
     
@@ -207,16 +211,20 @@ public class MainController implements Initializable {
             }
         }
         
-        debitTotalLabel.setText(currencyFormat.format(debitTotal));
-        creditTotalLabel.setText(currencyFormat.format(creditTotal));
+        debitTotalLabel.setText(currencyFormat.format(debitTotal) + " €");
+        creditTotalLabel.setText(currencyFormat.format(creditTotal) + " €");
         
         BigDecimal balance = debitTotal.subtract(creditTotal);
         if (balance.compareTo(BigDecimal.ZERO) == 0) {
+            balanceStatusLabel.setText("✓ Tasapaino");
+            balanceStatusLabel.getStyleClass().removeAll("balance-error");
+            balanceStatusLabel.getStyleClass().add("balance-ok");
             balanceLabel.setText("");
-            balanceLabel.getStyleClass().remove("balance-error");
         } else {
-            balanceLabel.setText("Erotus: " + currencyFormat.format(balance.abs()));
-            balanceLabel.getStyleClass().add("balance-error");
+            balanceStatusLabel.setText("⚠ Epätasapaino");
+            balanceStatusLabel.getStyleClass().removeAll("balance-ok");
+            balanceStatusLabel.getStyleClass().add("balance-error");
+            balanceLabel.setText(currencyFormat.format(balance.abs()) + " €");
         }
     }
     
@@ -382,6 +390,11 @@ public class MainController implements Initializable {
     @FXML
     private void handleDatabaseSettings() {
         showNotImplemented("Tietokannan asetukset");
+    }
+    
+    @FXML
+    private void handleAttachment() {
+        showNotImplemented("Liite");
     }
     
     // Report handlers

@@ -2,12 +2,14 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="kirjanpito.ui.javafx.MainController"
-            prefWidth="1200" prefHeight="700">
+            prefWidth="1200" prefHeight="750"
+            style="-fx-background-color: #f8f9fa;">
     
     <!-- Menu Bar -->
     <top>
@@ -76,70 +78,165 @@
             </MenuBar>
             
             <!-- Toolbar -->
-            <ToolBar fx:id="toolBar">
-                <Button fx:id="newDocBtn" text="Uusi" onAction="#handleNewDocument"/>
-                <Button fx:id="saveBtn" text="Tallenna" onAction="#handleSave"/>
-                <Separator/>
-                <Button fx:id="prevBtn" text="◀" onAction="#handlePrevDocument"/>
-                <Button fx:id="nextBtn" text="▶" onAction="#handleNextDocument"/>
-                <Separator/>
-                <Label text="Tosite:"/>
-                <TextField fx:id="documentNumberField" prefWidth="80" onAction="#handleGotoDocumentNumber"/>
-                <Label text="/"/>
-                <Label fx:id="totalDocumentsLabel" text="0"/>
-                <Separator/>
-                <Button fx:id="searchBtn" text="Haku" onAction="#handleSearch"/>
-            </ToolBar>
+            <HBox styleClass="tool-bar" spacing="8" alignment="CENTER_LEFT">
+                <padding><Insets top="8" right="16" bottom="8" left="16"/></padding>
+                
+                <!-- Primary actions -->
+                <Button fx:id="newDocBtn" text="＋ Uusi tosite" styleClass="primary" onAction="#handleNewDocument"/>
+                <Button fx:id="saveBtn" text="💾 Tallenna" onAction="#handleSave"/>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <!-- Navigation -->
+                <Button fx:id="firstBtn" text="⏮" styleClass="nav-button" onAction="#handleFirstDocument"/>
+                <Button fx:id="prevBtn" text="◀" styleClass="nav-button" onAction="#handlePrevDocument"/>
+                
+                <HBox alignment="CENTER" spacing="4">
+                    <TextField fx:id="documentNumberField" prefWidth="70" styleClass="doc-number-field" 
+                               alignment="CENTER" onAction="#handleGotoDocumentNumber"/>
+                    <Label text="/" style="-fx-text-fill: #94a3b8;"/>
+                    <Label fx:id="totalDocumentsLabel" text="0" style="-fx-font-weight: 600;"/>
+                </HBox>
+                
+                <Button fx:id="nextBtn" text="▶" styleClass="nav-button" onAction="#handleNextDocument"/>
+                <Button fx:id="lastBtn" text="⏭" styleClass="nav-button" onAction="#handleLastDocument"/>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <!-- Search -->
+                <TextField fx:id="searchField" prefWidth="200" promptText="🔍 Hae tositteita..."/>
+                <Button fx:id="searchBtn" text="Hae" onAction="#handleSearch"/>
+                
+                <!-- Spacer -->
+                <Pane HBox.hgrow="ALWAYS"/>
+                
+                <!-- Period indicator -->
+                <Label fx:id="periodIndicator" text="" style="-fx-background-color: #dbeafe; -fx-padding: 6 12; -fx-background-radius: 4; -fx-text-fill: #1e40af; -fx-font-weight: 500;"/>
+            </HBox>
         </VBox>
     </top>
     
     <!-- Center: Document content -->
     <center>
-        <VBox spacing="10">
-            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+        <VBox style="-fx-background-color: #f8f9fa;">
+            <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
             
-            <!-- Document header -->
-            <HBox spacing="15" alignment="CENTER_LEFT">
-                <Label text="Päivämäärä:"/>
-                <DatePicker fx:id="datePicker" prefWidth="130"/>
+            <!-- Document header card -->
+            <VBox styleClass="card" spacing="16">
+                <HBox spacing="24" alignment="CENTER_LEFT">
+                    <!-- Document number -->
+                    <VBox spacing="4">
+                        <Label text="TOSITENUMERO" styleClass="field-label" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="docNumberDisplay" text="1" style="-fx-font-size: 28px; -fx-font-weight: 700; -fx-text-fill: #1e293b;"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <Separator orientation="VERTICAL" prefHeight="50"/>
+                    
+                    <!-- Date -->
+                    <VBox spacing="4">
+                        <Label text="PÄIVÄMÄÄRÄ" styleClass="field-label" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                        <DatePicker fx:id="datePicker" prefWidth="150"/>
+                    </VBox>
+                    
+                    <!-- Document type -->
+                    <VBox spacing="4">
+                        <Label text="TOSITELAJI" styleClass="field-label" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                        <ComboBox fx:id="docTypeCombo" prefWidth="220" promptText="Valitse tositelaji"/>
+                    </VBox>
+                    
+                    <!-- Spacer -->
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    
+                    <!-- Document actions -->
+                    <VBox spacing="4" alignment="CENTER_RIGHT">
+                        <Label text="TOIMINNOT" styleClass="field-label" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                        <HBox spacing="8">
+                            <Button text="📎 Liite" onAction="#handleAttachment"/>
+                            <Button text="📄 Kopioi" onAction="#handleCopy"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+            </VBox>
+            
+            <Region prefHeight="16"/>
+            
+            <!-- Entry table card -->
+            <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="0">
+                <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
                 
-                <Label text="Tositenumero:"/>
-                <TextField fx:id="docNumberField" prefWidth="80" editable="false"/>
+                <!-- Table header -->
+                <HBox style="-fx-background-color: #f8fafc; -fx-padding: 12 16; -fx-border-color: transparent transparent #e2e8f0 transparent;">
+                    <Label text="VIENNIT" style="-fx-font-weight: 600; -fx-text-fill: #334155;"/>
+                    <Pane HBox.hgrow="ALWAYS"/>
+                    <Button text="＋ Lisää vienti" styleClass="primary" style="-fx-padding: 6 12;" onAction="#handleAddEntry"/>
+                </HBox>
                 
-                <Label text="Tositelaji:"/>
-                <ComboBox fx:id="docTypeCombo" prefWidth="200"/>
-            </HBox>
-            
-            <!-- Entry table -->
-            <TableView fx:id="entryTable" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="rowNumCol" text="#" prefWidth="40" editable="false"/>
-                    <TableColumn fx:id="accountCol" text="Tili" prefWidth="200"/>
-                    <TableColumn fx:id="descriptionCol" text="Selite" prefWidth="300"/>
-                    <TableColumn fx:id="debitCol" text="Debet" prefWidth="120"/>
-                    <TableColumn fx:id="creditCol" text="Kredit" prefWidth="120"/>
-                    <TableColumn fx:id="vatCol" text="ALV" prefWidth="80"/>
-                </columns>
-            </TableView>
-            
-            <!-- Totals row -->
-            <HBox spacing="20" alignment="CENTER_RIGHT" style="-fx-background-color: #f0f0f0; -fx-padding: 8;">
-                <Label text="Yhteensä:"/>
-                <Label fx:id="debitTotalLabel" text="0,00" style="-fx-font-weight: bold;"/>
-                <Label fx:id="creditTotalLabel" text="0,00" style="-fx-font-weight: bold;"/>
-                <Label fx:id="balanceLabel" text="" style="-fx-text-fill: red;"/>
-            </HBox>
+                <!-- Entry table -->
+                <TableView fx:id="entryTable" VBox.vgrow="ALWAYS" style="-fx-border-width: 0;">
+                    <columns>
+                        <TableColumn fx:id="rowNumCol" text="#" prefWidth="50" sortable="false" style="-fx-alignment: CENTER;"/>
+                        <TableColumn fx:id="accountCol" text="Tili" prefWidth="220"/>
+                        <TableColumn fx:id="descriptionCol" text="Selite" prefWidth="350"/>
+                        <TableColumn fx:id="debitCol" text="Debet €" prefWidth="130" style="-fx-alignment: CENTER-RIGHT;"/>
+                        <TableColumn fx:id="creditCol" text="Kredit €" prefWidth="130" style="-fx-alignment: CENTER-RIGHT;"/>
+                        <TableColumn fx:id="vatCol" text="ALV" prefWidth="80" style="-fx-alignment: CENTER;"/>
+                    </columns>
+                    <placeholder>
+                        <VBox alignment="CENTER" spacing="8">
+                            <Label text="📋" style="-fx-font-size: 32px;"/>
+                            <Label text="Ei vientejä" style="-fx-text-fill: #94a3b8; -fx-font-size: 14px;"/>
+                            <Label text="Lisää vienti aloittaaksesi" style="-fx-text-fill: #cbd5e1; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </placeholder>
+                </TableView>
+                
+                <!-- Totals row -->
+                <HBox styleClass="totals-row" spacing="32" alignment="CENTER_RIGHT" 
+                      style="-fx-background-color: #f8fafc; -fx-padding: 16 20; -fx-border-color: #e2e8f0 transparent transparent transparent;">
+                    
+                    <HBox spacing="8" alignment="CENTER_RIGHT">
+                        <Label text="Debet yhteensä:" style="-fx-text-fill: #64748b;"/>
+                        <Label fx:id="debitTotalLabel" text="0,00" styleClass="total-amount,debit-total"/>
+                    </HBox>
+                    
+                    <HBox spacing="8" alignment="CENTER_RIGHT">
+                        <Label text="Kredit yhteensä:" style="-fx-text-fill: #64748b;"/>
+                        <Label fx:id="creditTotalLabel" text="0,00" styleClass="total-amount,credit-total"/>
+                    </HBox>
+                    
+                    <Separator orientation="VERTICAL" prefHeight="24"/>
+                    
+                    <HBox spacing="8" alignment="CENTER_RIGHT">
+                        <Label fx:id="balanceStatusLabel" text="✓ Tasapaino" styleClass="balance-ok" style="-fx-font-weight: 600;"/>
+                        <Label fx:id="balanceLabel" text="" styleClass="balance-error"/>
+                    </HBox>
+                </HBox>
+            </VBox>
         </VBox>
     </center>
     
     <!-- Bottom: Status bar -->
     <bottom>
-        <HBox fx:id="statusBar" spacing="10" alignment="CENTER_LEFT" 
-              style="-fx-background-color: #e0e0e0; -fx-padding: 5;">
-            <Label fx:id="statusLabel" text="Valmis"/>
+        <HBox styleClass="status-bar" spacing="16" alignment="CENTER_LEFT" 
+              style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0 transparent transparent transparent; -fx-padding: 10 20;">
+            
+            <Label fx:id="statusLabel" text="Valmis" style="-fx-text-fill: #64748b;"/>
+            
             <Pane HBox.hgrow="ALWAYS"/>
-            <Label fx:id="periodLabel" text=""/>
-            <Label fx:id="databaseLabel" text=""/>
+            
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Label text="📅" style="-fx-font-size: 12px;"/>
+                <Label fx:id="periodLabel" text="Tilikausi: -" styleClass="database-label"/>
+            </HBox>
+            
+            <Separator orientation="VERTICAL" prefHeight="16"/>
+            
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Label text="💾" style="-fx-font-size: 12px;"/>
+                <Label fx:id="databaseLabel" text="Ei tietokantaa" styleClass="database-label"/>
+            </HBox>
         </HBox>
     </bottom>
     
