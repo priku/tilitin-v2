@@ -26,7 +26,22 @@ javafx {
     modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
+// Detect current OS for JavaFX dependencies
+val currentOS = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem()
+val javafxPlatform = when {
+    currentOS.isWindows -> "win"
+    currentOS.isMacOsX -> "mac"
+    else -> "linux"
+}
+
 dependencies {
+    // JavaFX dependencies (explicit, for compatibility with Compose)
+    implementation("org.openjfx:javafx-controls:21:$javafxPlatform")
+    implementation("org.openjfx:javafx-fxml:21:$javafxPlatform")
+    implementation("org.openjfx:javafx-swing:21:$javafxPlatform")
+    implementation("org.openjfx:javafx-base:21:$javafxPlatform")
+    implementation("org.openjfx:javafx-graphics:21:$javafxPlatform")
+    
     // Compose Desktop
     implementation(compose.desktop.currentOs)
     implementation(compose.runtime)
@@ -138,8 +153,15 @@ tasks.register<JavaExec>("runJavaFXTest") {
     description = "Run JavaFX test application"
     mainClass.set("kirjanpito.ui.javafx.JavaFXTest")
     classpath = sourceSets["main"].runtimeClasspath
-    jvmArgs = listOf(
-        "-Xmx512m",
-        "--add-modules", "javafx.controls,javafx.fxml,javafx.swing"
-    )
+    
+    // JavaFX requires module path
+    doFirst {
+        val javafxJars = classpath.files.filter { it.name.contains("javafx") }
+        val modulePath = javafxJars.joinToString(File.pathSeparator) { it.absolutePath }
+        jvmArgs = listOf(
+            "-Xmx512m",
+            "--module-path", modulePath,
+            "--add-modules", "javafx.controls,javafx.fxml,javafx.swing"
+        )
+    }
 }
