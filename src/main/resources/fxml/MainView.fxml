@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="kirjanpito.ui.javafx.MainController"
+            prefWidth="1200" prefHeight="700">
+    
+    <!-- Menu Bar -->
+    <top>
+        <VBox>
+            <MenuBar fx:id="menuBar" useSystemMenuBar="true">
+                <!-- Tiedosto -->
+                <Menu text="Tiedosto">
+                    <MenuItem text="Uusi tietokanta..." fx:id="newDatabaseItem" onAction="#handleNewDatabase"/>
+                    <MenuItem text="Avaa tietokanta..." fx:id="openDatabaseItem" onAction="#handleOpenDatabase" accelerator="Ctrl+O"/>
+                    <SeparatorMenuItem/>
+                    <Menu text="Viimeisimmät" fx:id="recentDatabasesMenu"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tallenna" fx:id="saveItem" onAction="#handleSave" accelerator="Ctrl+S"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tulosta..." fx:id="printItem" onAction="#handlePrint" accelerator="Ctrl+P"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Asetukset..." fx:id="settingsItem" onAction="#handleSettings"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Lopeta" onAction="#handleQuit" accelerator="Ctrl+Q"/>
+                </Menu>
+                
+                <!-- Muokkaa -->
+                <Menu text="Muokkaa">
+                    <MenuItem text="Lisää vienti" fx:id="addEntryItem" onAction="#handleAddEntry" accelerator="Ctrl+N"/>
+                    <MenuItem text="Poista vienti" fx:id="removeEntryItem" onAction="#handleRemoveEntry" accelerator="Ctrl+D"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Kopioi" fx:id="copyItem" onAction="#handleCopy" accelerator="Ctrl+C"/>
+                    <MenuItem text="Liitä" fx:id="pasteItem" onAction="#handlePaste" accelerator="Ctrl+V"/>
+                </Menu>
+                
+                <!-- Siirry -->
+                <Menu text="Siirry">
+                    <MenuItem text="Edellinen tosite" fx:id="prevDocItem" onAction="#handlePrevDocument" accelerator="Ctrl+Left"/>
+                    <MenuItem text="Seuraava tosite" fx:id="nextDocItem" onAction="#handleNextDocument" accelerator="Ctrl+Right"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Ensimmäinen tosite" fx:id="firstDocItem" onAction="#handleFirstDocument" accelerator="Ctrl+Home"/>
+                    <MenuItem text="Viimeinen tosite" fx:id="lastDocItem" onAction="#handleLastDocument" accelerator="Ctrl+End"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Siirry tositteeseen..." fx:id="gotoDocItem" onAction="#handleGotoDocument" accelerator="Ctrl+G"/>
+                </Menu>
+                
+                <!-- Rekisterit -->
+                <Menu text="Rekisterit">
+                    <MenuItem text="Tilikartta..." fx:id="coaItem" onAction="#handleChartOfAccounts"/>
+                    <MenuItem text="Tositelajit..." fx:id="docTypesItem" onAction="#handleDocumentTypes"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tilikauden tiedot..." fx:id="periodItem" onAction="#handlePeriodSettings"/>
+                    <MenuItem text="Tietokannan asetukset..." fx:id="dbSettingsItem" onAction="#handleDatabaseSettings"/>
+                </Menu>
+                
+                <!-- Raportit -->
+                <Menu text="Raportit">
+                    <MenuItem text="Päiväkirja" onAction="#handleJournalReport"/>
+                    <MenuItem text="Pääkirja" onAction="#handleLedgerReport"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tuloslaskelma" onAction="#handleIncomeStatement"/>
+                    <MenuItem text="Tase" onAction="#handleBalanceSheet"/>
+                </Menu>
+                
+                <!-- Ohje -->
+                <Menu text="Ohje">
+                    <MenuItem text="Käyttöohje" onAction="#handleHelp" accelerator="F1"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tietoja..." onAction="#handleAbout"/>
+                </Menu>
+            </MenuBar>
+            
+            <!-- Toolbar -->
+            <ToolBar fx:id="toolBar">
+                <Button fx:id="newDocBtn" text="Uusi" onAction="#handleNewDocument"/>
+                <Button fx:id="saveBtn" text="Tallenna" onAction="#handleSave"/>
+                <Separator/>
+                <Button fx:id="prevBtn" text="◀" onAction="#handlePrevDocument"/>
+                <Button fx:id="nextBtn" text="▶" onAction="#handleNextDocument"/>
+                <Separator/>
+                <Label text="Tosite:"/>
+                <TextField fx:id="documentNumberField" prefWidth="80" onAction="#handleGotoDocumentNumber"/>
+                <Label text="/"/>
+                <Label fx:id="totalDocumentsLabel" text="0"/>
+                <Separator/>
+                <Button fx:id="searchBtn" text="Haku" onAction="#handleSearch"/>
+            </ToolBar>
+        </VBox>
+    </top>
+    
+    <!-- Center: Document content -->
+    <center>
+        <VBox spacing="10">
+            <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            
+            <!-- Document header -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="Päivämäärä:"/>
+                <DatePicker fx:id="datePicker" prefWidth="130"/>
+                
+                <Label text="Tositenumero:"/>
+                <TextField fx:id="docNumberField" prefWidth="80" editable="false"/>
+                
+                <Label text="Tositelaji:"/>
+                <ComboBox fx:id="docTypeCombo" prefWidth="200"/>
+            </HBox>
+            
+            <!-- Entry table -->
+            <TableView fx:id="entryTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="rowNumCol" text="#" prefWidth="40" editable="false"/>
+                    <TableColumn fx:id="accountCol" text="Tili" prefWidth="200"/>
+                    <TableColumn fx:id="descriptionCol" text="Selite" prefWidth="300"/>
+                    <TableColumn fx:id="debitCol" text="Debet" prefWidth="120"/>
+                    <TableColumn fx:id="creditCol" text="Kredit" prefWidth="120"/>
+                    <TableColumn fx:id="vatCol" text="ALV" prefWidth="80"/>
+                </columns>
+            </TableView>
+            
+            <!-- Totals row -->
+            <HBox spacing="20" alignment="CENTER_RIGHT" style="-fx-background-color: #f0f0f0; -fx-padding: 8;">
+                <Label text="Yhteensä:"/>
+                <Label fx:id="debitTotalLabel" text="0,00" style="-fx-font-weight: bold;"/>
+                <Label fx:id="creditTotalLabel" text="0,00" style="-fx-font-weight: bold;"/>
+                <Label fx:id="balanceLabel" text="" style="-fx-text-fill: red;"/>
+            </HBox>
+        </VBox>
+    </center>
+    
+    <!-- Bottom: Status bar -->
+    <bottom>
+        <HBox fx:id="statusBar" spacing="10" alignment="CENTER_LEFT" 
+              style="-fx-background-color: #e0e0e0; -fx-padding: 5;">
+            <Label fx:id="statusLabel" text="Valmis"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Label fx:id="periodLabel" text=""/>
+            <Label fx:id="databaseLabel" text=""/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

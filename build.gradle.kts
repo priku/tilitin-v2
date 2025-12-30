@@ -165,3 +165,22 @@ tasks.register<JavaExec>("runJavaFXTest") {
         )
     }
 }
+
+// Task to run JavaFX main application
+tasks.register<JavaExec>("runJavaFX") {
+    group = "application"
+    description = "Run Tilitin JavaFX application"
+    mainClass.set("kirjanpito.ui.javafx.JavaFXApp")
+    classpath = sourceSets["main"].runtimeClasspath
+    
+    // JavaFX requires module path
+    doFirst {
+        val javafxJars = classpath.files.filter { it.name.contains("javafx") }
+        val modulePath = javafxJars.joinToString(File.pathSeparator) { it.absolutePath }
+        jvmArgs = listOf(
+            "-Xmx1024m",
+            "--module-path", modulePath,
+            "--add-modules", "javafx.controls,javafx.fxml,javafx.swing"
+        )
+    }
+}
