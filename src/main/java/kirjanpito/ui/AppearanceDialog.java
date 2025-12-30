@@ -50,7 +50,6 @@ public class AppearanceDialog extends JDialog {
     public void create() {
         setLayout(new BorderLayout());
         addWindowListener(new WindowAdapter() {
-            @Override
             public void windowClosing(WindowEvent e) {
                 revertTheme();
                 dispose();

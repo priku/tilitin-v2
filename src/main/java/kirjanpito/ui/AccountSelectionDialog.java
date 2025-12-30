@@ -405,15 +405,13 @@ public class AccountSelectionDialog extends JDialog {
 		}
 	};
 
-	private ActionListener allAccountsCheckBoxListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			boolean results = allAccountsCheckBox.isSelected();
-			accountTable.setRowSorter(results ? sorter : null);
-			cellRenderer.setIndentEnabled(!results);
-			AppSettings settings = AppSettings.getInstance();
-			settings.set("account-selection.all-accounts", !results);
-			search();
-		}
+	private ActionListener allAccountsCheckBoxListener = e -> {
+		boolean results = allAccountsCheckBox.isSelected();
+		accountTable.setRowSorter(results ? sorter : null);
+		cellRenderer.setIndentEnabled(!results);
+		AppSettings settings = AppSettings.getInstance();
+		settings.set("account-selection.all-accounts", !results);
+		search();
 	};
 
 	private AbstractAction toggleFavAccountsAction = new AbstractAction() {
@@ -425,26 +423,24 @@ public class AccountSelectionDialog extends JDialog {
 		}
 	};
 
-	private ActionListener hideNonFavAccountsCheckBoxListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			boolean enabled = hideNonFavAccountsCheckBox.isSelected();
+	private ActionListener hideNonFavAccountsCheckBoxListener = e -> {
+		boolean enabled = hideNonFavAccountsCheckBox.isSelected();
 
-			if (enabled) {
-				coa = new ChartOfAccounts();
-				coa.set(registry.getAccounts(), registry.getCOAHeadings());
-				coa.filterNonFavouriteAccounts();
-			}
-			else {
-				coa = registry.getChartOfAccounts();
-			}
-
-			AppSettings settings = AppSettings.getInstance();
-			settings.set("account-selection.hide-non-favourite-accounts", enabled);
-			cellRenderer.setHighlightFavouriteAccounts(!enabled);
-			cellRenderer.setChartOfAccounts(coa);
-			tableModel.setChartOfAccounts(coa);
-			search();
+		if (enabled) {
+			coa = new ChartOfAccounts();
+			coa.set(registry.getAccounts(), registry.getCOAHeadings());
+			coa.filterNonFavouriteAccounts();
 		}
+		else {
+			coa = registry.getChartOfAccounts();
+		}
+
+		AppSettings settings = AppSettings.getInstance();
+		settings.set("account-selection.hide-non-favourite-accounts", enabled);
+		cellRenderer.setHighlightFavouriteAccounts(!enabled);
+		cellRenderer.setChartOfAccounts(coa);
+		tableModel.setChartOfAccounts(coa);
+		search();
 	};
 
 	private RowFilter<COATableModel, Integer> accountFilter = new RowFilter<COATableModel, Integer>() {

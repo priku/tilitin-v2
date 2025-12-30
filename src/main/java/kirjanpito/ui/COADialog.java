@@ -944,117 +944,75 @@ public class COADialog extends JDialog {
 	}
 
 	/* Lisää tili */
-	private ActionListener addAccountListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			addAccount();
-		}
-	};
+	private ActionListener addAccountListener = e -> addAccount();
 
 	/* Lisää otsikko */
-	private ActionListener addHeadingListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			addHeading();
-		}
-	};
+	private ActionListener addHeadingListener = e -> addHeading();
 
 	/* Poista tili / Poista otsikko */
-	private ActionListener removeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			removeRow();
-		}
-	};
+	private ActionListener removeListener = e -> removeRow();
 
 	/* Tallenna */
-	private ActionListener saveListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			save();
-		}
-	};
+	private ActionListener saveListener = e -> save();
 
 	/* Sulje */
-	private ActionListener closeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			close();
-		}
-	};
+	private ActionListener closeListener = e -> close();
 
 	/* Taso X */
-	private ActionListener levelListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int level = -1;
+	private ActionListener levelListener = e -> {
+		int level = -1;
 
-			for (int i = 0; i < levelMenuItems.length; i++) {
-				if (e.getSource() == levelMenuItems[i]) {
-					level = i;
-					break;
-				}
+		for (int i = 0; i < levelMenuItems.length; i++) {
+			if (e.getSource() == levelMenuItems[i]) {
+				level = i;
+				break;
 			}
-
-			updateHeadingLevel(level);
 		}
+
+		updateHeadingLevel(level);
 	};
 
 	/* Siirrä ylös */
-	private ActionListener moveHeadingUpListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			moveHeading(false);
-		}
-	};
+	private ActionListener moveHeadingUpListener = e -> moveHeading(false);
 
 	/* Siirrä alas */
-	private ActionListener moveHeadingDownListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			moveHeading(true);
-		}
-	};
+	private ActionListener moveHeadingDownListener = e -> moveHeading(true);
 
 	/* Tilityyppivaihtoehto */
-	private ActionListener accountTypeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int type = -1;
+	private ActionListener accountTypeListener = e -> {
+		int type = -1;
 
-			/* Tarkistetaan, mitä vaihtoehtoa valikosta on klikattu. */
-			for (int i = 0; i < typeMenuItems.length; i++) {
-				if (typeMenuItems[i] == e.getSource()) {
-					type = i;
-					break;
-				}
+		/* Tarkistetaan, mitä vaihtoehtoa valikosta on klikattu. */
+		for (int i = 0; i < typeMenuItems.length; i++) {
+			if (typeMenuItems[i] == e.getSource()) {
+				type = i;
+				break;
 			}
-
-			updateAccountType(type);
 		}
+
+		updateAccountType(type);
 	};
 
 	/* ALV-koodivaihtoehto */
-	private ActionListener accountVatCodeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int code = -1;
+	private ActionListener accountVatCodeListener = e -> {
+		int code = -1;
 
-			/* Tarkistetaan, mitä vaihtoehtoa valikosta on klikattu. */
-			for (int i = 0; i < codeMenuItems.length; i++) {
-				if (codeMenuItems[i] == e.getSource()) {
-					code = i;
-					break;
-				}
+		/* Tarkistetaan, mitä vaihtoehtoa valikosta on klikattu. */
+		for (int i = 0; i < codeMenuItems.length; i++) {
+			if (codeMenuItems[i] == e.getSource()) {
+				code = i;
+				break;
 			}
-
-			updateVatCode(code);
 		}
+
+		updateVatCode(code);
 	};
 
 	/* ALV-prosentti */
-	private ActionListener vatPercentListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			updateVatRate();
-		}
-	};
+	private ActionListener vatPercentListener = e -> updateVatRate();
 
 	/* ALV-vastatili */
-	private ActionListener vatAccountListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			updateVatAccount();
-		}
-	};
+	private ActionListener vatAccountListener = e -> updateVatAccount();
 
 	private AbstractAction showMenuAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
@@ -1070,16 +1028,14 @@ public class COADialog extends JDialog {
 		}
 	};
 
-	private ActionListener hideNonFavAccountsListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			boolean enabled = !model.isNonFavouriteAccountsHidden();
-			hideNonFavouriteAccountsButton.setSelected(enabled);
-			hideNonFavouriteAccountsMenuItem.setSelected(enabled);
-			model.setNonFavouriteAccountsHidden(enabled);
-			cellRenderer.setHighlightFavouriteAccounts(!enabled);
-			tableModel.fireTableDataChanged();
-			search();
-		}
+	private ActionListener hideNonFavAccountsListener = e -> {
+		boolean enabled = !model.isNonFavouriteAccountsHidden();
+		hideNonFavouriteAccountsButton.setSelected(enabled);
+		hideNonFavouriteAccountsMenuItem.setSelected(enabled);
+		model.setNonFavouriteAccountsHidden(enabled);
+		cellRenderer.setHighlightFavouriteAccounts(!enabled);
+		tableModel.fireTableDataChanged();
+		search();
 	};
 
 	private AbstractAction toggleFavAccountAction = new AbstractAction() {

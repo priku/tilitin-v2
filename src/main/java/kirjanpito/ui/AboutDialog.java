@@ -5,8 +5,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -87,11 +85,7 @@ public class AboutDialog extends JDialog {
 				new ImageIcon(Resources.loadAsImage("close-22x22.png")));
 		closeButton.setMnemonic('S');
 		closeButton.setPreferredSize(new Dimension(100, 35));
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				dispose();
-			}
-		});
+		closeButton.addActionListener(e -> dispose());
 
 		c.anchor = GridBagConstraints.LAST_LINE_END;
 		c.gridy = 4;

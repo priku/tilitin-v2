@@ -7,7 +7,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -258,23 +257,11 @@ public class StartingBalanceDialog extends JDialog {
 	}
 	
 	/* Tallenna */
-	private ActionListener saveListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			save();
-		}
-	};
-	
+	private ActionListener saveListener = e -> save();
+
 	/* Kopioi edelliseltä tilikaudelta */
-	private ActionListener copyListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			copyFromPreviousPeriod();
-		}
-	};
-	
+	private ActionListener copyListener = e -> copyFromPreviousPeriod();
+
 	/* Sulje */
-	private ActionListener closeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			close();
-		}
-	};
+	private ActionListener closeListener = e -> close();
 }

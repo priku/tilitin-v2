@@ -6,7 +6,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
@@ -237,21 +236,9 @@ public class BalanceComparisonDialog extends JDialog {
 		}
 	}
 	
-	private ActionListener updateListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			updateTable();
-		}
-	};
-	
-	private ActionListener saveListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			save();
-		}
-	};
-	
-	private ActionListener closeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			dispose();
-		}
-	};
+	private ActionListener updateListener = e -> updateTable();
+
+	private ActionListener saveListener = e -> save();
+
+	private ActionListener closeListener = e -> dispose();
 }

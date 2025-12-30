@@ -291,33 +291,31 @@ public class AccountStatementOptionsDialog extends PrintOptionsDialog {
 		}
 	};
 
-	private ActionListener hideNonFavAccountsCheckBoxListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			boolean enabled = hideNonFavAccountsCheckBox.isSelected();
-			Account selectedAccount = account;
+	private ActionListener hideNonFavAccountsCheckBoxListener = e -> {
+		boolean enabled = hideNonFavAccountsCheckBox.isSelected();
+		Account selectedAccount = account;
 
-			if (enabled) {
-				coa = new ChartOfAccounts();
-				coa.set(registry.getAccounts(), registry.getCOAHeadings());
-				coa.filterNonFavouriteAccounts();
-			}
-			else {
-				coa = registry.getChartOfAccounts();
-			}
+		if (enabled) {
+			coa = new ChartOfAccounts();
+			coa.set(registry.getAccounts(), registry.getCOAHeadings());
+			coa.filterNonFavouriteAccounts();
+		}
+		else {
+			coa = registry.getChartOfAccounts();
+		}
 
-			AppSettings settings = AppSettings.getInstance();
-			settings.set("account-selection.hide-non-favourite-accounts", enabled);
-			cellRenderer.setHighlightFavouriteAccounts(!enabled);
-			cellRenderer.setChartOfAccounts(coa);
-			tableModel.setChartOfAccounts(coa);
-			search();
+		AppSettings settings = AppSettings.getInstance();
+		settings.set("account-selection.hide-non-favourite-accounts", enabled);
+		cellRenderer.setHighlightFavouriteAccounts(!enabled);
+		cellRenderer.setChartOfAccounts(coa);
+		tableModel.setChartOfAccounts(coa);
+		search();
 
-			if (selectedAccount != null) {
-				int index = coa.indexOfAccount(selectedAccount);
+		if (selectedAccount != null) {
+			int index = coa.indexOfAccount(selectedAccount);
 
-				if (index >= 0) {
-					setSelectedRow(index);
-				}
+			if (index >= 0) {
+				setSelectedRow(index);
 			}
 		}
 	};

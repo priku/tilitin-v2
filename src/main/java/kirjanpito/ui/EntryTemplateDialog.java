@@ -365,18 +365,10 @@ public class EntryTemplateDialog extends JDialog implements AccountSelectionList
 	};
 	
 	/* Tallenna */
-	private ActionListener saveListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			save();
-		}
-	};
-	
+	private ActionListener saveListener = e -> save();
+
 	/* Sulje */
-	private ActionListener closeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			close();
-		}
-	};
+	private ActionListener closeListener = e -> close();
 	
 	private AbstractAction nextCellAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;

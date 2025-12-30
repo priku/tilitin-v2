@@ -9,8 +9,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.text.ParseException;
@@ -387,19 +385,11 @@ public class FinancialStatementOptionsDialog extends JDialog {
 
 		okButton = new JButton("OK");
 		okButton.setMnemonic('O');
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				accept();
-			}
-		});
+		okButton.addActionListener(evt -> accept());
 
 		cancelButton = new JButton("Peruuta");
 		cancelButton.setMnemonic('P');
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		cancelButton.addActionListener(e -> dispose());
 
 		c.insets = new Insets(5, 10, 10, 5);
 		c.ipadx = 20;
@@ -409,11 +399,7 @@ public class FinancialStatementOptionsDialog extends JDialog {
 		resetButton = new JButton((periods.size() == 1) ? "Koko tilikausi" :
 			"Nykyinen ja edellinen tilikausi");
 		resetButton.setMnemonic('t');
-		resetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				reset();
-			}
-		});
+		resetButton.addActionListener(e -> reset());
 
 		panel.add(resetButton, c);
 

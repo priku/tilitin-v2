@@ -2,8 +2,6 @@ package kirjanpito.ui;
 
 import java.awt.Frame;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -56,11 +54,7 @@ public class VATChangeDialog extends JDialog implements AccountSelectionListener
 		ruleTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ruleTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
-		accountCellEditor = new AccountCellEditor(registry, ruleTableModel, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showAccountSelectionDialog();
-			}
-		});
+		accountCellEditor = new AccountCellEditor(registry, ruleTableModel, e -> showAccountSelectionDialog());
 
 		TableColumn column = ruleTable.getColumnModel().getColumn(0);
 		column.setCellEditor(accountCellEditor);
@@ -88,23 +82,19 @@ public class VATChangeDialog extends JDialog implements AccountSelectionListener
 
 		addRuleButton = new JButton(new ImageIcon(Resources.loadAsImage("list-add-16x16.png")));
 		addRuleButton.setToolTipText("Lisää muutos");
-		addRuleButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				model.addRule();
-				ruleTableModel.fireTableDataChanged();
-			}
+		addRuleButton.addActionListener(e -> {
+			model.addRule();
+			ruleTableModel.fireTableDataChanged();
 		});
 
 		removeRuleButton = new JButton(new ImageIcon(Resources.loadAsImage("list-remove-16x16.png")));
 		removeRuleButton.setToolTipText("Poista muutos");
-		removeRuleButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int index = ruleTable.getSelectedRow();
+		removeRuleButton.addActionListener(e -> {
+			int index = ruleTable.getSelectedRow();
 
-				if (index >= 0) {
-					model.removeRule(index);
-					ruleTableModel.fireTableRowsDeleted(index, index);
-				}
+			if (index >= 0) {
+				model.removeRule(index);
+				ruleTableModel.fireTableRowsDeleted(index, index);
 			}
 		});
 
@@ -126,20 +116,12 @@ public class VATChangeDialog extends JDialog implements AccountSelectionListener
 		JButton doChangesButton = new JButton("Tee muutokset");
 		doChangesButton.setMnemonic('m');
 		doChangesButton.setMargin(new Insets(3, 10, 3, 10));
-		doChangesButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doChanges();
-			}
-		});
+		doChangesButton.addActionListener(e -> doChanges());
 
 		JButton closeButton = new JButton("Sulje");
 		closeButton.setMnemonic('S');
 		closeButton.setMargin(new Insets(3, 10, 3, 10));
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				close();
-			}
-		});
+		closeButton.addActionListener(e -> close());
 
 		GroupLayout layout = new GroupLayout(getContentPane());
 		setLayout(layout);

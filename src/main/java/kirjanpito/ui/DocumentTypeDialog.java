@@ -277,32 +277,16 @@ public class DocumentTypeDialog extends JDialog {
 	}
 	
 	/* Lisää */
-	private ActionListener addRowListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			addEntryTemplate();
-		}
-	};
-	
+	private ActionListener addRowListener = e -> addEntryTemplate();
+
 	/* Poista */
-	private ActionListener removeRowListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			removeEntryTemplate();
-		}
-	};
-	
+	private ActionListener removeRowListener = e -> removeEntryTemplate();
+
 	/* Tallenna */
-	private ActionListener saveListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			save();
-		}
-	};
-	
+	private ActionListener saveListener = e -> save();
+
 	/* Sulje */
-	private ActionListener closeListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			close();
-		}
-	};
+	private ActionListener closeListener = e -> close();
 	
 	private AbstractAction nextCellAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;

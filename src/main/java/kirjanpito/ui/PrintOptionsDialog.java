@@ -360,22 +360,18 @@ public class PrintOptionsDialog extends JDialog {
 		}
 	}
 
-	private ActionListener periodActionListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			startDateTextField.setDate(period.getStartDate());
-			endDateTextField.setDate(period.getEndDate());
-		}
+	private ActionListener periodActionListener = e -> {
+		startDateTextField.setDate(period.getStartDate());
+		endDateTextField.setDate(period.getEndDate());
 	};
 
-	private ActionListener monthActionListener = new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(documentDate);
-			cal.set(Calendar.DAY_OF_MONTH, 1);
-			startDateTextField.setDate(cal.getTime());
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-			endDateTextField.setDate(cal.getTime());
-		}
+	private ActionListener monthActionListener = e -> {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(documentDate);
+		cal.set(Calendar.DAY_OF_MONTH, 1);
+		startDateTextField.setDate(cal.getTime());
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		endDateTextField.setDate(cal.getTime());
 	};
 
 	private AbstractAction prevPeriodListener = new AbstractAction() {
