@@ -15,6 +15,7 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 **Toteutusaika:** 2025-12-30 (~60 min)
 
 ### Lisätty
+
 - **Compose Desktop MenuBar** - Natiivi AWT/Swing menu-integraatio
   - Menu-palkki näkyy nyt Compose Desktop -ikkunassa
   - Kaikki valikot toimivat: Tiedosto, Muokkaa, Siirry, Tositelaji, Tulosteet, Työkalut, Ohje
@@ -23,12 +24,14 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
   - Ei tarvetta uudelleenkirjoittaa menu-logiikkaa
 
 ### Muutettu
+
 - **TilitinApp.kt** - Menu-integraatio Compose-ikkunaan
   - Lisätty `composeWindow`-parametri `MainContent`-funktioon
   - Menu-palkin asetus `SwingUtilities.invokeLater`:lla EDT:ssä
   - JMenuBar haetaan `DocumentFramePanel`:sta ja asetetaan JFrame:en
 
 ### Tekniset yksityiskohdat
+
 - **Lähestymistapa:** AWT MenuBar (vaihtoehto A)
   - Hyödyntää olemassa olevaa `DocumentMenuBuilder.java` (465 riviä)
   - Ei uutta koodia (~20 riviä muutoksia)
@@ -38,10 +41,12 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
   - Gradle 8.11.1 ei tue Java 25:tä
 
 ### Dokumentaatio
+
 - Luotu COMPOSE-MENU-IMPLEMENTATION.md - Täydellinen toteutusdokumentaatio
 - Päivitetty NEXT-STEPS-PLAN.md - Menu-integraatio merkitty valmiiksi
 
 ### Testattu
+
 - ✅ Menu näkyy oikein ikkunan yläreunassa
 - ✅ Tiedosto → Uusi tietokanta - Toimii
 - ✅ Tiedosto → Avaa tietokanta - Toimii
@@ -54,7 +59,7 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
-## [2.2.3] - 2025-12-29
+## [2.2.3-shortcuts] - 2025-12-29
 
 ### 🔧 Pikanäppäinkorjaukset
 
