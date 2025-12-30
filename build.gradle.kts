@@ -78,6 +78,9 @@ compose.desktop {
     application {
         mainClass = "kirjanpito.ui.Kirjanpito"
         
+        // JVM memory settings for running the application
+        jvmArgs += listOf("-Xmx1024m", "-Xms256m")
+        
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Tilitin"
@@ -113,10 +116,6 @@ tasks.jar {
             "Implementation-Version" to project.version
         )
     }
-    
-    // Include all dependencies in JAR (fat JAR)
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }
 
 // Copy LISENSSIT.html to build
