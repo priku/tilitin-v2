@@ -253,5 +253,42 @@ Valitse sen perusteella, kumpi tuntuu paremmalta käytännössä.
 
 ---
 
+---
+
+## ✅ PÄÄTÖS: Java + JavaFX
+
+### Perustelut:
+
+| Kriteeri | Valinta | Perustelu |
+|----------|---------|-----------|
+| Kieli | **Java** | Projekti on 84.5% Java, luonnollinen jatko |
+| UI-kirjasto | **JavaFX** | Paras TableView, paras macOS-tuki |
+| Cross-platform | ✅ | jpackage: .exe, .dmg, .deb |
+| 100% Kotlin | ❌ Hylätty | JavaFX toimii paremmin Javalla |
+
+### Miksi JavaFX:
+
+1. **TableView** - Paras taulukkokomponentti kirjanpitosovellukselle
+2. **macOS-tuki** - Natiivi menu bar (`useSystemMenuBar`)
+3. **Kypsyys** - 16 vuotta kehitystä, vakaa
+4. **Scene Builder** - Visuaalinen UI-editointi
+5. **Cross-platform** - Windows, macOS, Linux
+
+### Miksi ei Compose Desktop:
+
+1. ❌ Ei valmista TableView-komponenttia
+2. ❌ Ei natiivia macOS menu baria
+3. ❌ Nuorempi teknologia (3v vs 16v)
+
+### Miksi ei 100% Kotlin:
+
+1. Projekti on 84.5% Java
+2. JavaFX-dokumentaatio on Java-pohjainen
+3. Ei merkittävää hyötyä Kotlin + JavaFX vs Java + JavaFX
+
+---
+
 **Luotu:** 2025-12-31
-**Versio:** 1.0
+**Päivitetty:** 2025-12-31
+**Versio:** 1.1
+**Status:** ✅ PÄÄTÖS TEHTY - Java + JavaFX

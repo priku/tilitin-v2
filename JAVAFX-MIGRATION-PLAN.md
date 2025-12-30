@@ -1,246 +1,28 @@
 # JavaFX Migration Plan
 
-## 📋 Yhteenveto
+## ✅ Päätös
 
-Tämä dokumentti kuvaa suunnitelman Tilitin-sovelluksen UI-migraatiosta Swingistä JavaFX:ään.
-
-**Tavoite:** Moderni, nopea ja kaunis desktop-sovellus  
-**Aikataulu:** 2-4 viikkoa  
-**Vaivannäkö:** Matala - manager-luokat toimivat sellaisenaan
-
----
-
-## 🎯 Miksi JavaFX?
-
-### Vertailu vaihtoehtoihin
-
-| Ominaisuus | JavaFX | Electron | Web UI | Swing+FlatLaf |
-|------------|--------|----------|--------|---------------|
-| Moderni ulkoasu | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| Suorituskyky | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| Manager-yhteensopivuus | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Kehitysaika | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Pakettikoko | ~75 MB | ~280 MB | N/A | ~60 MB |
-| Muistin käyttö | ~150 MB | ~400 MB | N/A | ~150 MB |
-
-### JavaFX:n edut
-
-1. **Moderni ulkoasu** - CSS-tyylit, animaatiot, GPU-rendering
-2. **Parempi suorituskyky** - 2x nopeampi kuin Swing
-3. **Helppo kehitys** - Scene Builder visual editor
-4. **Manager-yhteensopivuus** - Toimivat sellaisenaan, ei muutoksia!
-5. **Sama ekosysteemi** - 100% Java, ei uusia kieliä
-6. **Native installer** - jpackage luo .exe:n automaattisesti
+| Valinta | Perustelu |
+|---------|-----------|
+| **Kieli:** Java | Projekti 84.5% Java |
+| **UI:** JavaFX | Paras TableView, paras macOS-tuki |
+| **Cross-platform:** ✅ | Windows, macOS, Linux |
 
 ---
 
-## 🏗️ Arkkitehtuuri
+## 📋 Valmius aloittamiseen
 
-### Nykyiset manager-luokat (toimivat sellaisenaan)
+### ✅ Jo valmiina:
 
-```
-DocumentFrame (Swing/JavaFX)
-├── DocumentNavigator        - Navigointi ja haku
-├── DocumentStateManager     - Tilan hallinta
-├── DocumentValidator        - Validointi ja tallennus
-├── DocumentEntryManager     - Vientien hallinta
-├── DocumentDataSourceManager - Tietokantayhteydet
-├── DocumentMenuHandler      - Menu-toiminnot
-├── DocumentPrinter          - Tulostus
-├── DocumentExporter         - CSV-vienti
-└── DocumentBackupManager    - Varmuuskopiointi
-```
+| Komponentti | Status |
+|-------------|--------|
+| Java 21 | ✅ Asennettu |
+| JavaFX plugin | ✅ `org.openjfx.javafxplugin` v0.1.0 |
+| JavaFX moduulit | ✅ `controls`, `fxml`, `swing` |
+| jpackage | ✅ GitHub Actions valmiina |
+| Manager-luokat | ✅ Refaktoroitu, UI-agnostiset |
 
-### JavaFX-integraatio
-
-```java
-// DocumentFrameFX.java - JavaFX versio
-public class DocumentFrameFX extends BorderPane implements NavigationCallbacks {
-    
-    // Samat managerit - ei muutoksia!
-    private final DocumentNavigator navigator;
-    private final DocumentStateManager stateManager;
-    private final DocumentValidator validator;
-    
-    // JavaFX UI komponentit
-    @FXML private TextField numberTextField;
-    @FXML private DatePicker datePicker;
-    @FXML private TableView<Entry> entryTable;
-    @FXML private Label documentLabel;
-    
-    public DocumentFrameFX() {
-        loadFXML();
-        initializeManagers();
-    }
-    
-    private void initializeManagers() {
-        // SAMA koodi kuin Swingissä - toimii heti!
-        this.navigator = new DocumentNavigator(
-            registry, searchPanel, searchPhraseField, this);
-        this.stateManager = new DocumentStateManager(...);
-        this.validator = new DocumentValidator(...);
-    }
-    
-    @FXML
-    private void onCreateDocument() {
-        navigator.createDocument(); // Sama kutsu!
-    }
-}
-```
-
----
-
-## 📅 Aikataulu
-
-### Vaihe 1: Prototyyppi (1-2 päivää)
-
-- [ ] Asenna Scene Builder
-- [ ] Luo `DocumentFrameFX.java` prototyyppi
-- [ ] Luo `DocumentFrame.fxml` layout
-- [ ] Testaa että yksi manager toimii (esim. `createDocument`)
-
-### Vaihe 2: Core funktiot (Viikko 1)
-
-- [ ] Document navigation (create, delete, go to)
-- [ ] Entry table (add, remove, edit)
-- [ ] Document fields (number, date)
-- [ ] Totals calculation
-- [ ] Basic keyboard shortcuts
-
-### Vaihe 3: Advanced funktiot (Viikko 2)
-
-- [ ] Search functionality
-- [ ] Print preview
-- [ ] CSV export/import
-- [ ] Attachments panel
-- [ ] Menu bar
-- [ ] All dialogs
-
-### Vaihe 4: Polish & Testing (Viikko 3)
-
-- [ ] CSS-tyylit (dark/light theme)
-- [ ] Animaatiot
-- [ ] Full keyboard shortcuts
-- [ ] Settings dialog
-- [ ] Reports
-- [ ] Comprehensive testing
-
-### Vaihe 5: Release (Viikko 4)
-
-- [ ] Build jpackage installer
-- [ ] Test installer on Windows/Linux/macOS
-- [ ] Documentation
-- [ ] Release
-
----
-
-## 🎨 UI Design
-
-### FXML Layout (DocumentFrame.fxml)
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" 
-            fx:controller="kirjanpito.ui.DocumentFrameFX">
-    <top>
-        <VBox>
-            <MenuBar fx:id="menuBar"/>
-            <ToolBar>
-                <Button text="Uusi tosite" onAction="#onCreateDocument"/>
-                <Button text="Poista" onAction="#onDeleteDocument"/>
-                <Separator orientation="VERTICAL"/>
-                <Button text="◀" onAction="#onPrevDocument"/>
-                <Button text="▶" onAction="#onNextDocument"/>
-            </ToolBar>
-        </VBox>
-    </top>
-    
-    <center>
-        <VBox spacing="10" padding="10">
-            <!-- Document fields -->
-            <HBox spacing="10">
-                <Label text="Tositenumero:"/>
-                <TextField fx:id="numberTextField" prefWidth="100"/>
-                <Label text="Päivämäärä:"/>
-                <DatePicker fx:id="datePicker" prefWidth="150"/>
-            </HBox>
-            
-            <!-- Entry table -->
-            <TableView fx:id="entryTable" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn text="Tili" prefWidth="200"/>
-                    <TableColumn text="Selite" prefWidth="300"/>
-                    <TableColumn text="Debet" prefWidth="100"/>
-                    <TableColumn text="Kredit" prefWidth="100"/>
-                    <TableColumn text="ALV" prefWidth="80"/>
-                </columns>
-            </TableView>
-            
-            <!-- Totals -->
-            <HBox spacing="20">
-                <Label text="Debet:" style="-fx-font-weight: bold"/>
-                <Label fx:id="debitTotalLabel" text="0.00"/>
-                <Label text="Kredit:" style="-fx-font-weight: bold"/>
-                <Label fx:id="creditTotalLabel" text="0.00"/>
-                <Label text="Erotus:" style="-fx-font-weight: bold"/>
-                <Label fx:id="differenceLabel" text="0.00"/>
-            </HBox>
-        </VBox>
-    </center>
-    
-    <bottom>
-        <HBox spacing="10" padding="5">
-            <Label fx:id="documentLabel" text="Tosite 1 / 1"/>
-            <Separator orientation="VERTICAL"/>
-            <Label fx:id="periodLabel" text="Tilikausi 2025"/>
-        </HBox>
-    </bottom>
-</BorderPane>
-```
-
-### CSS Themes
-
-**Dark Theme (dark-theme.css):**
-```css
-.root {
-    -fx-base: #2b2b2b;
-    -fx-background: #1e1e1e;
-    -fx-control-inner-background: #3c3f41;
-    -fx-accent: #4a86e8;
-}
-
-.table-view {
-    -fx-background-color: transparent;
-}
-
-.table-row-cell:selected {
-    -fx-background-color: #4a86e8;
-}
-
-.button {
-    -fx-background-radius: 3;
-    -fx-padding: 5 15;
-}
-
-.button:hover {
-    -fx-background-color: #4a86e8;
-}
-```
-
-**Light Theme (light-theme.css):**
-```css
-.root {
-    -fx-base: #f4f4f4;
-    -fx-background: #ffffff;
-    -fx-accent: #0078d7;
-}
-```
-
----
-
-## 📦 Build & Deployment
-
-### Gradle Configuration
+### Gradle-konfiguraatio (jo olemassa):
 
 ```kotlin
 // build.gradle.kts
@@ -250,87 +32,132 @@ plugins {
 
 javafx {
     version = "21"
-    modules = listOf("javafx.controls", "javafx.fxml")
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 ```
 
-### jpackage Installer
-
-```bash
-# Windows .exe installer
-jpackage --input build/libs \
-  --name Kirjanpito \
-  --main-jar kirjanpito-2.3.0.jar \
-  --main-class kirjanpito.ui.KirjanpitoFX \
-  --type exe \
-  --icon src/main/resources/icon.ico \
-  --win-menu \
-  --win-shortcut \
-  --app-version 2.3.0
-
-# Output: Kirjanpito-2.3.0.exe (~75 MB)
-```
-
 ---
 
-## 🔧 Tekniset yksityiskohdat
+## 🚀 Migraatiosuunnitelma
 
-### Scene Builder
+### Vaihe 1: Prototyyppi (1-2 päivää)
 
-- **Lataa:** https://gluonhq.com/products/scene-builder/
-- **Integrointi:** IntelliJ IDEA: Settings → Languages & Frameworks → JavaFX → Scene Builder path
+**Tavoite:** Testaa JavaFX toimii ja manager-luokat integroituvat.
 
-### Suorituskyky
+```
+src/main/java/kirjanpito/ui/javafx/
+├── JavaFXApp.java          # Application bootstrap
+├── MainController.java     # FXML controller
+└── MainView.fxml           # FXML layout
+```
 
-| Toiminto | Swing | JavaFX | Parannus |
-|----------|-------|--------|----------|
-| Käynnistys | ~3s | ~2s | 33% nopeampi |
-| Table scroll | ~30 FPS | ~60 FPS | 2x sujuvampi |
-| UI render | CPU | GPU | Paljon nopeampi |
+**Tehtävät:**
+- [ ] Luo `JavaFXApp.java` - Application-luokka
+- [ ] Luo yksinkertainen `MainView.fxml` - BorderPane + MenuBar
+- [ ] Testaa macOS menu bar (`useSystemMenuBar`)
+- [ ] Testaa manager-integraatio (DocumentNavigator)
 
-### Animaatiot
+### Vaihe 2: Entry-taulukko (3-5 päivää)
+
+**Tavoite:** Toteuta kirjanpidon ydin - Entry TableView.
 
 ```java
-// Fade in effect
-FadeTransition fadeIn = new FadeTransition(Duration.millis(300), node);
-fadeIn.setFromValue(0.0);
-fadeIn.setToValue(1.0);
-fadeIn.play();
+TableView<Entry> entryTable = new TableView<>();
+entryTable.getColumns().addAll(
+    new TableColumn<>("Nro"),
+    new TableColumn<>("Tili"),
+    new TableColumn<>("Debet"),
+    new TableColumn<>("Kredit")
+);
+```
+
+**Tehtävät:**
+- [ ] Luo `EntryTableView.java`
+- [ ] Implementoi solueditorit (Account, Currency, Date)
+- [ ] Testaa editointi ja navigaatio
+- [ ] Integroi `DocumentEntryManager`
+
+### Vaihe 3: Pääikkuna (1 viikko)
+
+**Tavoite:** Korvaa DocumentFrame JavaFX-versiolla.
+
+```
+DocumentFrameFX.java
+├── MenuBar (useSystemMenuBar)
+├── ToolBar
+├── Document fields (number, date)
+├── EntryTableView
+├── TotalRow
+├── SearchBar
+└── StatusBar
+```
+
+### Vaihe 4: Dialogit (2-3 viikkoa)
+
+**Prioriteettijärjestys:**
+1. AboutDialog
+2. AccountSelectionDialog
+3. SettingsDialog
+4. PropertiesDialog
+5. COADialog
+6. Muut (21 kpl)
+
+### Vaihe 5: Tulostus & Raportit (1 viikko)
+
+- [ ] PrintPreview JavaFX-versio
+- [ ] PDF-generointi
+
+---
+
+## 📁 Tiedostorakenne
+
+```
+src/main/java/kirjanpito/ui/javafx/
+├── JavaFXApp.java              # Main application
+├── controllers/
+│   ├── MainController.java
+│   ├── EntryTableController.java
+│   └── dialogs/
+│       ├── AboutController.java
+│       ├── SettingsController.java
+│       └── ...
+├── views/
+│   ├── MainView.fxml
+│   ├── EntryTable.fxml
+│   └── dialogs/
+│       ├── About.fxml
+│       └── ...
+└── css/
+    ├── light-theme.css
+    └── dark-theme.css
 ```
 
 ---
 
-## ✅ Tarkistuslista
+## ⏱️ Aikataulu
 
-### Ennen aloitusta
-- [ ] Scene Builder asennettu
-- [ ] JavaFX dependencies lisätty build.gradle.kts
-- [ ] IntelliJ FXML support konfiguroitu
-
-### Migraation aikana
-- [ ] Jokainen manager testattu JavaFX:ssä
-- [ ] Keyboard shortcuts toimivat
-- [ ] Kaikki dialogit konvertoitu
-- [ ] CSS-teemat toimivat
-- [ ] Print preview toimii
-
-### Ennen julkaisua
-- [ ] jpackage installer testattu
-- [ ] Windows/Linux/macOS testattu
-- [ ] Dokumentaatio päivitetty
-- [ ] CHANGELOG päivitetty
+| Vaihe | Kesto | Kumulatiivinen |
+|-------|-------|----------------|
+| 1. Prototyyppi | 1-2 pv | 2 pv |
+| 2. Entry-taulukko | 3-5 pv | 1 vko |
+| 3. Pääikkuna | 5-7 pv | 2 vko |
+| 4. Dialogit | 2-3 vko | 4-5 vko |
+| 5. Tulostus | 5-7 pv | 5-6 vko |
+| 6. Testaus | 1 vko | 6-7 vko |
+| **Yhteensä** | | **6-7 viikkoa** |
 
 ---
 
-## 📚 Resurssit
+## 🎯 Seuraava askel
 
-- [JavaFX Documentation](https://openjfx.io/)
-- [Scene Builder](https://gluonhq.com/products/scene-builder/)
-- [JavaFX CSS Reference](https://openjfx.io/javadoc/21/javafx.graphics/javafx/scene/doc-files/cssref.html)
-- [jpackage Guide](https://docs.oracle.com/en/java/javase/21/jpackage/)
+**Aloita Vaihe 1:** Luo JavaFX-prototyyppi
+
+```bash
+# Testaa JavaFX toimii
+./gradlew runJavaFXTest
+```
 
 ---
 
-**Luotu:** 2025-12-31  
-**Status:** Suunnitelma valmis, odottaa toteutusta  
-**Prioriteetti:** Keskipitkä aikaväli (refaktoroinnin jälkeen)
+**Luotu:** 2025-12-31
+**Status:** ✅ VALMIS ALOITETTAVAKSI

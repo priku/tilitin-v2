@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "2.1.0"
     id("org.jetbrains.compose") version "1.7.3"
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
+    id("org.openjfx.javafxplugin") version "0.1.0"  // JavaFX plugin
 }
 
 group = "fi.priku"
@@ -17,6 +18,12 @@ java {
 
 kotlin {
     jvmToolchain(21)
+}
+
+// JavaFX configuration
+javafx {
+    version = "21"
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 dependencies {
@@ -123,4 +130,16 @@ tasks.processResources {
     from(projectDir) {
         include("LISENSSIT.html")
     }
+}
+
+// Task to run JavaFX test application
+tasks.register<JavaExec>("runJavaFXTest") {
+    group = "application"
+    description = "Run JavaFX test application"
+    mainClass.set("kirjanpito.ui.javafx.JavaFXTest")
+    classpath = sourceSets["main"].runtimeClasspath
+    jvmArgs = listOf(
+        "-Xmx512m",
+        "--add-modules", "javafx.controls,javafx.fxml,javafx.swing"
+    )
 }
