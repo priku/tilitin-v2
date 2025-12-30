@@ -32,14 +32,14 @@
 
 ---
 
-## 🚧 Phase 2: Kriittiset toiminnot (KÄYNNISSÄ)
+## ✅ Phase 2: Kriittiset toiminnot (VALMIS)
 
 | Toiminto | Status | Prioriteetti |
 |----------|--------|--------------|
-| F9 account quick search | ⏳ | 🔴 Korkea |
-| VAT handling | ⏳ | 🔴 Korkea |
-| Delete document | ⏳ | 🟡 Keskitaso |
-| Copy/Paste entries | ⏳ | 🟡 Keskitaso |
+| F9 account quick search | ✅ | 🔴 Korkea |
+| VAT handling | ✅ | 🔴 Korkea |
+| Delete document | ✅ | 🟡 Keskitaso |
+| Copy/Paste entries | ✅ | 🟡 Keskitaso |
 | Date picker validation | ⏳ | 🟡 Keskitaso |
 
 ---
@@ -112,11 +112,11 @@ src/main/resources/fxml/
 | Kategoria | Valmis | Yhteensä | % |
 |-----------|--------|----------|---|
 | Perustoiminnot | 17 | 17 | 100% |
-| Kriittiset | 0 | 5 | 0% |
-| Dialogit | 1 | 10 | 10% |
+| Kriittiset | 4 | 5 | 80% |
+| Dialogit | 2 | 10 | 20% |
 | Raportit | 0 | 6 | 0% |
 | Työkalut | 0 | 6 | 0% |
-| **Yhteensä** | **18** | **44** | **41%** |
+| **Yhteensä** | **23** | **44** | **52%** |
 
 ---
 
