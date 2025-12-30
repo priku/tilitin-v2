@@ -1,4 +1,4 @@
-# Kotlin Migration Status - Tilitin 2.0.3
+# Kotlin Migration Status - Tilitin 2.2.3
 
 **Päivitetty:** 2025-12-30  
 **Status:** ✅ **Phase 4 & 5 COMPLETED** - 100% SQLite DAO Migration
@@ -132,7 +132,7 @@ mvn compile exec:java
 
 # JAR-paketilla
 mvn clean package
-java -jar target/tilitin-2.0.3.jar
+java -jar target/tilitin-2.2.3.jar
 ```
 
 ---
@@ -166,6 +166,6 @@ java -jar target/tilitin-2.0.3.jar
 ---
 
 **Viimeksi päivitetty:** 2025-12-30  
-**Versio:** 2.0.3  
+**Versio:** 2.2.3  
 **Status:** ✅ **100% SQLite DAO Migration Complete**
 

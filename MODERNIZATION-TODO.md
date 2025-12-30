@@ -33,7 +33,7 @@ Sovellus on selkeästi modernisoitu, mutta alkuperäinen Swing-arkkitehtuuri raj
 |----------|------|---------|----------|
 | **UI-kehys** | ⚠️ Vanha | Swing (20+ vuotta vanha) | JavaFX / Compose Desktop |
 | **Kotlin-osuus** | ⚠️ Matala | 7.8% (17/218 tiedostoa) | Tavoite 50%+ |
-| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame ~2,900 riviä | Pilkkominen osiin |
+| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame 3,093 riviä | Pilkkominen osiin |
 | **Testit** | ❌ Puuttuu | Ei yksikkötestejä | JUnit 5 / Kotest |
 
 ### 📈 Modernisoinnin eteneminen
@@ -74,7 +74,7 @@ Tavoite (v3.0):     ████████████████████
 
 - ✅ DAO-luokat migroitu Kotliniin (Phase 4 valmis)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
-- ⚠️ DocumentFrame.java on ~2,900 riviä (pilkottava pienemmäksi)
+- ⚠️ DocumentFrame.java on 3,093 riviä (pilkottava pienemmäksi)
 - ⚠️ Vanhat Swing-patternit (anonymous inner classes)
 - ❌ Yksikkötestit puuttuvat kokonaan
 
@@ -218,7 +218,7 @@ Tavoite (v3.0):     ████████████████████
   - ✅ Field initialization order korjattu (v2.1.6)
   - ✅ Wrapperit yksinkertaistettu (getPrevDocumentAction/getNextDocumentAction)
   - ✅ 10 käyttämätöntä importia poistettu
-- ✅ DocumentFrame.java vähennetty: 3,856 → ~2,930 riviä (-926 riviä, -24%)
+- ✅ DocumentFrame.java vähennetty: 3,856 → 3,093 riviä (-763 riviä, -20%)
 
 **Jäljellä**:
 

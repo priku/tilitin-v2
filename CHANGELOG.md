@@ -7,6 +7,53 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.3] - 2025-12-30
+
+### 🎯 Compose Desktop Menu Integration
+
+**Tila:** ✅ Valmis
+**Toteutusaika:** 2025-12-30 (~60 min)
+
+### Lisätty
+- **Compose Desktop MenuBar** - Natiivi AWT/Swing menu-integraatio
+  - Menu-palkki näkyy nyt Compose Desktop -ikkunassa
+  - Kaikki valikot toimivat: Tiedosto, Muokkaa, Siirry, Tositelaji, Tulosteet, Työkalut, Ohje
+  - Kaikki pikanäppäimet toimivat (Ctrl+N, Ctrl+O, jne.)
+  - 100% yhteensopivuus olemassa olevan `DocumentMenuBuilder.java`:n kanssa
+  - Ei tarvetta uudelleenkirjoittaa menu-logiikkaa
+
+### Muutettu
+- **TilitinApp.kt** - Menu-integraatio Compose-ikkunaan
+  - Lisätty `composeWindow`-parametri `MainContent`-funktioon
+  - Menu-palkin asetus `SwingUtilities.invokeLater`:lla EDT:ssä
+  - JMenuBar haetaan `DocumentFramePanel`:sta ja asetetaan JFrame:en
+
+### Tekniset yksityiskohdat
+- **Lähestymistapa:** AWT MenuBar (vaihtoehto A)
+  - Hyödyntää olemassa olevaa `DocumentMenuBuilder.java` (465 riviä)
+  - Ei uutta koodia (~20 riviä muutoksia)
+  - Vähemmän implementointiaikaa verrattuna Compose MenuBar:iin
+- **Build-korjaus:** Gradle konfiguroitu käyttämään Java 21
+  - Lisätty `org.gradle.java.home` `gradle.properties`:iin
+  - Gradle 8.11.1 ei tue Java 25:tä
+
+### Dokumentaatio
+- Luotu COMPOSE-MENU-IMPLEMENTATION.md - Täydellinen toteutusdokumentaatio
+- Päivitetty NEXT-STEPS-PLAN.md - Menu-integraatio merkitty valmiiksi
+
+### Testattu
+- ✅ Menu näkyy oikein ikkunan yläreunassa
+- ✅ Tiedosto → Uusi tietokanta - Toimii
+- ✅ Tiedosto → Avaa tietokanta - Toimii
+- ✅ Muokkaa-valikko - Toimii
+- ✅ Tositteet-valikko - Toimii
+- ✅ Tulosteet-valikko - Toimii
+- ✅ Työkalut-valikko - Toimii
+- ✅ Ohje-valikko - Toimii
+- ✅ Kaikki pikanäppäimet - Toimivat
+
+---
+
 ## [2.2.3] - 2025-12-29
 
 ### 🔧 Pikanäppäinkorjaukset
@@ -88,8 +135,8 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
   - ✅ Phase 5: Print operations siirretty DocumentPrinter:iin (~276 riviä pois)
   - ✅ Poistettu 10 käyttämätöntä importia + 21 print-importia
   - ✅ Yksinkertaistettu wrapperit (getPrevDocumentAction/getNextDocumentAction)
-  - ✅ DocumentFrame: 3,008 → ~2,654 riviä (-354 riviä, -11.8%)
-  - ✅ **Kokonaisprogress:** 3,856 → ~2,654 riviä (-1,202 riviä, -31%)
+  - ✅ DocumentFrame: 3,008 → 3,093 riviä (+85 riviä, +2.8%)
+  - ✅ **Kokonaisprogress:** 3,856 → 3,093 riviä (-763 riviä, -20%)
 
 ### Tekninen
 - **DocumentTableManager.java** - Uusi luokka (400 riviä)

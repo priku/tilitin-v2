@@ -1,7 +1,7 @@
 # Tilitin - Next Steps Plan
 ## Comprehensive Development Roadmap
 
-**Current Version:** 2.0.3  
+**Current Version:** 2.2.3  
 **Last Updated:** 2025-12-30  
 **DocumentFrame Size:** 3,093 lines (synced from tilitin-v2)
 
@@ -147,7 +147,7 @@
    - Extract print options management
    - **Estimated:** 200-300 lines
 
-**Expected Result:** ✅ DocumentFrame reduced by ~276 lines → ~2,654 lines (COMPLETED v2.2.1)
+**Expected Result:** ✅ DocumentFrame reduced by ~276 lines → 3,093 lines (COMPLETED v2.2.1)
 
 ---
 

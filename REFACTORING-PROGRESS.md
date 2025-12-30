@@ -3,8 +3,8 @@
 Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 **Alkuperäinen koko:** 3,856 riviä  
-**Nykyinen koko:** ~2,654 riviä  
-**Vähennys:** -1,202 riviä (-31%)  
+**Nykyinen koko:** 3,093 riviä  
+**Vähennys:** -763 riviä (-20%)  
 **Tavoite:** <500 riviä
 
 ---
@@ -128,7 +128,7 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 | Phase 3b | DocumentTableManager.java | 400 riviä | -75 riviä | ✅ |
 | Phase 4 | Code cleanup | - | -3 riviä | ✅ |
 | Phase 5 | DocumentPrinter.java | 434 riviä | -276 riviä | ✅ |
-| **YHTEENSÄ** | | **2,038 riviä** | **-1,202 riviä** | |
+| **YHTEENSÄ** | | **2,038 riviä** | **-763 riviä** | |
 
 **Huomio:** Vähennys on pienempi kuin eriytetty koodi, koska:
 - Uudet luokat tarvitsevat oman rakenteensa (importit, dokumentaatio, jne.)
@@ -222,8 +222,8 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 **Lopullinen tavoite:** DocumentFrame < 500 riviä
 
-**Nykyinen tila:** ~2,930 riviä  
-**Jäljellä:** ~2,430 riviä
+**Nykyinen tila:** 3,093 riviä  
+**Jäljellä:** ~2,593 riviä
 
 **Arvioitu vähennys Phase 5-7:**
 - Phase 5: ~200-300 riviä
@@ -246,7 +246,7 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 ---
 
-**Viimeksi päivitetty:** 2025-12-29  
-**Versio:** 2.2.1  
+**Viimeksi päivitetty:** 2025-12-30  
+**Versio:** 2.2.3  
 **Testaus:** ✅ Testattu ja toimii (2025-12-29)
 

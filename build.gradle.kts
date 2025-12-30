@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "fi.priku"
-version = "2.0.3"
+version = "2.2.3"
 
 java {
     toolchain {
@@ -81,7 +81,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Tilitin"
-            packageVersion = "2.0.3"
+            packageVersion = "2.2.3"
             description = "Ilmainen suomalainen kirjanpito-ohjelma"
             vendor = "Tilitin"
             

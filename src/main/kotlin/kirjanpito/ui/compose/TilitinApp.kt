@@ -91,11 +91,14 @@ object TilitinApp {
                 title = "$APP_NAME $APP_VERSION",
                 state = windowState
             ) {
+                val composeWindow = window
+
                 MaterialTheme {
                     MainContent(
                         registry = registry,
                         documentModel = documentModel,
-                        settings = settings
+                        settings = settings,
+                        composeWindow = composeWindow
                     )
                 }
             }
@@ -106,7 +109,8 @@ object TilitinApp {
     private fun MainContent(
         registry: Registry,
         documentModel: DocumentModel,
-        settings: AppSettings
+        settings: AppSettings,
+        composeWindow: java.awt.Window
     ) {
         // State to track if the application is initialized
         var isInitialized by remember { mutableStateOf(false) }
@@ -168,6 +172,15 @@ object TilitinApp {
                     factory = {
                         // Create DocumentFramePanel (JPanel wrapper for DocumentFrame)
                         val panel = DocumentFramePanel(registry, documentModel)
+
+                        // Set menu bar to the Compose window
+                        SwingUtilities.invokeLater {
+                            val menuBar = panel.getMenuBar()
+                            if (menuBar != null && composeWindow is javax.swing.JFrame) {
+                                composeWindow.jMenuBar = menuBar
+                            }
+                        }
+
                         panel
                     },
                     update = { panel ->
