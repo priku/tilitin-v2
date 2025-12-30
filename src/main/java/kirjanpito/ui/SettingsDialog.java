@@ -6,8 +6,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
@@ -144,15 +142,11 @@ public class SettingsDialog extends JDialog {
 
 		JButton lockAllMonthsButton = new JButton("Lukitse kaikki");
 		lockAllMonthsButton.setMnemonic('k');
-		lockAllMonthsButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				for (int i = 0; i < monthsLocked.length; i++) {
-					monthsLocked[i] = true;
-				}
-
-				tableModel.fireTableDataChanged();
+		lockAllMonthsButton.addActionListener(e -> {
+			for (int i = 0; i < monthsLocked.length; i++) {
+				monthsLocked[i] = true;
 			}
+			tableModel.fireTableDataChanged();
 		});
 
 		c.anchor = GridBagConstraints.EAST;
@@ -174,20 +168,12 @@ public class SettingsDialog extends JDialog {
 		okButton = new JButton("OK");
 		okButton.setMnemonic('O');
 		okButton.setPreferredSize(new Dimension(100, 30));
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				acceptChanges();
-			}
-		});
+		okButton.addActionListener(e -> acceptChanges());
 
 		cancelButton = new JButton("Peruuta");
 		cancelButton.setMnemonic('P');
 		cancelButton.setPreferredSize(new Dimension(100, 30));
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		cancelButton.addActionListener(e -> dispose());
 
 		c = new GridBagConstraints();
 		c.weightx = 1.0;

@@ -6,8 +6,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
@@ -144,18 +142,10 @@ public class PropertiesDialog extends JDialog {
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 		
 		JButton deletePeriodButton = new JButton("Poista tilikausi");
-		deletePeriodButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				deletePeriod();
-			}
-		});
+		deletePeriodButton.addActionListener(e -> deletePeriod());
 		
 		JButton createPeriodButton = new JButton("Uusi tilikausi");
-		createPeriodButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				createPeriod();
-			}
-		});
+		createPeriodButton.addActionListener(e -> createPeriod());
 		
 		c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.EAST;
@@ -183,20 +173,12 @@ public class PropertiesDialog extends JDialog {
 		okButton = new JButton("OK");
 		okButton.setMnemonic('O');
 		okButton.setPreferredSize(new Dimension(100, 30));
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				save();
-			}
-		});
+		okButton.addActionListener(e -> save());
 		
 		cancelButton = new JButton("Peruuta");
 		cancelButton.setMnemonic('P');
 		cancelButton.setPreferredSize(new Dimension(100, 30));
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		cancelButton.addActionListener(e -> dispose());
 		
 		c = new GridBagConstraints();
 		c.weightx = 1.0;

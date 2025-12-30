@@ -8,8 +8,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -221,19 +219,13 @@ public class DatabaseSettingsDialog extends JDialog {
 		JPanel container = new JPanel(new GridBagLayout());
 		
 		openButton = new JButton("Avaa hakemisto");
-		openButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				openDirectory();
-			}
-		});
+		openButton.addActionListener(e -> openDirectory());
 		
 		resetButton = new JButton("Palauta");
-		resetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				urlTextField.setText(defaultUrl);
-				usernameTextField.setText("");
-				passwordTextField.setText("");
-			}
+		resetButton.addActionListener(e -> {
+			urlTextField.setText(defaultUrl);
+			usernameTextField.setText("");
+			passwordTextField.setText("");
 		});
 		
 		c.anchor = GridBagConstraints.LINE_START;
@@ -248,19 +240,15 @@ public class DatabaseSettingsDialog extends JDialog {
 		add(container, BorderLayout.SOUTH);
 		
 		JButton cancelButton = new JButton("Peruuta");
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				result = JOptionPane.CANCEL_OPTION;
-				setVisible(false);
-			}
+		cancelButton.addActionListener(e -> {
+			result = JOptionPane.CANCEL_OPTION;
+			setVisible(false);
 		});
 		
 		JButton okButton = new JButton("OK");
-		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				result = JOptionPane.OK_OPTION;
-				setVisible(false);
-			}
+		okButton.addActionListener(e -> {
+			result = JOptionPane.OK_OPTION;
+			setVisible(false);
 		});
 		
 		panel.add(cancelButton);

@@ -243,7 +243,7 @@ Tavoite (v3.0):     ████████████████████
 
 ---
 
-### 4. 🔄 Lambda-lausekkeet anonymous inner class -rakenteiden tilalle (IN PROGRESS v2.1.6)
+### 4. ✅ Lambda-lausekkeet anonymous inner class -rakenteiden tilalle (COMPLETED v2.2.3)
 
 **Ongelma**: Koodissa 40+ kohtaa käytetään vanhoja anonymous inner classeja:
 
@@ -273,21 +273,34 @@ button.addActionListener(e -> doSomething());
 - ✅ DocumentFrame: 3,024 → 3,007 riviä (-17 riviä)
 - ✅ printListener optimoitu: if-else → switch-lauseke (modernimpi)
 
-**Jäljellä**:
-- [ ] DocumentFrame.java: ~6+ anonymous inner classes vielä jäljellä (AbstractAction -instanssit ActionMap:issa)
-- [ ] COADialog.java - useita kohtia
-- [ ] SettingsDialog.java
-- [ ] PropertiesDialog.java
-- [ ] EntryTemplateDialog.java
-- [ ] Ja monissa muissa... (~30+ jäljellä)
+**Toteutettu v2.2.3 (2025-12-30)**:
+- ✅ **Phase 1**: 12 dialogitiedostoa, ~40+ ActionListener → lambda
+  - AboutDialog, BalanceComparisonDialog, StartingBalanceDialog
+  - DocumentTypeDialog, VATChangeDialog, FinancialStatementOptionsDialog
+  - EntryTemplateDialog, AccountSelectionDialog, AccountStatementOptionsDialog
+  - PrintOptionsDialog, COADialog (12 listeneria), AppearanceDialog
+- ✅ **Phase 2**: 4 dialogitiedostoa, 19 ActionListener → lambda
+  - SettingsDialog.java (3 listeneria)
+  - PropertiesDialog.java (4 listeneria)
+  - DatabaseSettingsDialog.java (4 listeneria)
+  - ReportEditorDialog.java (8 listeneria)
+- ✅ **Yhteensä**: 16 tiedostoa, ~60+ ActionListener → lambda
+- ✅ **Rivit vähennetty**: ~176+ riviä
+- ✅ **Koodin vähennys**: ~30% listener-deklaraatioissa
+- ✅ Build onnistui, kaikki toimii
 
-**Tehtävät**:
-- [ ] Tunnista kaikki ActionListener-käyttökohteet
-- [ ] Refaktoroi lambda-lausekkeiksi
-- [ ] Testaa että toiminnallisuus säilyy
-- [ ] Sama WindowListener, FocusListener, etc.
+**Jäljellä (ei voi muuttaa lambdoiksi)**:
+- ✅ DocumentFrame.java: ~13 anonymous inner classes (AbstractAction -instanssit ActionMap:issa, WindowAdapter)
+- ✅ Muut tiedostot: ~20-25 anonymous inner classes
+  - WindowAdapter - useita metodeja (windowClosing, windowOpened, jne.)
+  - AbstractAction - tarvitsee Action-rajapinnan ja serialVersionUID:n
+  - AbstractTableModel - useita metodeja
+  - DocumentListener - useita metodeja (insertUpdate, removeUpdate, changedUpdate)
+  - Muut multi-method interfaces
 
-**Prioriteetti**: 🔴 KORKEA - Modernin Java-koodin standardi
+**Huomio**: Kaikki ActionListener-lausekkeet, jotka voidaan muuttaa lambdoiksi, on nyt muutettu. Jäljellä olevat anonymous inner class -instanssit eivät voi olla lambdoja, koska niillä on useita metodeja tai ne tarvitsevat erityisiä ominaisuuksia (kuten serialVersionUID).
+
+**Prioriteetti**: ✅ VALMIS - Modernin Java-koodin standardi saavutettu
 
 ---
 

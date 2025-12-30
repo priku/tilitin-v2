@@ -9,8 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -96,49 +94,29 @@ public class ReportEditorDialog extends JDialog {
 		exportButton.setMnemonic('V');
 		exportButton.setEnabled(Desktop.isDesktopSupported());
 		exportButton.setPreferredSize(new Dimension(100, 30));
-		exportButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				saveToZip();
-			}
-		});
+		exportButton.addActionListener(e -> saveToZip());
 		
 		JButton importButton = new JButton("Tuo");
 		importButton.setMnemonic('T');
 		importButton.setEnabled(Desktop.isDesktopSupported());
 		importButton.setPreferredSize(new Dimension(100, 30));
-		importButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				loadFromZip();
-			}
-		});
+		importButton.addActionListener(e -> loadFromZip());
 		
 		JButton helpButton = new JButton("Ohjeet");
 		helpButton.setMnemonic('O');
 		helpButton.setEnabled(Desktop.isDesktopSupported());
 		helpButton.setPreferredSize(new Dimension(100, 30));
-		helpButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showHelp();
-			}
-		});
+		helpButton.addActionListener(e -> showHelp());
 		
 		JButton saveButton = new JButton("Tallenna");
 		saveButton.setMnemonic('T');
 		saveButton.setPreferredSize(new Dimension(100, 30));
-		saveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				save();
-			}
-		});
+		saveButton.addActionListener(e -> save());
 		
 		JButton cancelButton = new JButton("Peruuta");
 		cancelButton.setMnemonic('P');
 		cancelButton.setPreferredSize(new Dimension(100, 30));
-		cancelButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
+		cancelButton.addActionListener(e -> dispose());
 		
 		c.anchor = GridBagConstraints.EAST;
 		c.insets = new Insets(5, 10, 10, 5);
@@ -175,11 +153,9 @@ public class ReportEditorDialog extends JDialog {
 		};
 		
 		printComboBox = new JComboBox(comboBoxItems);
-		printComboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				saveHeaderAndFooter();
-				loadHeaderAndFooter();
-			}
+		printComboBox.addActionListener(e -> {
+			saveHeaderAndFooter();
+			loadHeaderAndFooter();
 		});
 		
 		Font font = new Font(Font.MONOSPACED, Font.PLAIN, 11);
@@ -213,11 +189,7 @@ public class ReportEditorDialog extends JDialog {
 		headerTextArea.setFont(font);
 		restoreHeaderButton = new JButton("Palauta");
 		restoreHeaderButton.setToolTipText("Palauta alkuperäinen ylätunniste");
-		restoreHeaderButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				headerTextArea.setText(model.getDefaultHeader(printIndex));
-			}
-		});
+		restoreHeaderButton.addActionListener(e -> headerTextArea.setText(model.getDefaultHeader(printIndex)));
 		headerPanel.add(new JLabel("Ylätunniste"), c1);
 		headerPanel.add(restoreHeaderButton, c2);
 		headerPanel.add(new JScrollPane(headerTextArea), c3);
@@ -228,11 +200,7 @@ public class ReportEditorDialog extends JDialog {
 		footerTextArea.setFont(font);
 		restoreFooterButton = new JButton("Palauta");
 		restoreFooterButton.setToolTipText("Palauta alkuperäinen alatunniste");
-		restoreFooterButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				footerTextArea.setText(model.getDefaultFooter(printIndex));
-			}
-		});
+		restoreFooterButton.addActionListener(e -> footerTextArea.setText(model.getDefaultFooter(printIndex)));
 		footerPanel.add(new JLabel("Alatunniste"), c1);
 		footerPanel.add(restoreFooterButton, c2);
 		footerPanel.add(new JScrollPane(footerTextArea), c3);
