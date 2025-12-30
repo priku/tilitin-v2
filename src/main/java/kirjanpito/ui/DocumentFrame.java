@@ -1605,7 +1605,10 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Päivittää viimeisimpien tietokantojen valikon.
 	 */
 	protected void updateRecentDatabasesMenu() {
-		dataSourceManager.updateRecentDatabasesMenu(recentMenu);
+		// Tarkista null - dataSourceManager alustetaan vasta initializeUIManagers():ssa
+		if (dataSourceManager != null) {
+			dataSourceManager.updateRecentDatabasesMenu(recentMenu);
+		}
 	}
 
 	@Override
