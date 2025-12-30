@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -14,8 +15,11 @@ import kirjanpito.util.AppSettings
 import kirjanpito.util.Registry
 import kirjanpito.models.DocumentModel
 import kirjanpito.ui.DocumentFrame
+import kirjanpito.ui.DocumentFramePanel
 import java.awt.BorderLayout
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
+import javax.swing.UIManager
 
 /**
  * Tilitin Compose Desktop -sovellus.
@@ -78,7 +82,9 @@ object TilitinApp {
         
         // Launch Compose Desktop application
         application {
-            val windowState = rememberWindowState()
+            val windowState = rememberWindowState(
+                size = DpSize(1200.dp, 800.dp)
+            )
             
             Window(
                 onCloseRequest = ::exitApplication,
@@ -102,56 +108,103 @@ object TilitinApp {
         documentModel: DocumentModel,
         settings: AppSettings
     ) {
-        // For now, show a placeholder UI
-        // TODO: Integrate DocumentFrame using Swing-Interoperability
-        // Note: DocumentFrame is a JFrame, so we need to either:
-        // 1. Extract content to a JPanel and use SwingPanel
-        // 2. Or create a new Compose version of DocumentFrame
+        // State to track if the application is initialized
+        var isInitialized by remember { mutableStateOf(false) }
+        var showSwingContent by remember { mutableStateOf(false) }
+        var initError by remember { mutableStateOf<String?>(null) }
         
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Tilitin Compose Desktop",
-                style = MaterialTheme.typography.h4
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Compose Desktop -siirtymä käynnissä...",
-                style = MaterialTheme.typography.body1
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Swing-Interoperability -tuki lisätty",
-                style = MaterialTheme.typography.body2,
-                color = MaterialTheme.colors.secondary
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = { 
-                    // TODO: Open database and show DocumentFrame
-                    // For now, launch Swing version directly
-                    javax.swing.SwingUtilities.invokeLater {
-                        val frame = DocumentFrame(registry, documentModel)
-                        frame.create()
-                        try {
-                            if (documentModel.initialize()) {
-                                frame.isVisible = true
-                            } else {
-                                // Show initialization dialog
-                                frame.isVisible = true
-                            }
-                        } catch (e: Exception) {
-                            java.util.logging.Logger.getLogger(LOGGER_NAME)
-                                .log(java.util.logging.Level.SEVERE, "Database initialization failed", e)
-                            frame.isVisible = true
-                        }
+        // Initialize database on first composition
+        LaunchedEffect(Unit) {
+            try {
+                if (documentModel.initialize()) {
+                    isInitialized = true
+                    showSwingContent = true
+                } else {
+                    // Database not found, but we can still show UI
+                    isInitialized = true
+                    showSwingContent = true
+                }
+            } catch (e: Exception) {
+                java.util.logging.Logger.getLogger(LOGGER_NAME)
+                    .log(java.util.logging.Level.SEVERE, "Database initialization failed", e)
+                initError = e.message ?: "Tuntematon virhe"
+                isInitialized = true
+                showSwingContent = true
+            }
+        }
+        
+        if (!isInitialized) {
+            // Show loading indicator while initializing
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Alustetaan...")
+                }
+            }
+        } else if (showSwingContent) {
+            // Show Swing content using SwingPanel
+            Column(modifier = Modifier.fillMaxSize()) {
+                // Error banner if there was an initialization error
+                if (initError != null) {
+                    Surface(
+                        color = MaterialTheme.colors.error,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Varoitus: $initError",
+                            color = MaterialTheme.colors.onError,
+                            modifier = Modifier.padding(8.dp)
+                        )
                     }
                 }
+                
+                // Swing DocumentFrame content
+                SwingPanel(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = {
+                        // Create DocumentFramePanel (JPanel wrapper for DocumentFrame)
+                        val panel = DocumentFramePanel(registry, documentModel)
+                        panel
+                    },
+                    update = { panel ->
+                        // Update panel if needed (e.g., when theme changes)
+                    }
+                )
+            }
+        } else {
+            // Fallback: Show welcome screen with button to open Swing version
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text("Avaa tietokanta (Swing)")
+                Text(
+                    text = "Tilitin Compose Desktop",
+                    style = MaterialTheme.typography.h4
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Compose Desktop -siirtymä käynnissä...",
+                    style = MaterialTheme.typography.body1
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Swing-Interoperability -tuki lisätty",
+                    style = MaterialTheme.typography.body2,
+                    color = MaterialTheme.colors.secondary
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+                Button(
+                    onClick = { 
+                        showSwingContent = true
+                    }
+                ) {
+                    Text("Avaa kirjanpito")
+                }
             }
         }
     }
