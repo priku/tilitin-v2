@@ -198,18 +198,10 @@
                     <args>
                         <arg>-Xjvm-default=all</arg>
                     </args>
-                    <!-- Enable Compose Compiler (built into Kotlin 2.0+) -->
-                    <compilerPlugins>
-                        <plugin>compose</plugin>
-                    </compilerPlugins>
+                    <!-- Compose Compiler is built into Kotlin 2.0+ -->
+                    <!-- For Maven, use compiler plugin configuration if needed -->
+                    <!-- Note: Compose compiler may require additional setup for Maven -->
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>compose-compiler-gradle-plugin</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
