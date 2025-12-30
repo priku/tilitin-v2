@@ -2,13 +2,13 @@
 
 Tämä dokumentti sisältää kattavan listan jäljellä olevista modernisointitehtävistä sekä sovelluksen moderniusarvion.
 
-**Projektin tila**: v2.0.3 (synced from tilitin-v2)
-**Viimeksi päivitetty**: 2025-12-30
-**Analyysi perustuu**: 202 Java-tiedoston + 22 Kotlin-tiedoston kattavaan analyysiin
+**Projektin tila**: v2.2.0 julkaistu (master)
+**Viimeksi päivitetty**: 2025-06-27
+**Analyysi perustuu**: 201 Java-tiedoston + 17 Kotlin-tiedoston kattavaan analyysiin
 
 ---
 
-## 📊 Moderniusarvio (v2.0.3)
+## 📊 Moderniusarvio (v2.2.0)
 
 ### Kokonaisarvio: **75% moderni** ⭐⭐⭐⭐
 
@@ -32,8 +32,8 @@ Sovellus on selkeästi modernisoitu, mutta alkuperäinen Swing-arkkitehtuuri raj
 | Osa-alue | Tila | Ongelma | Ratkaisu |
 |----------|------|---------|----------|
 | **UI-kehys** | ⚠️ Vanha | Swing (20+ vuotta vanha) | JavaFX / Compose Desktop |
-| **Kotlin-osuus** | ⚠️ Matala | 9.8% (22/224 tiedostoa) | Tavoite 50%+ |
-| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame 3,093 riviä | Pilkkominen osiin |
+| **Kotlin-osuus** | ⚠️ Matala | 7.8% (17/218 tiedostoa) | Tavoite 50%+ |
+| **God Object** | ⚠️ Arkkitehtuuri | DocumentFrame ~2,900 riviä | Pilkkominen osiin |
 | **Testit** | ❌ Puuttuu | Ei yksikkötestejä | JUnit 5 / Kotest |
 
 ### 📈 Modernisoinnin eteneminen
@@ -41,7 +41,7 @@ Sovellus on selkeästi modernisoitu, mutta alkuperäinen Swing-arkkitehtuuri raj
 ```
 Vuosi 2023 (v1.x):  ████░░░░░░░░░░░░░░░░ 20% - Alkuperäinen Java 8 koodi
 Vuosi 2024 (v2.0):  ██████████░░░░░░░░░░ 50% - Java 25, FlatLaf, refaktorointi
-Vuosi 2025 (v2.0.3): ███████████████░░░░░ 75% - Synced from tilitin-v2, CSV, PDF
+Vuosi 2025 (v2.2):  ███████████████░░░░░ 75% - Kotlin, PDF-liitteet, CI/CD
 Tavoite (v3.0):     ████████████████████ 100% - JavaFX/Compose, 50%+ Kotlin
 ```
 
@@ -70,11 +70,11 @@ Tavoite (v3.0):     ████████████████████
 - ✅ PDF-liitteet tositteihin (v2.2.0)
 - ✅ GitHub Actions CI/CD pipeline
 
-**Jäljellä olevia haasteita (TODO - Ei vielä aloitettu):**
+**Jäljellä olevia haasteita:**
 
-- ❌ **DocumentFrame.java on 3,093 riviä** - EI REFAKTOROINTIA TEHTY (pilkottava alle 500 riviin)
+- ✅ DAO-luokat migroitu Kotliniin (Phase 4 valmis)
 - ❌ 19+ dialogia käyttää vanhaa GridBagLayout-patternia
-- ⚠️ DAO-luokat käyttävät vielä vanhoja Java-malleja (Phase 4 - tulevaisuus)
+- ⚠️ DocumentFrame.java on ~2,900 riviä (pilkottava pienemmäksi)
 - ⚠️ Vanhat Swing-patternit (anonymous inner classes)
 - ❌ Yksikkötestit puuttuvat kokonaan
 
@@ -93,15 +93,24 @@ Tavoite (v3.0):     ████████████████████
 - ✅ **Phase 3 AccountDAO integraatio** - SQLiteAccountDAOKt käytössä tuotannossa
 - **Koodi vähennetty**: 1,081 → 538 riviä Kotlin (50% vähemmän)
 
-**Phase 3 valmis (v2.1.3)**:
-- ✅ SQLiteDataSource käyttää SQLiteAccountDAOKt
+**Phase 4 valmis (v2.0.3)**:
+- ✅ Kaikki SQLite DAO:t migroitu Kotliniin (10 DAO-toteutusta)
+- ✅ SQLiteDataSource migroitu Kotliniin (SQLiteDataSourceKt)
+- ✅ SQLiteSession migroitu Kotliniin (SQLiteSessionKt)
+- ✅ DataSourceFactory migroitu Kotliniin (DataSourceFactoryKt)
+- ✅ Vanhat Java DAO-fallbackit poistettu (9 tiedostoa)
+- ✅ DAO:t käyttävät Session-rajapintaa extension propertyjen kautta
 - ✅ Testattu ja toimii tuotannossa
-- ⚠️ Vanhat Java DAO-tiedostot säilytetty fallbackina (poistetaan v2.2.0)
 
-**Seuraavaksi (Phase 4 - Tulevaisuus)**:
-- [ ] Entry DAO migraatio Kotliniin
-- [ ] Document DAO migraatio Kotliniin
-- [ ] Poista vanhat Java DAO fallbackit
+**Migroidut DAO:t:**
+- ✅ AccountDAO, EntryDAO, DocumentDAO, PeriodDAO
+- ✅ DocumentTypeDAO, COAHeadingDAO, SettingsDAO
+- ✅ ReportStructureDAO, EntryTemplateDAO, AttachmentDAO
+
+**Seuraavaksi (Phase 6 - Tulevaisuus)**:
+- [ ] Migroida muut DataSource-toteutukset (PostgreSQL, MySQL)
+- [ ] Migroida utility-luokat (DatabaseUpgradeUtil, jne.)
+- [ ] Migroida dialogit Kotliniin
 
 📖 **Yksityiskohtainen dokumentaatio**: [KOTLIN_MIGRATION.md](KOTLIN_MIGRATION.md)
 

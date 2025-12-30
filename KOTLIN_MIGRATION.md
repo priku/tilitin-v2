@@ -8,7 +8,8 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 **Phase 2: Model Classes - COMPLETED ✓**
 **Phase 2.5: DAO Foundation - COMPLETED ✓**
 **Phase 3: AccountDAO Migration - COMPLETED ✓**
-**Phase 4: Entry/Document DAO Migration - PLANNED 📋**
+**Phase 4: All SQLite DAO Migration - COMPLETED ✓**
+**Phase 5: Cleanup & Session Interface - COMPLETED ✓**
 
 ## What Has Been Done
 
@@ -123,17 +124,40 @@ java -jar target/tilitin-2.1.1.jar
 - ✓ All model classes converted to Kotlin
 - ✓ Helper methods and validation added
 
-### Phase 3: DAO Migration (PLANNED 📋)
+### Phase 3: AccountDAO Migration (COMPLETED ✓)
 
-- [ ] Migrate SQLAccountDAO to Kotlin
-- [ ] Migrate SQLEntryDAO to Kotlin
-- [ ] Migrate SQLDocumentDAO to Kotlin
 - [x] Create DatabaseExtensions.kt for ResultSet mapping
 - [x] Create SQLAccountDAOKt abstract base class
 - [x] Create SQLiteAccountDAOKt implementation
-- [ ] Update UI to use Kotlin models
+- [x] Integrate SQLiteAccountDAOKt into SQLiteDataSource
 
-### Phase 2.5: DAO Foundation (IN PROGRESS 🔄)
+### Phase 4: All SQLite DAO Migration (COMPLETED ✓)
+
+**Migrated DAOs:**
+- [x] SQLAccountDAOKt / SQLiteAccountDAOKt
+- [x] SQLEntryDAOKt / SQLiteEntryDAOKt
+- [x] SQLDocumentDAOKt / SQLiteDocumentDAOKt
+- [x] SQLPeriodDAOKt / SQLitePeriodDAOKt
+- [x] SQLDocumentTypeDAOKt / SQLiteDocumentTypeDAOKt
+- [x] SQLCOAHeadingDAOKt / SQLiteCOAHeadingDAOKt
+- [x] SQLSettingsDAOKt / SQLiteSettingsDAOKt
+- [x] SQLReportStructureDAOKt / SQLiteReportStructureDAOKt
+- [x] SQLEntryTemplateDAOKt / SQLiteEntryTemplateDAOKt
+- [x] SQLiteAttachmentDAO (already in Kotlin)
+
+**Total: 10 DAO implementations migrated to Kotlin**
+
+### Phase 5: Cleanup & Session Interface (COMPLETED ✓)
+
+- [x] Remove all old Java DAO fallback classes (9 files deleted)
+- [x] Update all DAOs to use Session interface instead of SQLiteSession type
+- [x] Create Session extension properties (insertId, prepareStatement)
+- [x] Migrate SQLiteDataSource to Kotlin (SQLiteDataSourceKt)
+- [x] Migrate SQLiteSession to Kotlin (SQLiteSessionKt)
+- [x] Migrate DataSourceFactory to Kotlin (DataSourceFactoryKt)
+- [x] Update SQLiteDataSource.java to use Kotlin DAOs without casting
+
+### Phase 2.5: DAO Foundation (COMPLETED ✓)
 
 Created database extension utilities and Kotlin DAO base classes:
 
@@ -146,6 +170,7 @@ ResultSet and PreparedStatement extension functions:
 - `ResultSet.mapToList()` - Iterate and map results
 - `withDataAccess()` - SQLException to DataAccessException wrapper
 - Java ↔ Kotlin conversion: `Account.toAccountData()`, `AccountData.toAccount()`
+- **Session extensions**: `Session.insertId`, `Session.prepareStatement()` - Works with both Java and Kotlin Session implementations
 
 #### [SQLAccountDAOKt.kt](src/main/kotlin/kirjanpito/db/sql/SQLAccountDAOKt.kt)
 Abstract Kotlin base class for Account DAO:
@@ -158,7 +183,65 @@ Abstract Kotlin base class for Account DAO:
 SQLite-specific implementation:
 - Multi-line SQL queries as companion constants
 - Override for SQLite-specific vatRate handling (TEXT vs DECIMAL)
+- Uses Session interface with extension properties
 - 83 lines vs 91 Java lines (9% reduction)
+
+### Phase 4: Complete DAO Migration (COMPLETED ✓)
+
+All SQLite DAO implementations have been migrated to Kotlin:
+
+#### Abstract Base Classes (in `src/main/kotlin/kirjanpito/db/sql/`)
+- `SQLAccountDAOKt.kt`
+- `SQLEntryDAOKt.kt`
+- `SQLDocumentDAOKt.kt`
+- `SQLPeriodDAOKt.kt`
+- `SQLDocumentTypeDAOKt.kt`
+- `SQLCOAHeadingDAOKt.kt`
+- `SQLSettingsDAOKt.kt`
+- `SQLReportStructureDAOKt.kt`
+- `SQLEntryTemplateDAOKt.kt`
+
+#### SQLite Implementations (in `src/main/kotlin/kirjanpito/db/sqlite/`)
+- `SQLiteAccountDAOKt.kt`
+- `SQLiteEntryDAOKt.kt`
+- `SQLiteDocumentDAOKt.kt`
+- `SQLitePeriodDAOKt.kt`
+- `SQLiteDocumentTypeDAOKt.kt`
+- `SQLiteCOAHeadingDAOKt.kt`
+- `SQLiteSettingsDAOKt.kt`
+- `SQLiteReportStructureDAOKt.kt`
+- `SQLiteEntryTemplateDAOKt.kt`
+- `SQLiteAttachmentDAO.kt` (already in Kotlin)
+
+**Key improvements:**
+- All DAOs use Session interface (not SQLiteSession type) - enables both Java and Kotlin Session implementations
+- Extension properties for Session (`insertId`, `prepareStatement`)
+- Null-safe operations throughout
+- Resource management with Kotlin `use {}`
+- Exception handling with `withDataAccess {}`
+
+### Phase 5: DataSource & Factory Migration (COMPLETED ✓)
+
+#### [SQLiteDataSourceKt.kt](src/main/kotlin/kirjanpito/db/sqlite/SQLiteDataSourceKt.kt)
+- Complete Kotlin implementation of SQLiteDataSource
+- Uses SQLiteSessionKt for new sessions
+- All DAO methods return Kotlin implementations
+- Cleaner code with Kotlin idioms
+
+#### [SQLiteSessionKt.kt](src/main/kotlin/kirjanpito/db/sqlite/SQLiteSessionKt.kt)
+- Kotlin implementation of SQLiteSession
+- Compatible with Session interface
+- Works with extension properties
+
+#### [DataSourceFactoryKt.kt](src/main/kotlin/kirjanpito/db/DataSourceFactoryKt.kt)
+- Kotlin object for DataSource creation
+- Uses `@JvmStatic` for Java compatibility
+- Delegates from Java DataSourceFactory
+
+**Cleanup:**
+- Removed 9 old Java DAO fallback files
+- Updated SQLiteDataSource.java to use Kotlin DAOs directly
+- Removed all "Legacy Java implementation" comments
 
 ### Phase 4: Dialog Refactoring (FUTURE)
 

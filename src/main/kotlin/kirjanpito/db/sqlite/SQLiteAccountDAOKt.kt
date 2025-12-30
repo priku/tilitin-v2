@@ -16,7 +16,8 @@ import java.sql.SQLException
  * @author Tommi Helineva (original Java)
  * @author Kotlin migration by Claude
  */
-class SQLiteAccountDAOKt(private val session: SQLiteSession) : SQLAccountDAOKt() {
+class SQLiteAccountDAOKt(session: Session) : SQLAccountDAOKt() {
+    private val session: Session = session
     
     companion object {
         private const val SELECT_ALL = """

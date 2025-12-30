@@ -15,8 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import kirjanpito.db.AccountDAO;
-// Kotlin DAO import
-// import kirjanpito.db.sqlite.SQLiteAccountDAOKt; // TODO: Phase 3 - enable when ready
 import kirjanpito.db.AttachmentDAO;
 import kirjanpito.db.COAHeadingDAO;
 import kirjanpito.db.DataAccessException;
@@ -30,6 +28,15 @@ import kirjanpito.db.PeriodDAO;
 import kirjanpito.db.ReportStructureDAO;
 import kirjanpito.db.Session;
 import kirjanpito.db.SettingsDAO;
+import kirjanpito.db.sqlite.SQLiteAccountDAOKt;
+import kirjanpito.db.sqlite.SQLiteEntryDAOKt;
+import kirjanpito.db.sqlite.SQLiteDocumentDAOKt;
+import kirjanpito.db.sqlite.SQLitePeriodDAOKt;
+import kirjanpito.db.sqlite.SQLiteDocumentTypeDAOKt;
+import kirjanpito.db.sqlite.SQLiteCOAHeadingDAOKt;
+import kirjanpito.db.sqlite.SQLiteSettingsDAOKt;
+import kirjanpito.db.sqlite.SQLiteReportStructureDAOKt;
+import kirjanpito.db.sqlite.SQLiteEntryTemplateDAOKt;
 
 /**
  * @author Tommi Helineva
@@ -91,46 +98,43 @@ public class SQLiteDataSource implements DataSource {
 	}
 
 	public AccountDAO getAccountDAO(Session session) {
-		// Phase 3: Kotlin DAO integration - ENABLED
-		return new SQLiteAccountDAOKt((SQLiteSession)session);
-		// Legacy Java implementation:
-		// return new SQLiteAccountDAO((SQLiteSession)session);
+		return new SQLiteAccountDAOKt(session);
 	}
 
 	public COAHeadingDAO getCOAHeadingDAO(Session session) {
-		return new SQLiteCOAHeadingDAO((SQLiteSession)session);
+		return new SQLiteCOAHeadingDAOKt(session);
 	}
 
 	public DocumentDAO getDocumentDAO(Session session) {
-		return new SQLiteDocumentDAO((SQLiteSession)session);
+		return new SQLiteDocumentDAOKt(session);
 	}
 
 	public EntryDAO getEntryDAO(Session session) {
-		return new SQLiteEntryDAO((SQLiteSession)session);
+		return new SQLiteEntryDAOKt(session);
 	}
 
 	public PeriodDAO getPeriodDAO(Session session) {
-		return new SQLitePeriodDAO((SQLiteSession)session);
+		return new SQLitePeriodDAOKt(session);
 	}
 
 	public SettingsDAO getSettingsDAO(Session session) {
-		return new SQLiteSettingsDAO((SQLiteSession)session);
+		return new SQLiteSettingsDAOKt(session);
 	}
 
 	public ReportStructureDAO getReportStructureDAO(Session session) {
-		return new SQLiteReportStructureDAO((SQLiteSession)session);
+		return new SQLiteReportStructureDAOKt(session);
 	}
 
 	public EntryTemplateDAO getEntryTemplateDAO(Session session) {
-		return new SQLiteEntryTemplateDAO((SQLiteSession)session);
+		return new SQLiteEntryTemplateDAOKt(session);
 	}
 
 	public DocumentTypeDAO getDocumentTypeDAO(Session session) {
-		return new SQLiteDocumentTypeDAO((SQLiteSession)session);
+		return new SQLiteDocumentTypeDAOKt(session);
 	}
 
 	public AttachmentDAO getAttachmentDAO(Session session) {
-		return new kirjanpito.db.sqlite.SQLiteAttachmentDAO((SQLiteSession)session);
+		return new kirjanpito.db.sqlite.SQLiteAttachmentDAO(session);
 	}
 
 	public Session openSession() throws DataAccessException {

@@ -14,7 +14,8 @@ import java.time.ZoneId
  * 
  * @since 2.2.0
  */
-class SQLiteAttachmentDAO(private val session: SQLiteSession) : AttachmentDAO {
+class SQLiteAttachmentDAO(session: Session) : AttachmentDAO {
+    private val session: Session = session
 
     override fun findById(id: Int): Attachment? {
         return try {
@@ -134,9 +135,9 @@ class SQLiteAttachmentDAO(private val session: SQLiteSession) : AttachmentDAO {
             stmt.executeUpdate()
         }
         
-        // Get generated key using session's method
+        // Get generated key using session's extension property
         return try {
-            session.getInsertId()
+            session.insertId
         } catch (e: SQLException) {
             throw DataAccessException("Failed to get generated key for attachment: ${e.message}", e)
         }

@@ -1,48 +1,21 @@
 package kirjanpito.db;
 
+/**
+ * Factory for creating DataSource instances.
+ * Delegates to Kotlin implementation.
+ * 
+ * @author Tommi Helineva (original)
+ * @author Kotlin migration by Claude
+ */
 public class DataSourceFactory {
 	private DataSourceFactory() {
 	}
 	
+	/**
+	 * Creates a DataSource instance using Kotlin implementation.
+	 */
 	public static DataSource create(String url, String username, String password)
 		throws DataAccessException {
-		
-		String[] prefixes = {
-			"jdbc:sqlite:",
-			"jdbc:postgresql:",
-			"jdbc:mysql:"
-		};
-		
-		String[] classNames = {
-			"kirjanpito.db.sqlite.SQLiteDataSource",
-			"kirjanpito.db.postgresql.PSQLDataSource",
-			"kirjanpito.db.mysql.MySQLDataSource"
-		};
-		
-		int index = 0;
-		
-		for (String prefix : prefixes) {
-			if (url.startsWith(prefix)) {
-				DataSource dataSource;
-
-				try {
-					dataSource = (DataSource)Class.forName(classNames[index])
-							.getDeclaredConstructor()
-							.newInstance();
-				}
-				catch (Exception e) {
-					throw new DataAccessException(
-							"Ilmentymän luonti luokasta " + classNames[index] +
-							" epäonnistui", e);
-				}
-				
-				dataSource.open(url, username, password);
-				return dataSource;
-			}
-			
-			index++;
-		}
-		
-		throw new DataAccessException("Virheellinen tietokantapalvelimen osoite");
+		return DataSourceFactoryKt.create(url, username, password);
 	}
 }

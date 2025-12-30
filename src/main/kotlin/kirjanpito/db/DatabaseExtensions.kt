@@ -253,6 +253,35 @@ fun PreparedStatement.setAccountValuesSQLite(account: AccountData, startIndex: I
     setInt(startIndex + 7, account.flags)
 }
 
+/**
+ * Sets EntryData values to PreparedStatement for INSERT/UPDATE.
+ * Parameter order: documentId, accountId, debit, amount, description, rowNumber, flags
+ * 
+ * @param startIndex 1-based index where to start setting parameters (default 1)
+ */
+fun PreparedStatement.setEntryValues(entry: EntryData, startIndex: Int = 1) {
+    setInt(startIndex, entry.documentId)
+    setInt(startIndex + 1, entry.accountId)
+    setBooleanAsInt(startIndex + 2, entry.debit)
+    setBigDecimal(startIndex + 3, entry.amount ?: BigDecimal.ZERO)
+    setNullableString(startIndex + 4, entry.description)
+    setInt(startIndex + 5, entry.rowNumber)
+    setInt(startIndex + 6, entry.flags)
+}
+
+/**
+ * Sets EntryData values for SQLite (amount as String).
+ */
+fun PreparedStatement.setEntryValuesSQLite(entry: EntryData, startIndex: Int = 1) {
+    setInt(startIndex, entry.documentId)
+    setInt(startIndex + 1, entry.accountId)
+    setBooleanAsInt(startIndex + 2, entry.debit)
+    setString(startIndex + 3, (entry.amount ?: BigDecimal.ZERO).toString())
+    setNullableString(startIndex + 4, entry.description)
+    setInt(startIndex + 5, entry.rowNumber)
+    setInt(startIndex + 6, entry.flags)
+}
+
 // ============================================================================
 // ResultSet Iteration
 // ============================================================================
@@ -286,7 +315,7 @@ inline fun <T> PreparedStatement.executeAndMap(mapper: (ResultSet) -> T): List<T
  * Wraps a SQLException into DataAccessException.
  */
 fun SQLException.toDataAccessException(): DataAccessException = 
-    DataAccessException(message, this)
+    DataAccessException(message ?: "SQL error", this)
 
 /**
  * Executes block and wraps any SQLException into DataAccessException.
@@ -347,4 +376,273 @@ fun AccountData.copyTo(target: Account) {
     target.vatAccount1Id = vatAccount1Id
     target.vatAccount2Id = vatAccount2Id
     target.flags = flags
+}
+
+/**
+ * Converts Java Entry to Kotlin EntryData.
+ */
+fun Entry.toEntryData(): EntryData = EntryData(
+    id = id,
+    documentId = documentId,
+    accountId = accountId,
+    debit = isDebit(),
+    amount = amount,
+    description = description,
+    rowNumber = rowNumber,
+    flags = flags
+)
+
+/**
+ * Converts Kotlin EntryData to Java Entry.
+ */
+fun EntryData.toEntry(): Entry = Entry().apply {
+    id = this@toEntry.id
+    documentId = this@toEntry.documentId
+    accountId = this@toEntry.accountId
+    setDebit(this@toEntry.debit)
+    amount = this@toEntry.amount
+    description = this@toEntry.description
+    rowNumber = this@toEntry.rowNumber
+    flags = this@toEntry.flags
+}
+
+/**
+ * Copies values from EntryData to existing Java Entry.
+ */
+fun EntryData.copyTo(target: Entry) {
+    target.id = id
+    target.documentId = documentId
+    target.accountId = accountId
+    target.setDebit(debit)
+    target.amount = amount
+    target.description = description
+    target.rowNumber = rowNumber
+    target.flags = flags
+}
+
+// ============================================================================
+// Document Conversion Functions
+// ============================================================================
+
+/**
+ * Converts Java Document to Kotlin DocumentData.
+ */
+fun Document.toDocumentData(): DocumentData = DocumentData(
+    id = id,
+    number = number,
+    periodId = periodId,
+    date = date
+)
+
+/**
+ * Converts Kotlin DocumentData to Java Document.
+ */
+fun DocumentData.toDocument(): Document = Document().apply {
+    id = this@toDocument.id
+    number = this@toDocument.number
+    periodId = this@toDocument.periodId
+    date = this@toDocument.date
+}
+
+/**
+ * Copies values from DocumentData to existing Java Document.
+ */
+fun DocumentData.copyTo(target: Document) {
+    target.id = id
+    target.number = number
+    target.periodId = periodId
+    target.date = date
+}
+
+/**
+ * Sets DocumentData values to PreparedStatement for INSERT/UPDATE.
+ * Parameter order: number, periodId, date
+ * 
+ * @param startIndex 1-based index where to start setting parameters (default 1)
+ */
+fun PreparedStatement.setDocumentValues(
+    data: DocumentData,
+    startIndex: Int = 1
+) {
+    setInt(startIndex, data.number)
+    setInt(startIndex + 1, data.periodId)
+    setDate(startIndex + 2, data.date?.let { java.sql.Date(it.time) })
+}
+
+// ============================================================================
+// Period Conversion Functions
+// ============================================================================
+
+/**
+ * Converts Java Period to Kotlin PeriodData.
+ */
+fun Period.toPeriodData(): PeriodData = PeriodData(
+    id = id,
+    startDate = startDate,
+    endDate = endDate,
+    locked = isLocked()
+)
+
+/**
+ * Converts Kotlin PeriodData to Java Period.
+ */
+fun PeriodData.toPeriod(): Period = Period().apply {
+    id = this@toPeriod.id
+    startDate = this@toPeriod.startDate
+    endDate = this@toPeriod.endDate
+    setLocked(this@toPeriod.locked)
+}
+
+/**
+ * Copies values from PeriodData to existing Java Period.
+ */
+fun PeriodData.copyTo(target: Period) {
+    target.id = id
+    target.startDate = startDate
+    target.endDate = endDate
+    target.setLocked(locked)
+}
+
+/**
+ * Sets PeriodData values to PreparedStatement for INSERT/UPDATE.
+ * Parameter order: startDate, endDate, locked
+ * 
+ * @param startIndex 1-based index where to start setting parameters (default 1)
+ */
+fun PreparedStatement.setPeriodValues(
+    data: PeriodData,
+    startIndex: Int = 1
+) {
+    setDate(startIndex, data.startDate?.let { java.sql.Date(it.time) })
+    setDate(startIndex + 1, data.endDate?.let { java.sql.Date(it.time) })
+    setBooleanAsInt(startIndex + 2, data.locked)
+}
+
+// ============================================================================
+// DocumentType Conversion Functions
+// ============================================================================
+
+/**
+ * Converts Java DocumentType to Kotlin DocumentTypeData.
+ */
+fun DocumentType.toDocumentTypeData(): DocumentTypeData = DocumentTypeData(
+    id = id,
+    number = number,
+    name = name ?: "",
+    numberStart = numberStart,
+    numberEnd = numberEnd
+)
+
+/**
+ * Converts Kotlin DocumentTypeData to Java DocumentType.
+ */
+fun DocumentTypeData.toDocumentType(): DocumentType = DocumentType().apply {
+    id = this@toDocumentType.id
+    number = this@toDocumentType.number
+    name = this@toDocumentType.name
+    numberStart = this@toDocumentType.numberStart
+    numberEnd = this@toDocumentType.numberEnd
+}
+
+/**
+ * Copies values from DocumentTypeData to existing Java DocumentType.
+ */
+fun DocumentTypeData.copyTo(target: DocumentType) {
+    target.id = id
+    target.number = number
+    target.name = name
+    target.numberStart = numberStart
+    target.numberEnd = numberEnd
+}
+
+/**
+ * Sets DocumentTypeData values to PreparedStatement for INSERT/UPDATE.
+ * Parameter order: number, name, numberStart, numberEnd
+ * 
+ * @param startIndex 1-based index where to start setting parameters (default 1)
+ */
+fun PreparedStatement.setDocumentTypeValues(
+    data: DocumentTypeData,
+    startIndex: Int = 1
+) {
+    setInt(startIndex, data.number)
+    setString(startIndex + 1, data.name)
+    setInt(startIndex + 2, data.numberStart)
+    setInt(startIndex + 3, data.numberEnd)
+}
+
+// ============================================================================
+// COAHeading Conversion Functions
+// ============================================================================
+
+/**
+ * Converts Java COAHeading to Kotlin COAHeadingData.
+ */
+fun COAHeading.toCOAHeadingData(): COAHeadingData = COAHeadingData(
+    id = id,
+    number = number ?: "",
+    text = text ?: "",
+    level = level
+)
+
+/**
+ * Converts Kotlin COAHeadingData to Java COAHeading.
+ */
+fun COAHeadingData.toCOAHeading(): COAHeading = COAHeading().apply {
+    id = this@toCOAHeading.id
+    number = this@toCOAHeading.number
+    text = this@toCOAHeading.text
+    level = this@toCOAHeading.level
+}
+
+/**
+ * Copies values from COAHeadingData to existing Java COAHeading.
+ */
+fun COAHeadingData.copyTo(target: COAHeading) {
+    target.id = id
+    target.number = number
+    target.text = text
+    target.level = level
+}
+
+/**
+ * Sets COAHeadingData values to PreparedStatement for INSERT/UPDATE.
+ * Parameter order: number, text, level
+ * 
+ * @param startIndex 1-based index where to start setting parameters (default 1)
+ */
+fun PreparedStatement.setCOAHeadingValues(
+    data: COAHeadingData,
+    startIndex: Int = 1
+) {
+    setString(startIndex, data.number)
+    setString(startIndex + 1, data.text)
+    setInt(startIndex + 2, data.level)
+}
+
+// ============================================================================
+// Session Extensions
+// ============================================================================
+
+/**
+ * Extension property for SQLiteSession to get insertId.
+ * Works with both SQLiteSession (Java) and SQLiteSessionKt (Kotlin).
+ */
+val Session.insertId: Int
+    @Throws(SQLException::class)
+    get() = when (this) {
+        is kirjanpito.db.sqlite.SQLiteSession -> this.getInsertId()
+        is kirjanpito.db.sqlite.SQLiteSessionKt -> this.getInsertId()
+        else -> throw UnsupportedOperationException("insertId not supported for ${this::class.simpleName}")
+    }
+
+/**
+ * Extension function for Session to prepare statements.
+ * Works with both SQLiteSession (Java) and SQLiteSessionKt (Kotlin).
+ */
+@Throws(SQLException::class)
+fun Session.prepareStatement(sql: String): PreparedStatement = when (this) {
+    is kirjanpito.db.sqlite.SQLiteSession -> this.prepareStatement(sql)
+    is kirjanpito.db.sqlite.SQLiteSessionKt -> this.prepareStatement(sql)
+    else -> throw UnsupportedOperationException("prepareStatement not supported for ${this::class.simpleName}")
 }

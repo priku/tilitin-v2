@@ -1,0 +1,30 @@
+# Build outputs - don't index these
+target/
+dist/
+bin/
+dependency-reduced-pom.xml
+
+# Installer files
+*.msi
+*.msix
+*.exe
+*.jar
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+nul
+
+# Test data (if large)
+# test-data/
+
