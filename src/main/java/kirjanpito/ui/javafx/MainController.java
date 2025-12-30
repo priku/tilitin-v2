@@ -83,6 +83,9 @@ public class MainController implements Initializable {
     private ObservableList<EntryRowModel> entries;
     private DecimalFormat currencyFormat;
     
+    // Clipboard for copy/paste
+    private List<EntryRowModel> clipboard;
+    
     // File chooser
     private FileChooser fileChooser;
     
@@ -166,6 +169,9 @@ public class MainController implements Initializable {
         
         // Placeholder
         entryTable.setPlaceholder(new Label("Ei vientejä - paina Enter lisätäksesi"));
+        
+        // Enable multi-select for copy
+        entryTable.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE);
         
         // Double-click to edit
         entryTable.setOnMouseClicked(event -> {
@@ -531,12 +537,60 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleCopy() {
-        showNotImplemented("Kopioi");
+        // Kopioi valitut rivit
+        List<EntryRowModel> selected = new ArrayList<>(entryTable.getSelectionModel().getSelectedItems());
+        if (selected.isEmpty()) {
+            setStatus("Valitse kopioitavat viennit");
+            return;
+        }
+        
+        // Suodata tyhjät
+        clipboard = new ArrayList<>();
+        for (EntryRowModel row : selected) {
+            if (!row.isEmpty()) {
+                clipboard.add(row);
+            }
+        }
+        
+        if (!clipboard.isEmpty()) {
+            setStatus("Kopioitu " + clipboard.size() + " vientiä");
+        }
     }
     
     @FXML
     private void handlePaste() {
-        showNotImplemented("Liitä");
+        if (clipboard == null || clipboard.isEmpty()) {
+            setStatus("Ei kopioituja vientejä");
+            return;
+        }
+        
+        if (currentDocument == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
+        }
+        
+        // Liitä ennen viimeistä tyhjää riviä
+        int insertIndex = Math.max(0, entries.size() - 1);
+        
+        for (EntryRowModel source : clipboard) {
+            EntryRowModel newRow = new EntryRowModel();
+            newRow.setRowNumber(insertIndex + 1);
+            newRow.setAccount(source.getAccount());
+            newRow.setDescription(source.getDescription());
+            newRow.setDebit(source.getDebit());
+            newRow.setCredit(source.getCredit());
+            
+            entries.add(insertIndex, newRow);
+            insertIndex++;
+        }
+        
+        // Päivitä rivinumerot
+        for (int i = 0; i < entries.size(); i++) {
+            entries.get(i).setRowNumber(i + 1);
+        }
+        
+        updateTotals();
+        setStatus("Liitetty " + clipboard.size() + " vientiä");
     }
     
     // Navigation handlers
