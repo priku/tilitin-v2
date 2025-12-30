@@ -9,9 +9,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 
 import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
+import kirjanpito.ui.javafx.cells.*;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -46,13 +48,13 @@ public class MainController implements Initializable {
     @FXML private ComboBox<DocumentType> docTypeCombo;
     @FXML private Label balanceStatusLabel;
     
-    @FXML private TableView<EntryRow> entryTable;
-    @FXML private TableColumn<EntryRow, Integer> rowNumCol;
-    @FXML private TableColumn<EntryRow, String> accountCol;
-    @FXML private TableColumn<EntryRow, String> descriptionCol;
-    @FXML private TableColumn<EntryRow, String> debitCol;
-    @FXML private TableColumn<EntryRow, String> creditCol;
-    @FXML private TableColumn<EntryRow, String> vatCol;
+    @FXML private TableView<EntryRowModel> entryTable;
+    @FXML private TableColumn<EntryRowModel, Integer> rowNumCol;
+    @FXML private TableColumn<EntryRowModel, Account> accountCol;
+    @FXML private TableColumn<EntryRowModel, String> descriptionCol;
+    @FXML private TableColumn<EntryRowModel, BigDecimal> debitCol;
+    @FXML private TableColumn<EntryRowModel, BigDecimal> creditCol;
+    @FXML private TableColumn<EntryRowModel, String> vatCol;
     
     @FXML private Label debitTotalLabel;
     @FXML private Label creditTotalLabel;
@@ -77,7 +79,7 @@ public class MainController implements Initializable {
     private int documentCount = 0;
     
     // UI data
-    private ObservableList<EntryRow> entries;
+    private ObservableList<EntryRowModel> entries;
     private DecimalFormat currencyFormat;
     
     // File chooser
@@ -109,21 +111,75 @@ public class MainController implements Initializable {
     private void initializeTable() {
         entries = FXCollections.observableArrayList();
         entryTable.setItems(entries);
+        entryTable.setEditable(true);
         
-        // Sarakkeiden asetukset
-        rowNumCol.setCellValueFactory(new PropertyValueFactory<>("rowNumber"));
-        accountCol.setCellValueFactory(new PropertyValueFactory<>("accountName"));
-        descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-        debitCol.setCellValueFactory(new PropertyValueFactory<>("debitFormatted"));
-        creditCol.setCellValueFactory(new PropertyValueFactory<>("creditFormatted"));
-        vatCol.setCellValueFactory(new PropertyValueFactory<>("vatCode"));
+        // Row number column (read-only)
+        rowNumCol.setCellValueFactory(cellData -> cellData.getValue().rowNumberProperty().asObject());
+        rowNumCol.setEditable(false);
+        rowNumCol.setStyle("-fx-alignment: CENTER;");
         
-        // Oikea tasaus numeroille
+        // Account column (editable with autocomplete)
+        accountCol.setCellValueFactory(cellData -> cellData.getValue().accountProperty());
+        accountCol.setCellFactory(col -> new AccountTableCell(accounts != null ? accounts : new ArrayList<>()));
+        accountCol.setOnEditCommit(event -> {
+            EntryRowModel row = event.getRowValue();
+            row.setAccount(event.getNewValue());
+            setStatus("Tili muutettu: " + event.getNewValue().getNumber());
+        });
+        accountCol.setEditable(true);
+        
+        // Description column (editable)
+        descriptionCol.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
+        descriptionCol.setCellFactory(col -> new DescriptionTableCell());
+        descriptionCol.setOnEditCommit(event -> {
+            EntryRowModel row = event.getRowValue();
+            row.setDescription(event.getNewValue());
+        });
+        descriptionCol.setEditable(true);
+        
+        // Debit column (editable)
+        debitCol.setCellValueFactory(cellData -> cellData.getValue().debitProperty());
+        debitCol.setCellFactory(col -> new AmountTableCell(true));
+        debitCol.setOnEditCommit(event -> {
+            EntryRowModel row = event.getRowValue();
+            row.setDebit(event.getNewValue());
+            updateTotals();
+        });
+        debitCol.setEditable(true);
         debitCol.setStyle("-fx-alignment: CENTER-RIGHT;");
+        
+        // Credit column (editable)
+        creditCol.setCellValueFactory(cellData -> cellData.getValue().creditProperty());
+        creditCol.setCellFactory(col -> new AmountTableCell(false));
+        creditCol.setOnEditCommit(event -> {
+            EntryRowModel row = event.getRowValue();
+            row.setCredit(event.getNewValue());
+            updateTotals();
+        });
+        creditCol.setEditable(true);
         creditCol.setStyle("-fx-alignment: CENTER-RIGHT;");
         
-        // Placeholder kun ei dataa
-        entryTable.setPlaceholder(new Label("Ei vientejä"));
+        // VAT column (read-only for now)
+        vatCol.setCellValueFactory(cellData -> cellData.getValue().vatCodeProperty());
+        vatCol.setEditable(false);
+        
+        // Placeholder
+        entryTable.setPlaceholder(new Label("Ei vientejä - paina Enter lisätäksesi"));
+        
+        // Double-click to edit
+        entryTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                TablePosition<EntryRowModel, ?> pos = entryTable.getFocusModel().getFocusedCell();
+                if (pos != null) {
+                    entryTable.edit(pos.getRow(), pos.getTableColumn());
+                }
+            }
+        });
+    }
+    
+    private void refreshAccountCells() {
+        // Update account column cell factory with new accounts list
+        accountCol.setCellFactory(col -> new AccountTableCell(accounts != null ? accounts : new ArrayList<>()));
     }
     
     private void initializeFileChooser() {
@@ -194,8 +250,17 @@ public class MainController implements Initializable {
         int rowNum = 1;
         for (Entry entry : currentEntries) {
             Account account = findAccount(entry.getAccountId());
-            entries.add(new EntryRow(rowNum++, entry, account, currencyFormat));
+            entries.add(new EntryRowModel(rowNum++, entry, account));
         }
+        
+        // Lisää tyhjä rivi uuden viennin lisäämistä varten
+        addEmptyRow();
+    }
+    
+    private void addEmptyRow() {
+        EntryRowModel emptyRow = new EntryRowModel();
+        emptyRow.setRowNumber(entries.size() + 1);
+        entries.add(emptyRow);
     }
     
     private Account findAccount(int accountId) {
@@ -213,12 +278,14 @@ public class MainController implements Initializable {
         BigDecimal debitTotal = BigDecimal.ZERO;
         BigDecimal creditTotal = BigDecimal.ZERO;
         
-        for (EntryRow row : entries) {
-            if (row.getDebit() != null) {
-                debitTotal = debitTotal.add(row.getDebit());
+        for (EntryRowModel row : entries) {
+            BigDecimal d = row.getDebit();
+            BigDecimal c = row.getCredit();
+            if (d != null) {
+                debitTotal = debitTotal.add(d);
             }
-            if (row.getCredit() != null) {
-                creditTotal = creditTotal.add(row.getCredit());
+            if (c != null) {
+                creditTotal = creditTotal.add(c);
             }
         }
         
@@ -303,17 +370,45 @@ public class MainController implements Initializable {
     // Entry handlers
     @FXML
     private void handleAddEntry() {
-        if (currentDocument != null) {
-            // TODO: Lisää vienti DocumentEntryManager avulla
-            setStatus("Vienti lisätty");
+        if (currentDocument == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
         }
+        
+        // Lisää tyhjä rivi ennen viimeistä (tyhjää) riviä
+        int insertIndex = Math.max(0, entries.size() - 1);
+        EntryRowModel newRow = new EntryRowModel();
+        newRow.setRowNumber(insertIndex + 1);
+        entries.add(insertIndex, newRow);
+        
+        // Päivitä rivinumerot
+        for (int i = 0; i < entries.size(); i++) {
+            entries.get(i).setRowNumber(i + 1);
+        }
+        
+        // Valitse ja aloita editointi
+        entryTable.getSelectionModel().select(insertIndex);
+        entryTable.scrollTo(insertIndex);
+        
+        // Aloita tilikartan editointi
+        Platform.runLater(() -> {
+            entryTable.edit(insertIndex, accountCol);
+        });
+        
+        setStatus("Uusi vienti lisätty");
     }
     
     @FXML
     private void handleRemoveEntry() {
-        EntryRow selected = entryTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
+        EntryRowModel selected = entryTable.getSelectionModel().getSelectedItem();
+        if (selected != null && !selected.isEmpty()) {
             entries.remove(selected);
+            
+            // Päivitä rivinumerot
+            for (int i = 0; i < entries.size(); i++) {
+                entries.get(i).setRowNumber(i + 1);
+            }
+            
             updateTotals();
             setStatus("Vienti poistettu");
         }
@@ -610,6 +705,9 @@ public class MainController implements Initializable {
             accounts = accountDAO.getAll();
             System.out.println("Ladattu " + accounts.size() + " tiliä");
             
+            // Päivitä taulukon tili-sarake
+            refreshAccountCells();
+            
             // 2. Lataa tilikausi
             PeriodDAO periodDAO = dataSource.getPeriodDAO(session);
             currentPeriod = periodDAO.getCurrent();
@@ -704,57 +802,4 @@ public class MainController implements Initializable {
         setStatus("Virhe: " + title);
     }
     
-    // ========== Entry row data class ==========
-    
-    public static class EntryRow {
-        private final int rowNumber;
-        private final Entry entry;
-        private final Account account;
-        private final DecimalFormat format;
-        
-        public EntryRow(int rowNumber, Entry entry, Account account, DecimalFormat format) {
-            this.rowNumber = rowNumber;
-            this.entry = entry;
-            this.account = account;
-            this.format = format;
-        }
-        
-        public int getRowNumber() { return rowNumber; }
-        
-        public String getAccountName() {
-            if (account == null) return "";
-            return account.getNumber() + " " + account.getName();
-        }
-        
-        public String getDescription() {
-            return entry != null ? entry.getDescription() : "";
-        }
-        
-        public BigDecimal getDebit() {
-            if (entry == null) return null;
-            return entry.isDebit() ? entry.getAmount() : null;
-        }
-        
-        public BigDecimal getCredit() {
-            if (entry == null) return null;
-            return !entry.isDebit() ? entry.getAmount() : null;
-        }
-        
-        public String getDebitFormatted() {
-            BigDecimal d = getDebit();
-            return d != null && d.compareTo(BigDecimal.ZERO) != 0 ? format.format(d) : "";
-        }
-        
-        public String getCreditFormatted() {
-            BigDecimal c = getCredit();
-            return c != null && c.compareTo(BigDecimal.ZERO) != 0 ? format.format(c) : "";
-        }
-        
-        public String getVatCode() {
-            // TODO: Hae ALV-koodi
-            return "";
-        }
-        
-        public Entry getEntry() { return entry; }
-    }
 }
