@@ -14,7 +14,7 @@ import javafx.beans.property.SimpleStringProperty;
 import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
 import kirjanpito.ui.javafx.cells.*;
-import kirjanpito.ui.javafx.dialogs.AccountSelectionDialogFX;
+import kirjanpito.ui.javafx.dialogs.*;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -478,11 +478,6 @@ public class MainController implements Initializable {
     }
     
     @FXML
-    private void handleSettings() {
-        showNotImplemented("Asetukset");
-    }
-    
-    @FXML
     private void handleQuit() {
         shutdown();
         stage.close();
@@ -853,22 +848,86 @@ public class MainController implements Initializable {
     // Registry handlers
     @FXML
     private void handleChartOfAccounts() {
-        openAccountSelectionDialog();
+        if (dataSource == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
+        }
+        
+        COADialogFX dialog = new COADialogFX(stage, dataSource);
+        dialog.setAccounts(new ArrayList<>(accounts));
+        dialog.setOnSave(v -> {
+            // Reload accounts
+            loadAllData();
+            setStatus("Tilikartta tallennettu");
+        });
+        dialog.show();
     }
     
     @FXML
     private void handleDocumentTypes() {
-        showNotImplemented("Tositelajit");
+        if (dataSource == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
+        }
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            DocumentTypeDAO dao = dataSource.getDocumentTypeDAO(session);
+            List<DocumentType> types = dao.getAll();
+            session.close();
+            session = null;
+            
+            DocumentTypeDialogFX dialog = new DocumentTypeDialogFX(stage, dataSource);
+            dialog.setItems(types);
+            dialog.setOnSave(v -> setStatus("Tositelajit tallennettu"));
+            dialog.show();
+            
+        } catch (Exception e) {
+            showError("Virhe", e.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
     }
     
     @FXML
     private void handlePeriodSettings() {
-        showNotImplemented("Tilikausi");
+        if (currentPeriod == null) {
+            setStatus("Ei tilikautta");
+            return;
+        }
+        
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy");
+        String info = "Tilikausi: " + sdf.format(currentPeriod.getStartDate()) + 
+                      " - " + sdf.format(currentPeriod.getEndDate()) +
+                      "\nLukittu: " + (currentPeriod.isLocked() ? "Kyllä" : "Ei");
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Tilikauden tiedot");
+        alert.setHeaderText("Nykyinen tilikausi");
+        alert.setContentText(info);
+        alert.showAndWait();
     }
     
     @FXML
     private void handleDatabaseSettings() {
-        showNotImplemented("Tietokannan asetukset");
+        if (databaseName == null) {
+            setStatus("Ei tietokantaa");
+            return;
+        }
+        
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Tietokannan tiedot");
+        alert.setHeaderText(databaseName);
+        alert.setContentText("Tyyppi: SQLite\nTilejä: " + (accounts != null ? accounts.size() : 0) +
+                            "\nTositteita: " + documentCount);
+        alert.showAndWait();
+    }
+    
+    @FXML
+    private void handleSettings() {
+        SettingsDialogFX dialog = new SettingsDialogFX(stage);
+        dialog.show();
     }
     
     @FXML
