@@ -2,9 +2,9 @@
 
 Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
-**Alkuperäinen koko:** 3,856 riviä  
-**Nykyinen koko:** 2,511 riviä  
-**Vähennys:** -1,345 riviä (-35%)  
+**Alkuperäinen koko:** 3,856 riviä
+**Nykyinen koko:** 2,722 riviä
+**Vähennys:** -1,134 riviä (-29%)
 **Tavoite:** <500 riviä
 
 ---
@@ -132,7 +132,8 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 | Phase 6 | DocumentStateManager.java | 368 riviä | ~300 riviä | ✅ |
 | Phase 7 | DocumentUIBuilder.java | 287 riviä | ~200 riviä | ✅ |
 | Phase 7 | DocumentUIUpdater.java | 372 riviä | ~250 riviä | ✅ |
-| **YHTEENSÄ** | | **~3,364 riviä** | **-1,345 riviä** | |
+| Phase 8 | DocumentNavigator.java | 320 riviä | -194 riviä | ✅ |
+| **YHTEENSÄ** | | **~3,684 riviä** | **-1,134 riviä** | |
 
 **Huomio:** Vähennys on pienempi kuin eriytetty koodi, koska:
 - Uudet luokat tarvitsevat oman rakenteensa (importit, dokumentaatio, jne.)
@@ -162,12 +163,13 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 ## 🔄 Jäljellä olevat vaiheet
 
-### Phase 8: Entry Actions & Navigation (Tulevaisuus)
-**Tavoite:** Eriytä entry-toiminnot ja navigation
+### Phase 9: Entry Actions (Tulevaisuus)
+
+**Tavoite:** Eriytä entry-toiminnot
 
 **Tehtävät:**
 - Siirrä AbstractAction listeners (addEntry, removeEntry, copy, paste) → handler
-- Siirrä navigation actions (prevCell, nextCell) → handler tai erillinen luokka
+- Siirrä cell navigation actions (prevCell, nextCell) → handler tai erillinen luokka
 - Luo `DocumentEntryManager.java` (valinnainen)
   - addEntry(), removeEntry()
   - copyEntries(), pasteEntries()
@@ -176,7 +178,8 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 ---
 
-### Phase 9: Business Logic Extraction (Tulevaisuus)
+### Phase 10: Business Logic Extraction (Tulevaisuus)
+
 **Tavoite:** Eriytä business-logiikka omiin luokkiin
 
 **Tehtävät:**
@@ -253,21 +256,57 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 ---
 
+### Phase 8: Navigation & Search ✅
+
+**Status:** Valmis (v2.2.5)
+
+**Tiedosto:** `DocumentNavigator.java` (320 riviä)
+**Vähennys:** ~194 riviä DocumentFrame:sta (2,916 → 2,722 riviä, -6.7%)
+
+**Eriytetty:**
+
+- Document navigation (create, delete, go to)
+- Document search functionality
+- Search panel management
+- Search state management (searchEnabled)
+
+**Rajapinnat:**
+
+- `NavigationCallbacks` - Callback-rajapinta DocumentFrame:lle
+
+**Metodit siirretty:**
+
+- createDocument()
+- deleteDocument()
+- goToDocument(int index)
+- findDocumentByNumber()
+- toggleSearchPanel()
+- searchDocuments()
+- isSearchEnabled()
+
+**Ominaisuudet:**
+
+- Callback-pohjainen arkkitehtuuri irrottaa navigation-logiikan DocumentFrame:sta
+- Search panel visibility hallitaan suoraan DocumentNavigator:ssa
+- searchEnabled-tila siirretty DocumentNavigator:iin
+
+---
+
 ## 🎯 Tavoite
 
 **Lopullinen tavoite:** DocumentFrame < 500 riviä
 
-**Nykyinen tila:** 2,511 riviä  
-**Jäljellä:** ~2,011 riviä
+**Nykyinen tila:** 2,722 riviä
+**Jäljellä:** ~2,222 riviä
 
 **Jäljellä olevat isot kokonaisuudet:**
 - AbstractAction listeners (addEntry, removeEntry, copy, paste) ~50 riviä
-- Navigation actions (prevCell, nextCell) ~110 riviä
+- Cell navigation actions (prevCell, nextCell) ~110 riviä
 - Entry-logiikka metodit (addEntry, removeEntry, copyEntries, pasteEntries) ~200 riviä
 - Business-logiikka metodit ~600 riviä
 - UI update metodit ~300 riviä
 
-**Arvioitu lopputulos Phase 8-9 jälkeen:** ~1,000-1,500 riviä
+**Arvioitu lopputulos Phase 9-10 jälkeen:** ~1,000-1,500 riviä
 
 **Huomio:** Tavoite <500 riviä vaatii merkittävää lisärefaktorointia ja mahdollisesti arkkitehtuurimuutoksia.
 

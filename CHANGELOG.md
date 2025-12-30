@@ -141,6 +141,44 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 - Claude jatkoi ja sai Phase 7:n valmiiksi
 - Kaikki muutokset dokumentoitu
 
+### 🧭 Phase 8 - Navigation & Search Management
+
+**Tila:** ✅ Valmis (v2.2.5)
+**Toteutusaika:** 2025-12-30 (~1 tunti)
+**Refaktorointi:** DocumentFrame 2,916 → 2,722 riviä (-194 riviä, -6.7%)
+
+### Lisätty (Phase 8)
+
+- **DocumentNavigator.java** (320 riviä)
+  - Navigation-logiikka eriytetty DocumentFrame:sta
+  - NavigationCallbacks-rajapinta DocumentFrame-vuorovaikutukselle
+  - Metodit: createDocument(), deleteDocument(), goToDocument(), findDocumentByNumber()
+  - Search: toggleSearchPanel(), searchDocuments(), isSearchEnabled()
+  - Search panel visibility management
+  - searchEnabled-tilan hallinta
+
+### Muutettu (Phase 8)
+
+- **DocumentFrame.java** - Navigation-refaktorointi
+  - 2,916 → 2,722 riviä (-194 riviä, -6.7%)
+  - Implementoi NavigationCallbacks-rajapinta
+  - Delegoi kaikki navigation-metodit DocumentNavigator:iin
+  - Poistettu searchEnabled-kenttä (siirretty DocumentNavigator:iin)
+  - Search panel visibility hallitaan nyt DocumentNavigator:ssa
+
+### Tekniset yksityiskohdat (Phase 8)
+
+- **Yhteensä luotu:** 1 uusi tiedosto, 320 riviä
+- **DocumentFrame vähennetty:** 194 riviä (-6.7%)
+- **Arkkitehtuuri:** Callback-pohjainen navigation management
+- **Build status:** ✅ BUILD SUCCESSFUL
+- **Runtime:** ✅ Kaikki navigation-toiminnot toimivat
+
+### Dokumentaatio (Phase 8)
+
+- Päivitetty **REFACTORING-PROGRESS.md** - Phase 8 lisätty
+- Päivitetty **CHANGELOG.md** - Phase 8 dokumentoitu
+
 ### 🎨 Theme Support - Legacy Dialogs
 
 **Tila:** ✅ Valmis

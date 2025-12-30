@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "fi.priku"
-version = "2.2.3"
+version = "2.2.5"
 
 java {
     toolchain {
@@ -81,7 +81,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Tilitin"
-            packageVersion = "2.2.3"
+            packageVersion = "2.2.5"
             description = "Ilmainen suomalainen kirjanpito-ohjelma"
             vendor = "Tilitin"
             
@@ -102,6 +102,21 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions {
         freeCompilerArgs.add("-Xjvm-default=all")
     }
+}
+
+// Configure JAR task with Main-Class manifest
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "kirjanpito.ui.Kirjanpito",
+            "Implementation-Title" to "Tilitin",
+            "Implementation-Version" to project.version
+        )
+    }
+    
+    // Include all dependencies in JAR (fat JAR)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
 }
 
 // Copy LISENSSIT.html to build
