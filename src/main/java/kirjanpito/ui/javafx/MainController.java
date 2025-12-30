@@ -938,22 +938,38 @@ public class MainController implements Initializable {
     // Report handlers
     @FXML
     private void handleJournalReport() {
-        showNotImplemented("Päiväkirja");
+        if (!checkReportPrereqs()) return;
+        new ReportDialogFX(stage, ReportDialogFX.ReportType.JOURNAL, dataSource, currentPeriod, accounts).show();
     }
     
     @FXML
     private void handleLedgerReport() {
-        showNotImplemented("Pääkirja");
+        if (!checkReportPrereqs()) return;
+        new ReportDialogFX(stage, ReportDialogFX.ReportType.LEDGER, dataSource, currentPeriod, accounts).show();
     }
     
     @FXML
     private void handleIncomeStatement() {
-        showNotImplemented("Tuloslaskelma");
+        if (!checkReportPrereqs()) return;
+        new ReportDialogFX(stage, ReportDialogFX.ReportType.INCOME_STATEMENT, dataSource, currentPeriod, accounts).show();
     }
     
     @FXML
     private void handleBalanceSheet() {
-        showNotImplemented("Tase");
+        if (!checkReportPrereqs()) return;
+        new ReportDialogFX(stage, ReportDialogFX.ReportType.BALANCE_SHEET, dataSource, currentPeriod, accounts).show();
+    }
+    
+    private boolean checkReportPrereqs() {
+        if (dataSource == null || currentPeriod == null) {
+            setStatus("Avaa ensin tietokanta");
+            return false;
+        }
+        if (accounts == null || accounts.isEmpty()) {
+            setStatus("Tilikartta puuttuu");
+            return false;
+        }
+        return true;
     }
     
     // Help handlers
