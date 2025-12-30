@@ -2690,12 +2690,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener createEntryTemplateListener = menuHandler.getCreateEntryTemplateListener();
 
 	/* Vientimalli */
-	private ActionListener entryTemplateListener = e -> {
-		String command = e.getActionCommand();
-		if (command != null) {
-			addEntriesFromTemplate(Integer.parseInt(command));
-		}
-	};
+	private ActionListener entryTemplateListener = menuHandler.getEntryTemplateListener();
 
 	// --- Settings Menu ---
 
@@ -2721,7 +2716,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener appearanceListener = menuHandler.getAppearanceListener();
 
 	/* Varmuuskopiointiasetukset */
-	private ActionListener backupSettingsListener = e -> BackupSettingsDialog.show(DocumentFrame.this);
+	private ActionListener backupSettingsListener = menuHandler.getBackupSettingsListener();
 
 	/* Palauta varmuuskopiosta */
 	private ActionListener restoreBackupListener = menuHandler.getRestoreBackupListener();
@@ -2779,62 +2774,12 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	}; // Note: AbstractAction needed for Action interface, cannot use simple lambda
 
 	/* Tositelaji */
-	private ActionListener docTypeListener = e -> {
-		String command = e.getActionCommand();
-		if (command != null) {
-			setDocumentType(Integer.parseInt(command));
-		}
-	};
+	private ActionListener docTypeListener = menuHandler.getDocTypeListener();
 
 	// --- Reports Menu ---
 
 	/* Tilien saldot */
-	private ActionListener printListener = e -> {
-		String cmd = e.getActionCommand();
-		if (cmd == null) return;
-		
-		switch (cmd) {
-			case "accountSummary":
-				showAccountSummary();
-				break;
-			case "document":
-				showDocumentPrint();
-				break;
-			case "accountStatement":
-				showAccountStatement();
-				break;
-			case "incomeStatement":
-				showIncomeStatement(false);
-				break;
-			case "incomeStatementDetailed":
-				showIncomeStatement(true);
-				break;
-			case "balanceSheet":
-				showBalanceSheet(false);
-				break;
-			case "balanceSheetDetailed":
-				showBalanceSheet(true);
-				break;
-			case "generalJournal":
-				showGeneralJournal();
-				break;
-			case "generalLedger":
-				showGeneralLedger();
-				break;
-			case "vatReport":
-				showVATReport();
-				break;
-			case "coa0":
-				showChartOfAccountsPrint(0);
-				break;
-			case "coa1":
-				showChartOfAccountsPrint(1);
-				break;
-			case "coa2":
-				showChartOfAccountsPrint(2);
-				break;
-		}
-	};
+	private ActionListener printListener = menuHandler.getPrintListener();
 
 	/* Muokkaa tulosteita */
 	private ActionListener editReportsListener = menuHandler.getEditReportsListener();

@@ -150,4 +150,85 @@ public class DocumentMenuHandler {
 	public ActionListener getAboutListener() {
 		return e -> frame.showAboutDialog();
 	}
+
+	// ========================================
+	// MEDIUM COMPLEXITY LISTENERS
+	// ========================================
+	// These listeners have simple logic (command parsing, etc.)
+
+	public ActionListener getEntryTemplateListener() {
+		return e -> {
+			String command = e.getActionCommand();
+			if (command != null) {
+				frame.addEntriesFromTemplate(Integer.parseInt(command));
+			}
+		};
+	}
+
+	public ActionListener getDocTypeListener() {
+		return e -> {
+			String command = e.getActionCommand();
+			if (command != null) {
+				frame.setDocumentType(Integer.parseInt(command));
+			}
+		};
+	}
+
+	public ActionListener getBackupSettingsListener() {
+		return e -> BackupSettingsDialog.show(frame);
+	}
+
+	// ========================================
+	// COMPLEX LISTENERS
+	// ========================================
+	// These listeners have more complex logic and are extracted for clarity
+
+	public ActionListener getPrintListener() {
+		return e -> {
+			String cmd = e.getActionCommand();
+			if (cmd == null) return;
+
+			switch (cmd) {
+				case "accountSummary":
+					frame.showAccountSummary();
+					break;
+				case "document":
+					frame.showDocumentPrint();
+					break;
+				case "accountStatement":
+					frame.showAccountStatement();
+					break;
+				case "incomeStatement":
+					frame.showIncomeStatement(false);
+					break;
+				case "incomeStatementDetailed":
+					frame.showIncomeStatement(true);
+					break;
+				case "balanceSheet":
+					frame.showBalanceSheet(false);
+					break;
+				case "balanceSheetDetailed":
+					frame.showBalanceSheet(true);
+					break;
+				case "generalJournal":
+					frame.showGeneralJournal();
+					break;
+				case "generalLedger":
+					frame.showGeneralLedger();
+					break;
+				case "vatReport":
+					frame.showVATReport();
+					break;
+				case "coa0":
+					frame.showChartOfAccountsPrint(0);
+					break;
+				case "coa1":
+					frame.showChartOfAccountsPrint(1);
+					break;
+				case "coa2":
+					frame.showChartOfAccountsPrint(2);
+					break;
+			}
+		};
+	}
 }
