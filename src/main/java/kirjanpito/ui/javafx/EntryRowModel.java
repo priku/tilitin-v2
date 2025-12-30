@@ -45,6 +45,9 @@ public class EntryRowModel {
                 this.credit.set(entry.getAmount());
             }
         }
+        
+        // Aseta ALV tilin perusteella
+        updateVatFromAccount();
     }
     
     // Row number
@@ -59,6 +62,7 @@ public class EntryRowModel {
         if (originalEntry != null && value != null) {
             originalEntry.setAccountId(value.getId());
         }
+        updateVatFromAccount();
         modified = true;
     }
     public ObjectProperty<Account> accountProperty() { return account; }
@@ -124,6 +128,20 @@ public class EntryRowModel {
     public String getVatCode() { return vatCode.get(); }
     public void setVatCode(String value) { vatCode.set(value); }
     public StringProperty vatCodeProperty() { return vatCode; }
+    
+    public void updateVatFromAccount() {
+        Account acc = account.get();
+        if (acc != null && acc.getVatRate() != null) {
+            java.math.BigDecimal rate = acc.getVatRate();
+            if (rate.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                vatCode.set(rate.stripTrailingZeros().toPlainString() + "%");
+            } else {
+                vatCode.set("");
+            }
+        } else {
+            vatCode.set("");
+        }
+    }
     
     // Entry access
     public Entry getEntry() { return originalEntry; }

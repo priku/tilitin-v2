@@ -632,6 +632,75 @@ public class MainController implements Initializable {
     }
     
     @FXML
+    private void handleDeleteDocument() {
+        if (currentDocument == null || dataSource == null) {
+            setStatus("Ei poistettavaa tositetta");
+            return;
+        }
+        
+        // Vahvistus
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Poista tosite");
+        confirm.setHeaderText("Haluatko varmasti poistaa tositteen " + currentDocument.getNumber() + "?");
+        confirm.setContentText("Tositteen kaikki viennit poistetaan. Toimintoa ei voi perua.");
+        
+        if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
+            return;
+        }
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            
+            // Poista viennit
+            EntryDAO entryDAO = dataSource.getEntryDAO(session);
+            if (currentEntries != null) {
+                for (Entry entry : currentEntries) {
+                    if (entry.getId() > 0) {
+                        entryDAO.delete(entry.getId());
+                    }
+                }
+            }
+            
+            // Poista tosite
+            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
+            documentDAO.delete(currentDocument.getId());
+            
+            session.commit();
+            
+            // Poista listasta
+            int deletedIndex = currentDocumentIndex;
+            documents.remove(deletedIndex);
+            documentCount = documents.size();
+            
+            // Siirry edelliseen tai seuraavaan
+            if (!documents.isEmpty()) {
+                if (deletedIndex >= documents.size()) {
+                    currentDocumentIndex = documents.size() - 1;
+                }
+                loadDocument(documents.get(currentDocumentIndex));
+            } else {
+                currentDocument = null;
+                currentEntries = null;
+                currentDocumentIndex = -1;
+                updateUI();
+            }
+            
+            setStatus("Tosite poistettu");
+            
+        } catch (Exception e) {
+            if (session != null) {
+                try { session.rollback(); } catch (Exception re) {}
+            }
+            showError("Virhe poistettaessa tositetta", e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    
+    @FXML
     private void handleGotoDocumentNumber() {
         String text = documentNumberField.getText();
         try {

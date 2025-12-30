@@ -36,6 +36,8 @@
                     <MenuItem text="Lisää vienti" fx:id="addEntryItem" onAction="#handleAddEntry" accelerator="Ctrl+N"/>
                     <MenuItem text="Poista vienti" fx:id="removeEntryItem" onAction="#handleRemoveEntry" accelerator="Ctrl+D"/>
                     <SeparatorMenuItem/>
+                    <MenuItem text="Poista tosite" onAction="#handleDeleteDocument"/>
+                    <SeparatorMenuItem/>
                     <MenuItem text="Kopioi" fx:id="copyItem" onAction="#handleCopy" accelerator="Ctrl+C"/>
                     <MenuItem text="Liitä" fx:id="pasteItem" onAction="#handlePaste" accelerator="Ctrl+V"/>
                 </Menu>
