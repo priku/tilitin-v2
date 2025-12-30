@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleStringProperty;
 import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
 import kirjanpito.ui.javafx.cells.*;
+import kirjanpito.ui.javafx.dialogs.AccountSelectionDialogFX;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -175,6 +176,38 @@ public class MainController implements Initializable {
                 }
             }
         });
+        
+        // F9 = Account selection dialog
+        entryTable.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.F9) {
+                openAccountSelectionDialog();
+                event.consume();
+            }
+        });
+    }
+    
+    private void openAccountSelectionDialog() {
+        if (accounts == null || accounts.isEmpty()) {
+            setStatus("Tilikartta ei ole ladattu");
+            return;
+        }
+        
+        // Hae nykyinen hakusana tilisolusta
+        String initialSearch = "";
+        EntryRowModel selectedRow = entryTable.getSelectionModel().getSelectedItem();
+        if (selectedRow != null && selectedRow.getAccount() != null) {
+            initialSearch = selectedRow.getAccount().getNumber();
+        }
+        
+        // Näytä dialogi
+        Account selected = AccountSelectionDialogFX.showAndSelect(
+            stage, accounts, initialSearch);
+        
+        if (selected != null && selectedRow != null) {
+            selectedRow.setAccount(selected);
+            entryTable.refresh();
+            setStatus("Tili valittu: " + selected.getNumber() + " " + selected.getName());
+        }
     }
     
     private void refreshAccountCells() {
@@ -697,7 +730,7 @@ public class MainController implements Initializable {
     // Registry handlers
     @FXML
     private void handleChartOfAccounts() {
-        showNotImplemented("Tilikartta");
+        openAccountSelectionDialog();
     }
     
     @FXML
