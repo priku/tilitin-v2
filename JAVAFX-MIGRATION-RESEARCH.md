@@ -358,6 +358,113 @@ public class DocumentFrameFX extends BorderPane
 
 ---
 
+## 🆚 JavaFX vs Compose Desktop - Vertailu
+
+### Projektissa on jo Compose Desktop!
+
+Löysin olemassa olevan prototyypin: `src/main/kotlin/kirjanpito/ui/compose/TilitinApp.kt`
+
+```kotlin
+// Käyttää SwingPanel-bridgeä upottaakseen Swing-UI:n
+SwingPanel(
+    modifier = Modifier.fillMaxSize(),
+    factory = {
+        val panel = DocumentFramePanel(registry, documentModel)
+        panel
+    }
+)
+```
+
+### Vertailutaulukko
+
+| Ominaisuus | JavaFX | Compose Desktop |
+|------------|--------|-----------------|
+| **Kieli** | Java | Kotlin |
+| **Ekosysteemi** | Oracle/OpenJFX | JetBrains |
+| **Kypsyys** | ⭐⭐⭐⭐⭐ (2008-) | ⭐⭐⭐ (2021-) |
+| **Dokumentaatio** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| **IDE-tuki** | ⭐⭐⭐⭐ (Scene Builder) | ⭐⭐⭐⭐⭐ (IntelliJ) |
+| **Swing Interop** | SwingNode | SwingPanel ✅ (käytössä) |
+| **Deklaratiivinen** | FXML + Controller | ⭐⭐⭐⭐⭐ 100% Kotlin |
+| **Hot Reload** | Ei | Kyllä (Preview) |
+| **Android-koodi** | Ei | Jaettavissa |
+| **Riippuvuudet** | Erillinen moduli | Gradle plugin (jo käytössä) |
+
+### Compose Desktop - Edut
+
+1. ✅ **Jo konfiguroitu** - `build.gradle.kts` sisältää Compose-pluginin
+2. ✅ **Prototyyppi valmiina** - `TilitinApp.kt` toimii
+3. ✅ **Kotlin-natiivi** - Projekti jo käyttää Kotlinia (37 tiedostoa)
+4. ✅ **SwingPanel toimii** - Asteittainen migraatio mahdollinen
+5. ✅ **Modernin reaktiivinen** - State management sisäänrakennettu
+
+### Compose Desktop - Haitat
+
+1. ⚠️ **Nuori teknologia** - Vähemmän resursseja/esimerkkejä
+2. ⚠️ **Swing-UI upotettuna** - Ei vielä natiivi Compose-UI
+3. ⚠️ **Ei Scene Builderia** - Kaikki koodina
+4. ⚠️ **Taulukkotuki** - LazyColumn, ei TableView-vastinetta
+
+### JavaFX - Edut
+
+1. ✅ **Kypsä teknologia** - 15+ vuotta kehitystä
+2. ✅ **Scene Builder** - Visuaalinen FXML-editointi
+3. ✅ **TableView** - Valmis taulukkokomponentti
+4. ✅ **CSS-teemat** - Laaja teematuki
+5. ✅ **Dokumentaatio** - Kattava
+
+### JavaFX - Haitat
+
+1. ⚠️ **Ei projektissa** - Vaatii uuden konfiguraation
+2. ⚠️ **Java-pohjainen** - Projekti siirtyy Kotliniin
+3. ⚠️ **FXML + Controller** - Kaksi tiedostoa per näkymä
+4. ⚠️ **Ei Hot Reload** - Käännös joka muutokseen
+
+---
+
+## 🎯 Suositus
+
+### Vaihtoehto A: Compose Desktop (Suositeltu 🏆)
+
+**Miksi:**
+- Projekti käyttää jo Kotlinia
+- Compose Desktop jo konfiguroitu
+- Prototyyppi olemassa
+- Moderni, reaktiivinen arkkitehtuuri
+- SwingPanel mahdollistaa asteittaisen migraation
+
+**Migraatiostrategia:**
+1. Käytä `TilitinApp.kt` lähtökohtana
+2. Korvaa yksi Swing-dialogi kerrallaan Compose-versiolla
+3. Lopulta korvaa koko DocumentFrame Compose-toteutuksella
+
+### Vaihtoehto B: JavaFX
+
+**Milloin:**
+- Jos tarvitset Scene Builder -visuaalieditoria
+- Jos TableView on kriittinen (Composessa LazyColumn)
+- Jos haluat pysyä Java-ekosysteemissä
+
+---
+
+## 📋 Seuraavat askeleet
+
+### Jos valitset Compose Desktop:
+
+1. **Korjaa Compose-build** (nyt Kotlin Compose -virhe)
+2. **Luo yksinkertainen dialogi** Composella (esim. AboutDialog)
+3. **Testaa SwingPanel-integraatio** olemassa olevalla koodilla
+4. **Iteroi** - korvaa dialogit yksi kerrallaan
+
+### Jos valitset JavaFX:
+
+1. **Lisää JavaFX Gradle-riippuvuudet**
+2. **Luo DocumentFrameFX prototyyppi**
+3. **Testaa manager-integraatio**
+4. **Käytä Scene Builderia layoutiin**
+
+---
+
 **Luotu:** 2025-12-31  
 **Päivitetty:** 2025-12-31  
-**Status:** Tutkimus valmis - odottaa päätöstä
+**Status:** Tutkimus valmis - **Compose Desktop suositeltu** koska jo käytössä
