@@ -340,7 +340,7 @@ public class DocumentMenuBuilder {
         menu.setMnemonic('y');
         
         vatDocumentMenuItem = SwingUtils.createMenuItem("ALV-tilien päättäminen",
-                null, 'p', KeyStroke.getKeyStroke('V', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK), 
+                null, 'p', KeyStroke.getKeyStroke('V', shortcutKeyMask | InputEvent.SHIFT_DOWN_MASK),
                 l.vatDocumentListener);
         menu.add(vatDocumentMenuItem);
         

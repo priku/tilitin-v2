@@ -1,6 +1,7 @@
 package kirjanpito.models;
 
 import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.math.BigDecimal;
 
 import javax.swing.table.AbstractTableModel;
@@ -147,16 +148,16 @@ public class EntryTableModel extends AbstractTableModel {
 			}
 		}
 		else if (col == 1) {
-			boolean vatEntries = (currencyCellEditor.getLastModifiers() &
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0;
+			int shortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+			boolean vatEntries = (currencyCellEditor.getLastModifiers() & shortcutMask) == 0;
 			Entry entry = model.getEntry(row);
 			entry.setDebit(true);
 			model.updateAmount(row, (BigDecimal)value, vatEntries);
 			currencyCellEditor.setLastModifiers(0);
 		}
 		else if (col == 2) {
-			boolean vatEntries = (currencyCellEditor.getLastModifiers() &
-					Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) == 0;
+			int shortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+			boolean vatEntries = (currencyCellEditor.getLastModifiers() & shortcutMask) == 0;
 			Entry entry = model.getEntry(row);
 			entry.setDebit(false);
 			model.updateAmount(row, (BigDecimal)value, vatEntries);

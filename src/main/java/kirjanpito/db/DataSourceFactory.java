@@ -24,10 +24,11 @@ public class DataSourceFactory {
 		for (String prefix : prefixes) {
 			if (url.startsWith(prefix)) {
 				DataSource dataSource;
-				
+
 				try {
-					dataSource = (DataSource)Class.forName(
-							classNames[index]).newInstance();
+					dataSource = (DataSource)Class.forName(classNames[index])
+							.getDeclaredConstructor()
+							.newInstance();
 				}
 				catch (Exception e) {
 					throw new DataAccessException(

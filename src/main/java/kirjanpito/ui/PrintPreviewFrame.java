@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -100,7 +101,7 @@ public class PrintPreviewFrame extends JFrame {
 		setLayout(new BorderLayout());
 		createToolBar();
 		createPrintPreviewPanel();
-		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
 		/* Suljetaan ikkuna, kun Escape tai Ctrl+W painetaan. */
 		rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -256,7 +257,7 @@ public class PrintPreviewFrame extends JFrame {
 		/* Zoomataan, kun hiiren rullaa vieritään Ctrl-näppäin pohjassa */
 		previewPanel.addMouseWheelListener(new MouseAdapter() {
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				if ((e.getModifiers() & KeyEvent.CTRL_MASK) > 0) {
+				if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) > 0) {
 					int index = zoomComboBox.getSelectedIndex();
 
 					if (e.getWheelRotation() > 0 && index > 0) {
@@ -270,7 +271,7 @@ public class PrintPreviewFrame extends JFrame {
 				else {
 					/* Vieritetään sivua vaakatasossa, jos käytetään
 					 * shift-näppäintä. */
-					if ((e.getModifiers() & KeyEvent.SHIFT_MASK) > 0) {
+					if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) > 0) {
 						scrollPage(e.getWheelRotation() * 50, 0);
 					}
 					else {

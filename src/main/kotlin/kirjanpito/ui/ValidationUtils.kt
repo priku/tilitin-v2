@@ -103,7 +103,7 @@ object ValidationUtils {
  */
 fun String?.requireNotEmpty(fieldName: String = "Kenttä"): String {
     require(!isNullOrEmpty()) { "$fieldName ei voi olla tyhjä" }
-    return this!!
+    return this
 }
 
 /**

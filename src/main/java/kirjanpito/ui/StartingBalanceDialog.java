@@ -97,7 +97,7 @@ public class StartingBalanceDialog extends JDialog {
 		menu.setMnemonic('s');
 		menuBar.add(menu);
 		
-		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 		
 		saveMenuItem = SwingUtils.createMenuItem("Tallenna", "save-16x16.png", 'T',
 				KeyStroke.getKeyStroke('S', shortcutKeyMask),

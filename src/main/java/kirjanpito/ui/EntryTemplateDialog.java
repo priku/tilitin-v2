@@ -112,7 +112,7 @@ public class EntryTemplateDialog extends JDialog implements AccountSelectionList
 		menu.setMnemonic('s');
 		menuBar.add(menu);
 		
-		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 		
 		menu.add(SwingUtils.createMenuItem("Lisää",
 				"list-add-16x16.png", 'L',

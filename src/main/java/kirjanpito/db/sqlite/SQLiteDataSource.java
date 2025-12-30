@@ -245,7 +245,7 @@ public class SQLiteDataSource implements DataSource {
 
 			if (version == 14) {
 				backupDatabase(file);
-				DatabaseUpgradeUtil.upgrade14to15(conn, stmt, true);
+				// upgrade14to15 - POISTETTU: PDF-liitteet tiedostoina, ei tietokantaan
 				version = 15;
 			}
 

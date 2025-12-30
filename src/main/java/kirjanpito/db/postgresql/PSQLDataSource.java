@@ -200,7 +200,7 @@ public class PSQLDataSource implements DataSource {
 			}
 
 			if (version == 14) {
-				DatabaseUpgradeUtil.upgrade14to15(conn, stmt, false);
+				// upgrade14to15 - POISTETTU: PDF-liitteet tiedostoina, ei tietokantaan
 				version = 15;
 			}
 

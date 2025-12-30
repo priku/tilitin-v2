@@ -58,7 +58,7 @@ public class CurrencyCellEditor extends AbstractCellEditor
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					lastModifiers = e.getModifiers();
+					lastModifiers = e.getModifiersEx();
 				}
 			}
 
