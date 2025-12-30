@@ -175,6 +175,12 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	
 	// Print manager
 	private DocumentPrinter documentPrinter;
+	
+	// UI managers for Phase 7 refactoring
+	private DocumentUIBuilder uiBuilder;
+	private DocumentUIUpdater uiUpdater;
+	private DocumentUIBuilder.UIComponents uiComponents;
+	private DocumentUIUpdater.UIComponents uiUpdaterComponents;
 
 	// File filter for SQLite databases
 	FileFilter sqliteFileFilter = new FileFilter() {
@@ -344,6 +350,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		setAboutAction();
 		createMenuBar();
 		createToolBar();
+		
+		// Initialize formatter before UI builders
+		formatter = new DecimalFormat();
+		formatter.setMinimumFractionDigits(2);
+		formatter.setMaximumFractionDigits(2);
+		formatter.setParseBigDecimal(true);
+		
+		// Initialize UI builders and updaters
+		initializeUIManagers();
+		
 		createStatusBar();
 
 		JPanel contentPanel = new JPanel();
@@ -359,11 +375,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		createTotalRow(bottomPanel);
 		createSearchBar(bottomPanel);
 		createAttachmentsPanel(bottomPanel);
-
-		formatter = new DecimalFormat();
-		formatter.setMinimumFractionDigits(2);
-		formatter.setMaximumFractionDigits(2);
-		formatter.setParseBigDecimal(true);
 
 		AppSettings settings = AppSettings.getInstance();
 		int width = settings.getInt("window.width", 0);
@@ -503,109 +514,139 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	}
 
 	/**
+	 * Alustaa UI-managerit Phase 7 -refaktoroinnin osana.
+	 */
+	private void initializeUIManagers() {
+		// Initialize UI builder
+		uiBuilder = new DocumentUIBuilder(new DocumentUIBuilder.UICallbacks() {
+			@Override
+			public void onNumberFieldChanged() {
+				model.setDocumentChanged();
+			}
+			
+			@Override
+			public void onDateFieldChanged() {
+				model.setDocumentChanged();
+			}
+			
+			@Override
+			public void onSearchButtonClicked() {
+				searchDocuments();
+			}
+			
+			@Override
+			public void onSearchPanelClosed() {
+				// Handled by searchListener
+			}
+			
+			@Override
+			public Action getAddEntryAction() {
+				return addEntryListener;
+			}
+			
+			@Override
+			public ActionListener getSearchListener() {
+				return searchListener;
+			}
+		});
+		
+		// Get UI components from builder
+		uiComponents = uiBuilder.getComponents();
+		
+		// Initialize UI updater components wrapper
+		uiUpdaterComponents = new DocumentUIUpdater.UIComponents();
+		
+		// Initialize UI updater
+		uiUpdater = new DocumentUIUpdater(model, registry, uiUpdaterComponents, 
+			new DocumentUIUpdater.UICallbacks() {
+				@Override
+				public JTable getEntryTable() {
+					return entryTable;
+				}
+				
+				@Override
+				public EntryTableModel getTableModel() {
+					return tableModel;
+				}
+				
+				@Override
+				public Object getAttachmentsPanel() {
+					return attachmentsPanel;
+				}
+				
+				@Override
+				public ActionListener getEntryTemplateListener() {
+					return entryTemplateListener;
+				}
+				
+				@Override
+				public ActionListener getDocTypeListener() {
+					return docTypeListener;
+				}
+				
+				@Override
+				public JMenuItem getEditDocTypesMenuItem() {
+					return editDocTypesMenuItem;
+				}
+				
+				@Override
+				public JMenuItem getCreateEntryTemplateMenuItem() {
+					return createEntryTemplateMenuItem;
+				}
+				
+				@Override
+				public JMenuItem getEditEntryTemplatesMenuItem() {
+					return editEntryTemplatesMenuItem;
+				}
+				
+				@Override
+				public int findDocumentTypeByNumber(int number) {
+					return DocumentFrame.this.findDocumentTypeByNumber(number);
+				}
+				
+				@Override
+				public void setComponentsEnabled(boolean read, boolean create, boolean edit) {
+					DocumentFrame.this.setComponentsEnabled(read, create, edit);
+				}
+				
+				@Override
+				public void setTitle(String title) {
+					DocumentFrame.this.setTitle(title);
+				}
+				
+				@Override
+				public void updateBackupStatusLabel() {
+					DocumentFrame.this.updateBackupStatusLabel();
+				}
+				
+				@Override
+				public void updateTableSettings() {
+					DocumentFrame.this.updateTableSettings();
+				}
+			}, formatter);
+	}
+	
+	/**
 	 * Lisää <code>container</code>-paneeliin tositenumerokentän,
 	 * päivämääräkentän ja tagikentän.
 	 *
 	 * @param container paneeli, johon komponentit lisätään
 	 */
 	protected void createTextFieldPanel(JPanel container) {
-		GridBagConstraints c;
-		JPanel panel = new JPanel();
-		container.add(panel, BorderLayout.PAGE_START);
-		panel.setLayout(new GridLayout(0, 2));
+		// Use UI builder for Phase 7 refactoring
+		uiBuilder.createTextFieldPanel(container);
 
-		JPanel left = new JPanel();
-		left.setLayout(new GridBagLayout());
-		panel.add(left);
+		// Get component references
+		numberTextField = uiComponents.numberTextField;
+		dateTextField = uiComponents.dateTextField;
 
-		/* Lisätään paneeliin tositenumeronimiö ja -tekstikenttä. */
-		JLabel numberLabel = new JLabel("Tositenumero");
-		c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.insets = new Insets(8, 8, 8, 4);
-		left.add(numberLabel, c);
+		// Update updater components
+		uiUpdaterComponents.numberTextField = numberTextField;
+		uiUpdaterComponents.dateTextField = dateTextField;
 
-		numberTextField = new TextFieldWithLockIcon();
-		numberTextField.setCaret(new DefaultCaret());
-		numberTextField.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				if (numberTextField.isEditable()) {
-					model.setDocumentChanged();
-				}
-			}
-		});
-
-		numberTextField.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "transferFocus");
-
-		numberTextField.getActionMap().put("transferFocus", new AbstractAction() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				numberTextField.transferFocus();
-			}
-		});
-
-		c = new GridBagConstraints();
-		c.insets = new Insets(8, 4, 8, 4);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		left.add(numberTextField, c);
-
-		c.fill = GridBagConstraints.VERTICAL;
-		c.weightx = 0.0;
-		left.add(new JSeparator(SwingConstants.VERTICAL), c);
-
-		JPanel right = new JPanel();
-		right.setLayout(new GridBagLayout());
-		panel.add(right);
-
-		/* Lisätään paneeliin päivämääränimiö ja -tekstikenttä. */
-		JLabel dateLabel = new JLabel("Päivämäärä");
-		c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.insets = new Insets(8, 8, 8, 4);
-		right.add(dateLabel, c);
-
-		dateTextField = new DateTextField();
-		dateTextField.setCaret(new DefaultCaret());
-		dateTextField.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				if (dateTextField.isEditable() && Character.isDigit(e.getKeyChar())) {
-					model.setDocumentChanged();
-				}
-			}
-		});
-
-		dateTextField.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "addEntry");
-
-		dateTextField.getActionMap().put("addEntry", addEntryListener);
-
-		dateTextField.getInputMap().put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "firstEntry");
-
-		dateTextField.getActionMap().put("firstEntry", new AbstractAction() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dateTextField.transferFocus();
-
-				/* Valitaan ensimmäinen rivi. */
-				if (entryTable.getRowCount() > 0) {
-					entryTable.changeSelection(0,
-							Math.max(0, entryTable.getSelectedColumn()),
-							false, false);
-				}
-			}
-		});
-
-		c = new GridBagConstraints();
-		c.insets = new Insets(8, 4, 8, 8);
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		right.add(dateTextField, c);
+		// Configure firstEntry action to select first row in table
+		// Note: entryTable may not be initialized yet, so we'll set this up after table creation
+		// For now, the action is already configured in DocumentUIBuilder
 	}
 
 	/**
@@ -679,30 +720,18 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * @param container paneeli, johon rivi lisätään
 	 */
 	protected void createTotalRow(JPanel container) {
-		GridBagLayout layout = new GridBagLayout();
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(2, 2, 2, 6);
-		c.anchor = GridBagConstraints.WEST;
-
-		JPanel panel = new JPanel(layout);
-		panel.setBorder(BorderFactory.createEmptyBorder(2, 2, 5, 2));
-		container.add(panel);
-
-		debitTotalLabel = new JLabel("0,00");
-		Dimension minSize = debitTotalLabel.getMinimumSize();
-		debitTotalLabel.setPreferredSize(new Dimension(80, minSize.height));
-		creditTotalLabel = new JLabel("0,00");
-		creditTotalLabel.setPreferredSize(new Dimension(80, minSize.height));
-		differenceLabel = new JLabel("0,00");
-		differenceLabel.setPreferredSize(new Dimension(80, minSize.height));
-
-		panel.add(new JLabel("Debet yht."), c);
-		panel.add(debitTotalLabel, c);
-		panel.add(new JLabel("Kredit yht."), c);
-		panel.add(creditTotalLabel, c);
-		panel.add(new JLabel("Erotus"), c);
-		c.weightx = 1.0;
-		panel.add(differenceLabel, c);
+		// Use UI builder for Phase 7 refactoring
+		uiBuilder.createTotalRow(container);
+		
+		// Get component references
+		debitTotalLabel = uiComponents.debitTotalLabel;
+		creditTotalLabel = uiComponents.creditTotalLabel;
+		differenceLabel = uiComponents.differenceLabel;
+		
+		// Update updater components
+		uiUpdaterComponents.debitTotalLabel = debitTotalLabel;
+		uiUpdaterComponents.creditTotalLabel = creditTotalLabel;
+		uiUpdaterComponents.differenceLabel = differenceLabel;
 	}
 
 	/**
@@ -711,42 +740,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * @param container paneeli, johon hakupalkki lisätään
 	 */
 	protected void createSearchBar(JPanel container) {
-		GridBagLayout layout = new GridBagLayout();
-		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(8, 5, 8, 5);
-		c.anchor = GridBagConstraints.WEST;
-
-		JPanel panel = searchPanel = new JPanel(layout);
-		panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-		panel.setVisible(false);
-		container.add(panel);
-
-		JTextField textField = searchPhraseTextField = new JTextField();
-		textField.setCaret(new DefaultCaret());
-		textField.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					searchDocuments();
-					e.consume();
-				}
-			}
-		});
-		c.weightx = 1.0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		panel.add(textField, c);
-
-		JButton button = new JButton("Etsi", new ImageIcon(
-				Resources.loadAsImage("find-16x16.png")));
-
-		button.addActionListener(e -> searchDocuments());
-		button.setMnemonic('H');
-		c.weightx = 0.0;
-		c.fill = GridBagConstraints.BOTH;
-		panel.add(button, c);
-
-		button = new JButton(new ImageIcon(Resources.loadAsImage("close-16x16.png")));
-		button.addActionListener(searchListener);
-		panel.add(button, c);
+		// Use UI builder for Phase 7 refactoring
+		uiBuilder.createSearchBar(container);
+		
+		// Get component references
+		searchPanel = uiComponents.searchPanel;
+		searchPhraseTextField = uiComponents.searchPhraseTextField;
+		
+		// Update updater components
+		uiUpdaterComponents.searchPanel = searchPanel;
+		uiUpdaterComponents.searchPhraseTextField = searchPhraseTextField;
 	}
 
 	/**
@@ -765,26 +768,30 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * ja tilikausi.
 	 */
 	protected void createStatusBar() {
-		JPanel statusBarPanel = new JPanel(new BorderLayout());
-		documentLabel = new JLabel();
-		documentLabel.setBorder(new EtchedBorder());
-		documentLabel.setPreferredSize(new Dimension(150, 0));
-		periodLabel = new JLabel(" ");
-		periodLabel.setBorder(new EtchedBorder());
-		documentTypeLabel = new JLabel();
-		documentTypeLabel.setBorder(new EtchedBorder());
-		documentTypeLabel.setPreferredSize(new Dimension(200, 0));
-		
-		// Backup-indikaattori (Word AutoSave -tyylinen)
-		backupStatusLabel = new JLabel();
-		backupStatusLabel.setBorder(new EtchedBorder());
-		backupStatusLabel.setPreferredSize(new Dimension(120, 0));
-		backupStatusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		// Use UI builder for Phase 7 refactoring
+		uiBuilder.createStatusBar(this);
+
+		// Get component references
+		documentLabel = uiComponents.documentLabel;
+		periodLabel = uiComponents.periodLabel;
+		documentTypeLabel = uiComponents.documentTypeLabel;
+		backupStatusLabel = uiComponents.backupStatusLabel;
+
+		// Update updater components FIRST before calling any update methods
+		uiUpdaterComponents.documentLabel = documentLabel;
+		uiUpdaterComponents.periodLabel = periodLabel;
+		uiUpdaterComponents.documentTypeLabel = documentTypeLabel;
+		uiUpdaterComponents.backupStatusLabel = backupStatusLabel;
+		uiUpdaterComponents.entryTemplateMenu = entryTemplateMenu;
+		uiUpdaterComponents.docTypeMenu = docTypeMenu;
+		uiUpdaterComponents.searchMenuItem = searchMenuItem;
+
+		// Now safe to update backup status label
 		updateBackupStatusLabel();
-		
+
 		// Aseta listener backup-statuksen päivitykseen
 		BackupService.getInstance().setStatusListener(status -> updateBackupStatusLabel());
-		
+
 		// Backup-indikaattoria klikkaamalla avautuu asetukset
 		backupStatusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
@@ -793,44 +800,14 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 				updateBackupStatusLabel();
 			}
 		});
-		backupStatusLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-		backupStatusLabel.setToolTipText("Klikkaa muuttaaksesi varmuuskopiointiasetuksia");
-		
-		JPanel rightPanel = new JPanel(new BorderLayout());
-		rightPanel.add(backupStatusLabel, BorderLayout.WEST);
-		rightPanel.add(documentTypeLabel, BorderLayout.CENTER);
-		
-		statusBarPanel.add(documentLabel, BorderLayout.WEST);
-		statusBarPanel.add(periodLabel, BorderLayout.CENTER);
-		statusBarPanel.add(rightPanel, BorderLayout.EAST);
-		add(statusBarPanel, BorderLayout.PAGE_END);
 	}
 	
 	/**
 	 * Päivittää backup-indikaattorin tilariville.
 	 */
 	private void updateBackupStatusLabel() {
-		BackupService backup = BackupService.getInstance();
-		
-		if (!backup.isEnabled()) {
-			backupStatusLabel.setText("○ Backup");
-			backupStatusLabel.setForeground(UIConstants.getMutedColor());
-		} else if (backup.isAutoBackupEnabled()) {
-			String cloudName = backup.getCloudServiceName();
-			if (cloudName != null) {
-				backupStatusLabel.setText("☁ AutoBackup");
-				backupStatusLabel.setForeground(UIConstants.getSuccessColor());
-				backupStatusLabel.setToolTipText("AutoBackup käytössä • " + cloudName + " • Klikkaa muuttaaksesi");
-			} else {
-				backupStatusLabel.setText("◉ AutoBackup");
-				backupStatusLabel.setForeground(UIConstants.getInfoColor());
-				backupStatusLabel.setToolTipText("AutoBackup käytössä • Klikkaa muuttaaksesi");
-			}
-		} else {
-			backupStatusLabel.setText("● Backup");
-			backupStatusLabel.setForeground(UIConstants.getMutedColor());
-			backupStatusLabel.setToolTipText("Varmuuskopiointi käytössä • Klikkaa muuttaaksesi");
-		}
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateBackupStatusLabel();
 	}
 
 	/**
@@ -1922,36 +1899,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Päivittää ikkunan otsikkorivin.
 	 */
 	protected void updateTitle() {
-		Settings settings = registry.getSettings();
-		String name = (settings == null) ? null : settings.getName();
-		String title;
-
-		if (name == null || name.length() == 0) {
-			title = Kirjanpito.APP_NAME;
-		}
-		else {
-			title = name + " - " + Kirjanpito.APP_NAME;
-		}
-
-		setTitle(title);
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateTitle();
 	}
 
 	/**
 	 * Päivittää tilikauden tiedot tilariville.
 	 */
 	protected void updatePeriod() {
-		Period period = registry.getPeriod();
-
-		if (period == null) {
-			periodLabel.setText("");
-		}
-		else {
-			DateFormat dateFormat = new SimpleDateFormat("d.M.yyyy");
-			String text = "Tilikausi " +
-				dateFormat.format(period.getStartDate()) + " - " +
-				dateFormat.format(period.getEndDate());
-			periodLabel.setText(text);
-		}
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updatePeriod();
 	}
 
 	/**
@@ -1959,36 +1916,21 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * lukumäärän ja tositelajin tilariville.
 	 */
 	protected void updatePosition() {
-		int count = model.getDocumentCount();
-		int countTotal = model.getDocumentCountTotal();
-
-		if (count != countTotal) {
-			documentLabel.setText(String.format("Tosite %d / %d (%d)",
-					model.getDocumentPosition() + 1,
-					model.getDocumentCount(),
-					model.getDocumentCountTotal()));
-		}
-		else {
-			documentLabel.setText(String.format("Tosite %d / %d",
-					model.getDocumentPosition() + 1,
-					model.getDocumentCount()));
-		}
-
-		DocumentType type;
-
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updatePosition();
+		
+		// Handle searchEnabled case
 		if (searchEnabled) {
+			DocumentType type;
 			int index = findDocumentTypeByNumber(model.getDocument().getNumber());
 			type = (index < 0) ? null : registry.getDocumentTypes().get(index);
-		}
-		else {
-			type = model.getDocumentType();
-		}
-
-		if (type == null) {
-			documentTypeLabel.setText("");
-		}
-		else {
-			documentTypeLabel.setText(type.getName());
+			
+			if (type == null) {
+				documentTypeLabel.setText("");
+			}
+			else {
+				documentTypeLabel.setText(type.getName());
+			}
 		}
 	}
 
@@ -1996,36 +1938,14 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Päivittää tositteen tiedot.
 	 */
 	protected void updateDocument() {
-		Document document = model.getDocument();
-
-		if (document == null) {
-			numberTextField.setText("");
-			dateTextField.setDate(null);
-		}
-		else {
-			numberTextField.setText(Integer.toString(document.getNumber()));
-			dateTextField.setDate(document.getDate());
-			dateTextField.setBaseDate(document.getDate());
-
-			/* Uuden tositteen päivämäärä on kopioitu edellisestä
-			 * tositteesta. Valitaan päivämääräkentän teksti, jotta
-			 * uusi päivämäärä voidaan kirjoittaa päälle. */
-			if (document.getId() <= 0) {
-				dateTextField.select(0, dateTextField.getText().length());
-			}
-
-			dateTextField.requestFocus();
-		}
-
-		boolean documentEditable = model.isDocumentEditable();
-		tableModel.fireTableDataChanged();
-		numberTextField.setLockIconVisible(document != null && !documentEditable);
-		setComponentsEnabled(document != null, model.isPeriodEditable(), documentEditable);
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateDocument();
 		
-		// Update attachments panel with current document ID
-		if (attachmentsPanel != null) {
-			int documentId = (document != null && document.getId() > 0) ? document.getId() : 0;
-			attachmentsPanel.setDocumentId(documentId);
+		// Update dateTextField focus and selection for new documents
+		Document document = model.getDocument();
+		if (document != null && document.getId() <= 0) {
+			dateTextField.select(0, dateTextField.getText().length());
+			dateTextField.requestFocus();
 		}
 	}
 
@@ -2049,104 +1969,33 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			}
 		}
 
-		BigDecimal difference = creditTotal.subtract(debitTotal).abs();
-		debitTotalLabel.setText(formatter.format(debitTotal));
-		creditTotalLabel.setText(formatter.format(creditTotal));
-		// Käytä teeman mukaista error-väriä epätasapainon korostamiseen
-		Color errorColor = UIManager.getColor("Actions.Red");
-		if (errorColor == null) {
-			errorColor = Color.RED; // Fallback
-		}
-		differenceLabel.setForeground(difference.compareTo(BigDecimal.ZERO) == 0 ?
-				debitTotalLabel.getForeground() : errorColor);
-		differenceLabel.setText(formatter.format(difference));
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateTotalRow(debitTotal, creditTotal);
 	}
 
 	/**
 	 * Päivittää vientimallivalikon.
 	 */
 	protected void updateEntryTemplates() {
-		List<EntryTemplate> templates = registry.getEntryTemplates();
-		JMenuItem menuItem;
-		int count = 0;
-
-		entryTemplateMenu.removeAll();
-
-		if (templates != null) {
-			int prevNumber = -1;
-
-			for (EntryTemplate template : templates) {
-				if (template.getNumber() != prevNumber) {
-					prevNumber = template.getNumber();
-					menuItem = new JMenuItem(template.getName());
-					menuItem.addActionListener(entryTemplateListener);
-
-					/* 10 ensimmäiselle vientimallille näppäinoikotie. */
-					if (template.getNumber() >= 1 && template.getNumber() <= 10) {
-						menuItem.setAccelerator(KeyStroke.getKeyStroke(
-								'0' + (template.getNumber() % 10),
-								InputEvent.ALT_DOWN_MASK));
-					}
-
-					entryTemplateMenu.add(menuItem);
-					menuItem.setActionCommand(Integer.toString(template.getNumber()));
-					count++;
-				}
-			}
-		}
-
-		if (count == 0) {
-			menuItem = new JMenuItem("Ei vientimalleja");
-			menuItem.setEnabled(false);
-			entryTemplateMenu.add(menuItem);
-		}
-
-		entryTemplateMenu.addSeparator();
-		entryTemplateMenu.add(createEntryTemplateMenuItem);
-		entryTemplateMenu.add(editEntryTemplatesMenuItem);
+		// Update updater components
+		uiUpdaterComponents.entryTemplateMenu = entryTemplateMenu;
+		
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateEntryTemplates();
 	}
 
 	/**
 	 * Päivittää tositelajivalikon.
 	 */
 	protected void updateDocumentTypes() {
-		char[] accelerators = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'};
-		List<DocumentType> docTypes = registry.getDocumentTypes();
-		JCheckBoxMenuItem menuItem;
-		int selectedIndex = model.getDocumentTypeIndex();
-		int index = 0;
-
-		docTypeMenu.removeAll();
-
-		if (docTypes != null) {
-			docTypeMenuItems = new JCheckBoxMenuItem[docTypes.size()];
-
-			for (DocumentType type : docTypes) {
-				menuItem = new JCheckBoxMenuItem(type.getName());
-				menuItem.addActionListener(docTypeListener);
-				menuItem.setSelected(index == selectedIndex);
-
-				/* 10 ensimmäiselle tositelajille näppäinoikotie. */
-				if (type.getNumber() >= 1 && type.getNumber() <= 10) {
-					menuItem.setAccelerator(KeyStroke.getKeyStroke(
-							accelerators[type.getNumber() - 1],
-							InputEvent.ALT_DOWN_MASK));
-				}
-
-				docTypeMenu.add(menuItem);
-				docTypeMenuItems[index] = menuItem;
-				menuItem.setActionCommand(Integer.toString(index++));
-			}
-		}
-
-		if (index == 0) {
-			JMenuItem tmp = new JMenuItem("Ei tositelajeja");
-			tmp.setEnabled(false);
-			docTypeMenu.add(tmp);
-		}
-
-		docTypeMenu.addSeparator();
-		docTypeMenu.add(editDocTypesMenuItem);
+		// Update updater components
+		uiUpdaterComponents.docTypeMenu = docTypeMenu;
+		
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateDocumentTypes();
+		
+		// Get docTypeMenuItems reference back
+		docTypeMenuItems = uiUpdaterComponents.docTypeMenuItems;
 	}
 
 	/**
@@ -2172,13 +2021,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Näyttää tai piilottaa hakupaneelin.
 	 */
 	protected void updateSearchPanel() {
-		searchPhraseTextField.setText("");
-		searchPanel.setVisible(searchEnabled);
-		searchMenuItem.setSelected(searchEnabled);
-
-		if (searchEnabled) {
-			searchPhraseTextField.requestFocusInWindow();
-		}
+		// Use UI updater for Phase 7 refactoring
+		uiUpdater.updateSearchPanel(searchEnabled);
 	}
 
 	/**

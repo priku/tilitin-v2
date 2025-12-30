@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import kirjanpito.db.Account;
 import kirjanpito.ui.resources.Resources;
 import kirjanpito.util.ChartOfAccounts;
+import kirjanpito.ui.UIConstants;
 
 /**
  * <code>TableCellRenderer</code>in toteuttava luokka, joka näyttää
@@ -44,11 +45,11 @@ public class COATableCellRenderer extends DefaultTableCellRenderer {
 		this.indentEnabled = true;
 		this.highlightFavouriteAccounts = true;
 		// Käytä teeman mukaista highlight-väriä suosikkitileille
-		// FlatLaf tarjoaa automaattisesti teemaan sopivan accent-värin
+		// UIConstants tarjoaa automaattisesti teemaan sopivan värin
 		this.favouriteColor = UIManager.getColor("List.selectionInactiveBackground");
 		if (this.favouriteColor == null) {
-			// Fallback jos UIManager ei tarjoa väriä
-			this.favouriteColor = new Color(245, 208, 169);
+			// Fallback: käytä info-väriä jos UIManager ei tarjoa väriä
+			this.favouriteColor = UIConstants.getInfoColor();
 		}
 		this.formatter = new DecimalFormat();
 		this.formatter.setMinimumFractionDigits(0);
@@ -106,13 +107,11 @@ public class COATableCellRenderer extends DefaultTableCellRenderer {
 
 			if (coa.getHeading(row).getLevel() == 0) {
 				// Käytä teeman mukaista aksentti-/korostusväriä pääotsikkotasolle
+				// UIConstants tarjoaa automaattisesti teemaan sopivan värin
 				Color accentColor = UIManager.getColor("Component.accentColor");
 				if (accentColor == null) {
 					// Fallback: käytä error-väriä jos accent ei ole saatavilla
-					accentColor = UIManager.getColor("Actions.Red");
-					if (accentColor == null) {
-						accentColor = Color.RED; // Ultimate fallback
-					}
+					accentColor = UIConstants.getErrorColor();
 				}
 				setForeground(accentColor);
 			}
