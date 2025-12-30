@@ -259,8 +259,6 @@ object TilitinApp {
         }
     }
     
-    companion object {
-        const val LOGGER_NAME = "kirjanpito"
-    }
+    private const val LOGGER_NAME = "kirjanpito"
 }
 

@@ -9,10 +9,11 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>25</maven.compiler.release>
-        <kotlin.version>2.3.0</kotlin.version>
-        <compose.version>1.7.1</compose.version>
-        <compose.compiler.version>1.7.1</compose.compiler.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <!-- Latest stable: Kotlin 2.1.21 with Compose Desktop 1.8.0 (compatible combo) -->
+        <kotlin.version>2.1.21</kotlin.version>
+        <compose.version>1.8.0</compose.version>
+        <!-- Compose Compiler is built into Kotlin 2.0+ -->
     </properties>
 
     <repositories>
@@ -121,26 +122,25 @@
             <artifactId>pdfbox</artifactId>
             <version>3.0.3</version>
         </dependency>
-        <!-- Compose Multiplatform Desktop -->
-        <!-- Note: Using compose.runtime and compose.ui directly to avoid version conflicts -->
+        <!-- Compose Multiplatform Desktop (JVM only - exclude Android artifacts) -->
         <dependency>
             <groupId>org.jetbrains.compose.runtime</groupId>
-            <artifactId>runtime</artifactId>
+            <artifactId>runtime-desktop</artifactId>
             <version>${compose.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.compose.ui</groupId>
-            <artifactId>ui</artifactId>
+            <artifactId>ui-desktop</artifactId>
             <version>${compose.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.compose.foundation</groupId>
-            <artifactId>foundation</artifactId>
+            <artifactId>foundation-desktop</artifactId>
             <version>${compose.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.compose.material</groupId>
-            <artifactId>material</artifactId>
+            <artifactId>material-desktop</artifactId>
             <version>${compose.version}</version>
         </dependency>
         <dependency>
@@ -194,19 +194,20 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>25</jvmTarget>
+                    <jvmTarget>21</jvmTarget>
                     <args>
                         <arg>-Xjvm-default=all</arg>
                     </args>
+                    <!-- Enable Compose Compiler (built into Kotlin 2.0+) -->
                     <compilerPlugins>
-                        <plugin>org.jetbrains.compose:compose-compiler-plugin:${compose.compiler.version}</plugin>
+                        <plugin>compose</plugin>
                     </compilerPlugins>
                 </configuration>
                 <dependencies>
                     <dependency>
-                        <groupId>org.jetbrains.compose</groupId>
-                        <artifactId>compose-compiler-plugin</artifactId>
-                        <version>${compose.compiler.version}</version>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>compose-compiler-gradle-plugin</artifactId>
+                        <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -215,7 +216,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>25</release>
+                    <release>21</release>
                     <debug>true</debug>
                     <debuglevel>lines</debuglevel>
                 </configuration>

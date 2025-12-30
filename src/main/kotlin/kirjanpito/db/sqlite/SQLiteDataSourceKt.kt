@@ -215,11 +215,7 @@ class SQLiteDataSourceKt : DataSource {
                 version = 14
             }
 
-            if (version == 14) {
-                backupDatabase(file)
-                DatabaseUpgradeUtil.upgrade14to15(conn, stmt, true)
-                version = 15
-            }
+            // upgrade14to15 - POISTETTU: PDF-liitteet tiedostoina, ei tietokantaan
 
             stmt.close()
         } catch (e: Exception) {
