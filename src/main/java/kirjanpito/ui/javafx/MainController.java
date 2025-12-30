@@ -344,10 +344,92 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleSave() {
-        if (dataSource != null) {
-            setStatus("Tallennetaan...");
-            // TODO: Tallenna DocumentValidator avulla
-            setStatus("Tallennettu");
+        if (dataSource == null || currentDocument == null) {
+            setStatus("Ei tallennettavaa");
+            return;
+        }
+        
+        setStatus("Tallennetaan...");
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            
+            // 1. Tallenna tositteen tiedot (päivämäärä)
+            if (datePicker.getValue() != null) {
+                java.util.Date date = java.util.Date.from(
+                    datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                currentDocument.setDate(date);
+            }
+            
+            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
+            documentDAO.save(currentDocument);
+            
+            // 2. Tallenna viennit
+            EntryDAO entryDAO = dataSource.getEntryDAO(session);
+            
+            int savedCount = 0;
+            int deletedCount = 0;
+            
+            for (EntryRowModel row : entries) {
+                // Ohita tyhjät rivit
+                if (row.isEmpty()) {
+                    continue;
+                }
+                
+                // Päivitä Entry-olio
+                row.updateEntry();
+                Entry entry = row.getEntry();
+                
+                // Aseta dokumentin id jos uusi
+                if (entry.getDocumentId() == 0) {
+                    entry.setDocumentId(currentDocument.getId());
+                }
+                
+                // Tallenna
+                if (entry.getAccountId() > 0 && entry.getAmount() != null) {
+                    entryDAO.save(entry);
+                    savedCount++;
+                    row.setModified(false);
+                }
+            }
+            
+            // 3. Poista poistetut viennit
+            // (vertaa currentEntries vs entries)
+            if (currentEntries != null) {
+                for (Entry oldEntry : currentEntries) {
+                    boolean found = false;
+                    for (EntryRowModel row : entries) {
+                        if (row.getEntry() != null && row.getEntry().getId() == oldEntry.getId()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found && oldEntry.getId() > 0) {
+                        entryDAO.delete(oldEntry.getId());
+                        deletedCount++;
+                    }
+                }
+            }
+            
+            session.commit();
+            
+            // Päivitä currentEntries
+            currentEntries = entryDAO.getByDocumentId(currentDocument.getId());
+            
+            setStatus("Tallennettu: " + savedCount + " vientiä" + 
+                     (deletedCount > 0 ? ", poistettu " + deletedCount : ""));
+            
+        } catch (Exception e) {
+            if (session != null) {
+                try { session.rollback(); } catch (Exception re) {}
+            }
+            showError("Tallennusvirhe", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
     
@@ -429,6 +511,11 @@ public class MainController implements Initializable {
     private void handlePrevDocument() {
         if (documents == null || documents.isEmpty()) return;
         
+        // Tallenna ennen siirtymistä
+        if (hasUnsavedChanges()) {
+            handleSave();
+        }
+        
         if (currentDocumentIndex > 0) {
             currentDocumentIndex--;
             loadDocument(documents.get(currentDocumentIndex));
@@ -441,6 +528,11 @@ public class MainController implements Initializable {
     @FXML
     private void handleNextDocument() {
         if (documents == null || documents.isEmpty()) return;
+        
+        // Tallenna ennen siirtymistä
+        if (hasUnsavedChanges()) {
+            handleSave();
+        }
         
         if (currentDocumentIndex < documents.size() - 1) {
             currentDocumentIndex++;
@@ -455,6 +547,11 @@ public class MainController implements Initializable {
     private void handleFirstDocument() {
         if (documents == null || documents.isEmpty()) return;
         
+        // Tallenna ennen siirtymistä
+        if (hasUnsavedChanges()) {
+            handleSave();
+        }
+        
         currentDocumentIndex = 0;
         loadDocument(documents.get(0));
         setStatus("Ensimmäinen tosite: " + currentDocument.getNumber());
@@ -464,9 +561,23 @@ public class MainController implements Initializable {
     private void handleLastDocument() {
         if (documents == null || documents.isEmpty()) return;
         
+        // Tallenna ennen siirtymistä
+        if (hasUnsavedChanges()) {
+            handleSave();
+        }
+        
         currentDocumentIndex = documents.size() - 1;
         loadDocument(documents.get(currentDocumentIndex));
         setStatus("Viimeinen tosite: " + currentDocument.getNumber());
+    }
+    
+    private boolean hasUnsavedChanges() {
+        for (EntryRowModel row : entries) {
+            if (row.isModified() && !row.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
     
     @FXML
