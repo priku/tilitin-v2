@@ -2637,8 +2637,23 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		return new File(directory, baseName + "_" + System.currentTimeMillis() + ".sqlite");
 	}
 
+	// ========================================
+	// MENU ACTION LISTENERS
+	// ========================================
+	// Organized by menu category as defined in DocumentMenuBuilder
+	// See DOCUMENTFRAME-MENU-REFACTORING.md for refactoring plan
+	//
+	// Note: Some listeners (newDatabaseListener, openDatabaseListener, databaseSettingsListener)
+	// are defined earlier in the file (lines 193-254) because they are needed before
+	// this section during object initialization.
+
+	// --- File Menu ---
+	// Also includes: newDatabaseListener, openDatabaseListener, databaseSettingsListener (defined at line 193)
+
 	/* Lopeta */
 	private ActionListener quitListener = e -> quit();
+
+	// --- Go Menu ---
 
 	/* Edellinen tosite */
 	private ActionListener prevDocListener = e -> goToDocument(DocumentModel.FETCH_PREVIOUS);
@@ -2657,6 +2672,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 
 	/* Etsi */
 	private ActionListener searchListener = e -> toggleSearchPanel();
+
+	// --- Edit Menu ---
 
 	/* Uusi tosite */
 	private ActionListener newDocListener = e -> createDocument();
@@ -2677,6 +2694,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			addEntriesFromTemplate(Integer.parseInt(command));
 		}
 	};
+
+	// --- Settings Menu ---
 
 	/* Vie */
 	private ActionListener exportListener = e -> export();
@@ -2705,6 +2724,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/* Palauta varmuuskopiosta */
 	private ActionListener restoreBackupListener = e -> restoreFromBackup();
 
+	// --- Edit Menu Entry Actions (Ctrl+N, Ctrl+D) ---
+
 	/* Lisää vienti */
 	private AbstractAction addEntryListener = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
@@ -2730,8 +2751,12 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		}
 	};
 
+	// --- Document Type Menu ---
+
 	/* Muokkaa tositelajeja */
 	private ActionListener editDocTypesListener = e -> editDocumentTypes();
+
+	// --- Entry Table Actions (Ctrl+C, Ctrl+V) ---
 
 	/* Kopioi */
 	private Action copyEntriesAction = new AbstractAction() {
@@ -2758,6 +2783,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			setDocumentType(Integer.parseInt(command));
 		}
 	};
+
+	// --- Reports Menu ---
 
 	/* Tilien saldot */
 	private ActionListener printListener = e -> {
@@ -2810,6 +2837,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/* Muokkaa tulosteita */
 	private ActionListener editReportsListener = e -> editReports();
 
+	// --- Tools Menu ---
+
 	/* Tilien saldojen vertailu */
 	private ActionListener balanceComparisonListener = e -> showBalanceComparison();
 
@@ -2856,6 +2885,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/* ALV-kantojen muutokset */
 	private ActionListener vatChangeListener = e -> showVATChangeDialog();
 
+	// --- Help Menu ---
+
 	/* Ohje */
 	private ActionListener helpListener = e -> showHelp();
 
@@ -2864,6 +2895,8 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 
 	/* Tietoja ohjelmasta */
 	private ActionListener aboutListener = e -> showAboutDialog();
+
+	// --- Entry Table Navigation Actions (Shift+Enter, Enter, Tab) ---
 
 	private AbstractAction prevCellAction = new AbstractAction() {
 		private static final long serialVersionUID = 1L;
