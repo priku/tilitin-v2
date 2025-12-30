@@ -107,7 +107,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	protected Registry registry;
 	protected DocumentModel model;
 	private DocumentExporter documentExporter;
-	private DocumentMenuHandler menuHandler;
+	private DocumentMenuHandler menuHandler = new DocumentMenuHandler(this);
 	protected JMenu entryTemplateMenu;
 	protected JMenu docTypeMenu;
 	protected JMenu gotoMenu;
@@ -293,7 +293,6 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		super(Kirjanpito.APP_NAME);
 		this.registry = registry;
 		this.model = model;
-		this.menuHandler = new DocumentMenuHandler(this);
 		this.debitTotal = BigDecimal.ZERO;
 		this.creditTotal = BigDecimal.ZERO;
 		registry.addListener(registryListener);
