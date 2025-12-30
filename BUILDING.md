@@ -2,24 +2,41 @@
 
 ## Vaatimukset
 
-- **Java Development Kit (JDK) 25** tai uudempi
+- **Java Development Kit (JDK) 21** tai uudempi
   - Suositus: [Eclipse Temurin](https://adoptium.net/)
-- **Apache Maven 3.x**
+- **Gradle 8.11+** (wrapper mukana projektissa)
 - **Windows 10/11** (Windows-buildia varten)
-- **WiX Toolset 3.14+** (MSI-asennusohjelmaa varten)
-  - Lataa: https://wixtoolset.org/
+- **Inno Setup 6** (asennusohjelmaa varten)
+  - Lataa: https://jrsoftware.org/isinfo.php
 
 ## Perus JAR-paketin Buildaaminen
 
 ```bash
-mvn clean package
+# Windows
+.\gradlew jar
+
+# Linux/Mac
+./gradlew jar
 ```
 
-Tuottaa: `target/tilitin-2.2.0.jar`
+Tuottaa: `build/libs/tilitin-2.2.0.jar`
 
 Suorita:
 ```bash
-java -jar target/tilitin-2.2.0.jar
+java -jar build/libs/tilitin-2.2.0.jar
+```
+
+## Kääntäminen
+
+```bash
+# Käännä kaikki (Java + Kotlin)
+.\gradlew build
+
+# Vain käännös ilman testejä
+.\gradlew compileJava compileKotlin
+
+# Puhdista ja käännä
+.\gradlew clean build
 ```
 
 ## Windows Natiivi Sovellus
@@ -38,20 +55,7 @@ Tuottaa:
 
 Sovellus sisältää JRE:n, joten Java-asennusta ei tarvita.
 
-### Vaihtoehto 2: MSI Installer
-
-Luo MSI-asennusohjelma:
-
-```bash
-build-windows-installer.bat
-```
-
-Tuottaa:
-- `dist/installer/Tilitin 2.0-2.2.0.msi`
-
-**Huom:** Vaatii WiX Toolset 3.14+ -asennuksen.
-
-### Vaihtoehto 3: Inno Setup Installer (Suositus)
+### Vaihtoehto 2: Inno Setup Installer (Suositus)
 
 Luo moderni Windows-asennusohjelma:
 
@@ -74,33 +78,40 @@ Tuottaa:
 
 **Huom:** Vaatii [Inno Setup 6](https://jrsoftware.org/isinfo.php) -asennuksen.
 
-## Code Signing (Allekirjoitus)
-
-Ennen julkaisua, allekirjoita MSI-paketti:
+## Gradle-tehtävät
 
 ```bash
-signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist/installer/Tilitin-1.6.0.msi
+# Listaa kaikki tehtävät
+.\gradlew tasks
+
+# JAR-paketti
+.\gradlew jar
+
+# Suorita sovellus
+.\gradlew run
+
+# Puhdista build-hakemisto
+.\gradlew clean
+
+# Käännä Kotlin
+.\gradlew compileKotlin
+
+# Käännä Java
+.\gradlew compileJava
+```
+
+## Code Signing (Allekirjoitus)
+
+Ennen julkaisua, allekirjoita asennusohjelma:
+
+```bash
+signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist/installer/Tilitin-2.2.0-setup.exe
 ```
 
 Tai jos sertifikaatti on Windows Certificate Storessa:
 
 ```bash
-signtool sign /fd SHA256 /n "Tilitin Project" dist/installer/Tilitin-1.6.0.msi
-```
-
-## MSIX (Microsoft Store)
-
-MSIX-paketin luominen:
-
-```bash
-# 1. Luo app-image ensin
-build-windows.bat
-
-# 2. Paketointi MSIX:ksi (vaatii MSIX Packaging Tool tai makeappx.exe)
-makeappx pack /d dist\windows\Tilitin /p dist\Tilitin.msix
-
-# 3. Allekirjoita
-signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist\Tilitin.msix
+signtool sign /fd SHA256 /n "Tilitin Project" dist/installer/Tilitin-2.2.0-setup.exe
 ```
 
 ## Testaus
@@ -111,46 +122,85 @@ signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist\Tilitin.msix
 "dist\windows\Tilitin 2.0\Tilitin 2.0.exe"
 ```
 
-### Testaa MSI-asennusohjelma
+### Testaa JAR-paketti
 
-1. Tuplaklikkaa `dist/installer/Tilitin 2.0-2.2.0.msi`
-2. Seuraa asennusohjeita
-3. Käynnistä sovellus Start-valikosta tai työpöydän pikakuvakkeesta
+```bash
+java -jar build/libs/tilitin-2.2.0.jar
+```
 
 ## Ongelmatilanteet
 
-### "jpackage: command not found"
+### "gradlew: command not found"
 
-Varmista että JDK 14+ on asennettu ja PATH-ympäristömuuttuja on asetettu.
+Varmista että olet projektin juurihakemistossa ja käytä oikeaa komentoa:
 
 ```bash
-java -version
+# Windows PowerShell
+.\gradlew build
+
+# Windows CMD
+gradlew build
+
+# Linux/Mac
+./gradlew build
 ```
 
-### "WiX Toolset not found"
+### "JAVA_HOME is not set"
 
-MSI-buildaus vaatii WiX Toolset -asennuksen:
-1. Lataa: https://github.com/wixtoolset/wix3/releases
-2. Asenna
-3. Lisää `C:\Program Files (x86)\WiX Toolset v3.11\bin` PATH:iin
-
-### Maven-riippuvuusongelmat
+Aseta JAVA_HOME osoittamaan JDK 21+ asennukseen:
 
 ```bash
-mvn clean install -U
+# Windows PowerShell
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.1.12-hotspot"
+
+# Pysyvä asetus Windows:ssa - Järjestelmäasetukset > Ympäristömuuttujat
+```
+
+### Gradle-välimuistin tyhjennys
+
+```bash
+.\gradlew clean
+.\gradlew --stop
+Remove-Item -Recurse -Force .gradle -ErrorAction SilentlyContinue
+.\gradlew build
 ```
 
 ## CI/CD
 
-GitHub Actions -workflow on määritelty `.github/workflows/maven.yml` -tiedostossa.
+GitHub Actions -workflowit ovat `.github/workflows/` -hakemistossa:
+
+- **gradle.yml** - Perus CI-buildi jokaiselle pushille
+- **advanced-build.yml** - Täysi buildi + release-paketit (Windows, macOS, Linux)
 
 Automaattinen buildi suoritetaan:
 - Push master-haaraan
 - Pull requestit
-- Tag-julkaisut (v*)
+- Tag-julkaisut (v*) → luodaan release + asennuspaketit
+
+## Projektin rakenne
+
+```
+Tilitin2.0/
+├── build.gradle.kts      # Gradle build-konfiguraatio
+├── settings.gradle.kts   # Gradle-asetukset
+├── gradle.properties     # Gradle-ominaisuudet
+├── gradlew              # Gradle wrapper (Linux/Mac)
+├── gradlew.bat          # Gradle wrapper (Windows)
+├── src/
+│   └── main/
+│       ├── java/        # Java-lähdekoodi
+│       ├── kotlin/      # Kotlin-lähdekoodi
+│       └── resources/   # Resurssit (ikonit, SQL, jne.)
+├── build/               # Gradle build-output
+│   └── libs/            # JAR-paketit
+└── dist/                # Jakelutiedostot
+    ├── windows/         # App-image
+    └── installer/       # Asennusohjelmat
+```
 
 ## Lisätietoa
 
+- Gradle: https://gradle.org/
 - jPackage: https://docs.oracle.com/en/java/javase/21/jpackage/
 - FlatLaf: https://www.formdev.com/flatlaf/
-- WiX Toolset: https://wixtoolset.org/documentation/
+- Inno Setup: https://jrsoftware.org/isinfo.php

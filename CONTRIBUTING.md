@@ -12,23 +12,26 @@ tilitin/
 │   ├── reports/      # Raporttien generointi (PDF, tulostus)
 │   ├── ui/           # Käyttöliittymä (Swing + FlatLaf)
 │   └── util/         # Apuluokat
+├── src/main/kotlin/kirjanpito/
+│   ├── db/           # Kotlin DAO-toteutukset
+│   └── ui/           # Kotlin UI-komponentit
 ├── src/main/resources/
 │   ├── reports/      # Raporttien header-tiedostot
 │   ├── schema/       # Tietokantaskeemat (SQLite, MySQL, PostgreSQL)
 │   └── tilikarttamallit/  # Tilikarttapohjat
 ├── installer/        # Inno Setup -skriptit
+├── build.gradle.kts  # Gradle build-konfiguraatio
+├── settings.gradle.kts # Gradle-asetukset
 ├── build-windows.bat          # Windows .exe -build
-├── build-windows-installer.bat # MSI-build
 ├── build-inno-installer.bat   # Inno Setup -build
-└── pom.xml           # Maven-konfiguraatio
+└── build/            # Gradle output
 ```
 
 ## Kehitysympäristön asennus
 
 ### Vaatimukset
 
-- **JDK 25+** (suositus: [Eclipse Temurin](https://adoptium.net/))
-- **Maven 3.x**
+- **JDK 21+** (suositus: [Eclipse Temurin](https://adoptium.net/))
 - **Git**
 - **IDE** (IntelliJ IDEA, Eclipse tai VS Code + Java-lisäosa)
 
@@ -39,14 +42,15 @@ tilitin/
 git clone https://github.com/priku/tilitin-modernized.git
 cd tilitin-modernized
 
-# Vaihda kehityshaaraan
-git checkout feature/windows-modernization
-
 # Buildaa projekti
-mvn clean package
+./gradlew build
 
 # Käynnistä sovellus
-java -jar target/tilitin-2.0.0.jar
+./gradlew run
+
+# Tai JAR-paketilla
+./gradlew jar
+java -jar build/libs/tilitin-2.2.3.jar
 ```
 
 ## Kehityskäytännöt
@@ -106,7 +110,7 @@ Ennen Pull Requestin luomista:
 
 1. **Buildaa projekti:**
    ```bash
-   mvn clean package
+   ./gradlew build
    ```
 
 2. **Testaa manuaalisesti:**
@@ -118,6 +122,28 @@ Ennen Pull Requestin luomista:
    ```bash
    build-windows.bat
    ```
+
+## Gradle-komennot
+
+```bash
+# Käännä kaikki (Java + Kotlin)
+./gradlew build
+
+# Vain käännös
+./gradlew compileJava compileKotlin
+
+# JAR-paketti
+./gradlew jar
+
+# Suorita sovellus
+./gradlew run
+
+# Puhdista
+./gradlew clean
+
+# Listaa kaikki tehtävät
+./gradlew tasks
+```
 
 ## FlatLaf-teeman kehitys
 

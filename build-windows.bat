@@ -13,16 +13,16 @@ echo.
 REM Tarkista että Java on asennettu
 java -version >nul 2>&1
 if errorlevel 1 (
-    echo [VIRHE] Java ei löydy! Asenna Java 25 tai uudempi.
+    echo [VIRHE] Java ei loydy! Asenna Java 21 tai uudempi.
     pause
     exit /b 1
 )
 
-echo [1/3] Rakennetaan JAR-paketti Mavenilla...
+echo [1/3] Rakennetaan JAR-paketti Gradlella...
 echo.
-call mvn clean package
+call gradlew clean jar
 if errorlevel 1 (
-    echo [VIRHE] Maven build epäonnistui!
+    echo [VIRHE] Gradle build epäonnistui!
     pause
     exit /b 1
 )
@@ -35,20 +35,26 @@ REM Luo dist-hakemisto jos ei ole olemassa
 if not exist "dist" mkdir dist
 if not exist "dist\windows" mkdir dist\windows
 
-REM Hae versio pom.xml:stä
-for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+REM Hae versio build.gradle.kts:sta
+for /f "tokens=2 delims==" %%v in ('findstr /r "version.*=" build.gradle.kts ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+REM Poista välilyönnit ja lainausmerkit
+set VERSION=%VERSION: =%
+set VERSION=%VERSION:"=%
 echo Versio: %VERSION%
+
+REM Fallback jos versiota ei löydy
+if "%VERSION%"=="" set VERSION=2.2.0
 
 REM Suorita jPackage
 jpackage ^
-  --input target ^
+  --input build\libs ^
   --name "Tilitin %VERSION%" ^
   --main-jar tilitin-%VERSION%.jar ^
   --main-class kirjanpito.ui.Kirjanpito ^
   --type app-image ^
   --app-version %VERSION% ^
   --vendor "Tilitin Project" ^
-  --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille - CSV-tuonti" ^
+  --description "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille" ^
   --icon src\main\resources\tilitin.ico ^
   --java-options "--enable-native-access=ALL-UNNAMED" ^
   --dest dist\windows
@@ -66,11 +72,11 @@ echo ========================================
 echo  BUILD ONNISTUI!
 echo ========================================
 echo.
-echo Sovellus on kansiossa: dist\windows\Tilitin\
-echo Suoritettava tiedosto: dist\windows\Tilitin\Tilitin.exe
+echo Sovellus on kansiossa: dist\windows\Tilitin %VERSION%\
+echo Suoritettava tiedosto: dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe
 echo.
 echo Voit testata sovellusta komennolla:
-echo   dist\windows\Tilitin\Tilitin.exe
+echo   "dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe"
 echo.
 
 pause

@@ -63,7 +63,10 @@ Ohjelman teki alun perin Tommi Helineva ([helineva.net/tilitin](https://helineva
 
 ```bash
 # Buildaa JAR
-mvn clean package
+./gradlew jar
+
+# Käännä kaikki
+./gradlew build
 
 # Windows-asennusohjelma
 build-windows.bat

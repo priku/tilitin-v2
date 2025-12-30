@@ -3,8 +3,8 @@
 Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 **Alkuperäinen koko:** 3,856 riviä  
-**Nykyinen koko:** 3,093 riviä  
-**Vähennys:** -763 riviä (-20%)  
+**Nykyinen koko:** 2,511 riviä  
+**Vähennys:** -1,345 riviä (-35%)  
 **Tavoite:** <500 riviä
 
 ---
@@ -128,7 +128,11 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 | Phase 3b | DocumentTableManager.java | 400 riviä | -75 riviä | ✅ |
 | Phase 4 | Code cleanup | - | -3 riviä | ✅ |
 | Phase 5 | DocumentPrinter.java | 434 riviä | -276 riviä | ✅ |
-| **YHTEENSÄ** | | **2,038 riviä** | **-763 riviä** | |
+| Phase 5b | DocumentMenuHandler.java (laajennus) | 299 riviä | -34 riviä | ✅ |
+| Phase 6 | DocumentStateManager.java | 368 riviä | ~300 riviä | ✅ |
+| Phase 7 | DocumentUIBuilder.java | 287 riviä | ~200 riviä | ✅ |
+| Phase 7 | DocumentUIUpdater.java | 372 riviä | ~250 riviä | ✅ |
+| **YHTEENSÄ** | | **~3,364 riviä** | **-1,345 riviä** | |
 
 **Huomio:** Vähennys on pienempi kuin eriytetty koodi, koska:
 - Uudet luokat tarvitsevat oman rakenteensa (importit, dokumentaatio, jne.)
@@ -158,15 +162,30 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 ## 🔄 Jäljellä olevat vaiheet
 
-### Phase 4: Event Handling (jatkuu)
-**Tavoite:** Jäljellä olevat anonymous inner classes → lambdas (jos mahdollista)
+### Phase 8: Entry Actions & Navigation (Tulevaisuus)
+**Tavoite:** Eriytä entry-toiminnot ja navigation
 
-**Jäljellä:**
-- Monimutkaiset AbstractAction-luokat (prevCellAction, nextCellAction, toggleDebitCreditAction)
-- FileFilter (ei voi olla lambda, koska 2 metodia)
+**Tehtävät:**
+- Siirrä AbstractAction listeners (addEntry, removeEntry, copy, paste) → handler
+- Siirrä navigation actions (prevCell, nextCell) → handler tai erillinen luokka
+- Luo `DocumentEntryManager.java` (valinnainen)
+  - addEntry(), removeEntry()
+  - copyEntries(), pasteEntries()
 
-**Valinnainen:**
-- `DocumentEventHandler.java` - Kaikki event handling -logiikka yhteen paikkaan
+**Arvio:** ~160 riviä pois DocumentFrame:sta
+
+---
+
+### Phase 9: Business Logic Extraction (Tulevaisuus)
+**Tavoite:** Eriytä business-logiikka omiin luokkiin
+
+**Tehtävät:**
+- Luo `DocumentBusinessLogic.java`
+  - Document validation
+  - Document operations
+- Refaktoroi loput metodit
+
+**Arvio:** ~600-800 riviä pois DocumentFrame:sta
 
 ---
 
@@ -183,38 +202,54 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 ---
 
-### Phase 6: Navigation & State Management
-**Tavoite:** Eriytä navigointi ja state management
+### Phase 5b: File Menu Listeners ✅ UUSI
+**Tiedosto:** `DocumentMenuHandler.java` laajennus (252 → 299 riviä)  
+**Vähennys:** ~34 riviä DocumentFrame:sta
 
-**Tehtävät:**
-- Luo `DocumentNavigator.java`
-  - prev/next/first/last document -logiikka
-  - document search -logiikka
-  - document filtering
-- Luo `DocumentStateManager.java`
-  - document loading -logiikka
-  - document saving -logiikka
-  - dirty state tracking
-  - validation -logiikka
+**Eriytetty:**
+- newDatabaseListener (43 riviä → handler)
+- openDatabaseListener (15 riviä → handler)
+- databaseSettingsListener (handler)
+- setIgnoreFlagToEntryAction (32 riviä → handler)
 
-**Arvio:** ~500-650 riviä pois DocumentFrame:sta
+**Lisätty getterit DocumentFrame:een:**
+- getModel()
+- getSqliteFileFilter()
+- getTableModel()
+- getEntryTable()
+- getRegistry()
+- generateUniqueFileName() public
 
 ---
 
-### Phase 7: UI Component Management
-**Tavoite:** Eriytä UI-komponenttien luominen ja päivitys
+### Phase 6: State Management ✅
+**Status:** Valmis (v2.2.5)
 
-**Tehtävät:**
-- Luo `DocumentUIBuilder.java`
-  - Kaikki komponenttien luominen
-  - Layout management
-  - Komponenttien alustus
-- Luo `DocumentUIUpdater.java`
-  - UI update -logiikka
-  - Label updates
-  - Button state management
+**Tiedosto:** `DocumentStateManager.java` (368 riviä)  
 
-**Arvio:** ~600-800 riviä pois DocumentFrame:sta
+**Eriytetty:**
+- Document state persistence (save/load)
+- UI component updates (labels, text fields)
+- Validation logic
+- Dirty state tracking
+- Total row calculations
+
+---
+
+### Phase 7: UI Component Management ✅
+**Status:** Valmis (v2.2.5)
+
+**Tiedostot:**
+- `DocumentUIBuilder.java` (287 riviä)
+- `DocumentUIUpdater.java` (372 riviä)
+
+**Eriytetty:**
+- Kaikki UI-komponenttien luominen
+- Layout management
+- Komponenttien alustus
+- UI update -logiikka
+- Label updates
+- Button state management
 
 ---
 
@@ -222,18 +257,19 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 
 **Lopullinen tavoite:** DocumentFrame < 500 riviä
 
-**Nykyinen tila:** 3,093 riviä  
-**Jäljellä:** ~2,593 riviä
+**Nykyinen tila:** 2,511 riviä  
+**Jäljellä:** ~2,011 riviä
 
-**Arvioitu vähennys Phase 5-7:**
-- Phase 5: ~200-300 riviä
-- Phase 6: ~500-650 riviä
-- Phase 7: ~600-800 riviä
-- **Yhteensä:** ~1,300-1,750 riviä
+**Jäljellä olevat isot kokonaisuudet:**
+- AbstractAction listeners (addEntry, removeEntry, copy, paste) ~50 riviä
+- Navigation actions (prevCell, nextCell) ~110 riviä
+- Entry-logiikka metodit (addEntry, removeEntry, copyEntries, pasteEntries) ~200 riviä
+- Business-logiikka metodit ~600 riviä
+- UI update metodit ~300 riviä
 
-**Arvioitu lopputulos:** ~1,180-1,630 riviä
+**Arvioitu lopputulos Phase 8-9 jälkeen:** ~1,000-1,500 riviä
 
-**Huomio:** Tavoite <500 riviä saavutetaan todennäköisesti vasta Phase 7:n jälkeen, ja saattaa vaatia lisää eriytyksiä.
+**Huomio:** Tavoite <500 riviä vaatii merkittävää lisärefaktorointia ja mahdollisesti arkkitehtuurimuutoksia.
 
 ---
 
@@ -247,6 +283,6 @@ Tämä dokumentti seuraa DocumentFrame.java -refaktoroinnin edistymistä.
 ---
 
 **Viimeksi päivitetty:** 2025-12-30  
-**Versio:** 2.2.3  
-**Testaus:** ✅ Testattu ja toimii (2025-12-29)
+**Versio:** 2.2.5  
+**Testaus:** ✅ Testattu ja toimii (Gradle build)
 

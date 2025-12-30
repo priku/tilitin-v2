@@ -103,11 +103,13 @@ import kirjanpito.util.RegistryAdapter;
  * @author Tommi Helineva
  */
 public class DocumentFrame extends JFrame implements AccountSelectionListener,
-		DocumentBackupManager.DatabaseOpener, DocumentExporter.CSVExportStarter {
+		DocumentBackupManager.DatabaseOpener, DocumentExporter.CSVExportStarter,
+		DocumentNavigator.NavigationCallbacks {
 	protected Registry registry;
 	protected DocumentModel model;
 	private DocumentExporter documentExporter;
 	private DocumentMenuHandler menuHandler = new DocumentMenuHandler(this);
+	private DocumentNavigator documentNavigator;
 	protected JMenu entryTemplateMenu;
 	protected JMenu docTypeMenu;
 	protected JMenu gotoMenu;
@@ -195,70 +197,15 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 		}
 	}; // Note: FileFilter has two methods, cannot be converted to lambda
 
-	// Action listeners - defined early so they can be used in createMenuBar()
+	// Action listeners - delegated to DocumentMenuHandler
 	/* Uusi tietokanta */
-	private ActionListener newDatabaseListener = e -> {
-		File dbDir = model.getDatabaseDir();
-		if (dbDir == null) {
-			dbDir = new File(AppSettings.getInstance().getDirectoryPath());
-		}
-		
-		// Ehdota automaattisesti vapaata nimeä
-		File suggestedFile = generateUniqueFileName(dbDir, "kirjanpito");
-		
-		final JFileChooser fileChooser = new JFileChooser(dbDir);
-		fileChooser.setFileFilter(sqliteFileFilter);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.setDialogTitle("Uusi tietokanta");
-		fileChooser.setSelectedFile(suggestedFile);
-		File file = null;
-
-		while (true) {
-			fileChooser.showSaveDialog(DocumentFrame.this);
-			file = fileChooser.getSelectedFile();
-
-			if (file == null) {
-				return;
-			}
-
-			if (!file.getName().toLowerCase().endsWith(".sqlite")) {
-				file = new File(file.getAbsolutePath() + ".sqlite");
-			}
-
-			if (file.exists()) {
-				SwingUtils.showErrorMessage(DocumentFrame.this, String.format(
-						"Tiedosto %s on jo olemassa. Valitse toinen nimi.", file.getAbsolutePath()));
-				// Ehdota seuraavaa vapaata nimeä
-				String currentName = file.getName().replace(".sqlite", "");
-				File nextSuggestion = generateUniqueFileName(file.getParentFile(), currentName);
-				fileChooser.setSelectedFile(nextSuggestion);
-			}
-			else {
-				break;
-			}
-		}
-
-		openSqliteDataSource(file);
-	};
+	private ActionListener newDatabaseListener = menuHandler.getNewDatabaseListener();
 
 	/* Avaa tietokanta */
-	private ActionListener openDatabaseListener = e -> {
-		final JFileChooser fileChooser = new JFileChooser(model.getDatabaseDir());
-		fileChooser.setFileFilter(sqliteFileFilter);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.setDialogTitle("Avaa tietokanta");
-		fileChooser.showOpenDialog(DocumentFrame.this);
-		File file = fileChooser.getSelectedFile();
-
-		if (file == null) {
-			return;
-		}
-
-		openSqliteDataSource(file);
-	};
+	private ActionListener openDatabaseListener = menuHandler.getOpenDatabaseListener();
 
 	/* Tietokanta-asetukset */
-	private ActionListener databaseSettingsListener = e -> showDatabaseSettings();
+	private ActionListener databaseSettingsListener = menuHandler.getDatabaseSettingsListener();
 	
 	// Column mapper for DocumentTableManager
 	// This will be initialized after tableManager is created
@@ -742,14 +689,18 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	protected void createSearchBar(JPanel container) {
 		// Use UI builder for Phase 7 refactoring
 		uiBuilder.createSearchBar(container);
-		
+
 		// Get component references
 		searchPanel = uiComponents.searchPanel;
 		searchPhraseTextField = uiComponents.searchPhraseTextField;
-		
+
 		// Update updater components
 		uiUpdaterComponents.searchPanel = searchPanel;
 		uiUpdaterComponents.searchPhraseTextField = searchPhraseTextField;
+
+		// Initialize document navigator (Phase 8)
+		documentNavigator = new DocumentNavigator(registry, searchPanel,
+				searchPhraseTextField, this);
 	}
 
 	/**
@@ -854,47 +805,14 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * käyttäjän tekemät muutokset tallennetaan.
 	 */
 	public void createDocument() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		try {
-			model.createDocument();
-		}
-		catch (DataAccessException e) {
-			String message = "Uuden tositteen luominen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-		}
-
-		updatePosition();
-		updateDocument();
-		updateTotalRow();
+		documentNavigator.createDocument();
 	}
 
 	/**
 	 * Poistaa valitun tositteen.
 	 */
 	public void deleteDocument() {
-		int result = JOptionPane.showConfirmDialog(this,
-				"Haluatko varmasti poistaa valitun tositteen?",
-				Kirjanpito.APP_NAME, JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE);
-
-		if (result == JOptionPane.YES_OPTION) {
-			try {
-				model.deleteDocument();
-			}
-			catch (DataAccessException e) {
-				String message = "Tositteen poistaminen epäonnistui";
-				logger.log(Level.SEVERE, message, e);
-				SwingUtils.showDataAccessErrorMessage(this, e, message);
-			}
-
-			updatePosition();
-			updateDocument();
-			updateTotalRow();
-		}
+		documentNavigator.deleteDocument();
 	}
 
 	/**
@@ -904,171 +822,28 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * @param index tositteen järjestysnumero
 	 */
 	public void goToDocument(int index) {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		try {
-			model.goToDocument(index);
-		}
-		catch (DataAccessException e) {
-			String message = "Tositetietojen hakeminen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-		}
-
-		updatePosition();
-		updateDocument();
-		updateTotalRow();
+		documentNavigator.goToDocument(index);
 	}
 
 	/**
 	 * Kysyy käyttäjältä tositenumeroa, ja siirtyy tähän tositteeseen.
 	 */
 	public void findDocumentByNumber() {
-		boolean valid = false;
-		int documentTypeIndex, index;
-		int number = -1;
-
-		while (!valid) {
-			String s = JOptionPane.showInputDialog(this, "Tositenumero?",
-				Kirjanpito.APP_NAME, JOptionPane.PLAIN_MESSAGE);
-
-			if (s != null) {
-				try {
-					number = Integer.parseInt(s);
-				}
-				catch (NumberFormatException e) {
-					number = -1;
-				}
-
-				valid = (number > 0);
-
-				if (!valid) {
-					JOptionPane.showMessageDialog(this,
-							"Tositenumero saa sisältää vain numeroita.",
-							Kirjanpito.APP_NAME, JOptionPane.ERROR_MESSAGE);
-				}
-			}
-			else {
-				return;
-			}
-		}
-
-		documentTypeIndex = findDocumentTypeByNumber(number);
-
-		try {
-			index = model.findDocumentByNumber(documentTypeIndex, number);
-		}
-		catch (DataAccessException e) {
-			String message = "Tositetietojen hakeminen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-			return;
-		}
-
-		if (index < 0) {
-			SwingUtils.showInformationMessage(this,
-					"Tositetta ei löytynyt numerolla " + number + ".");
-			return;
-		}
-
-		boolean invalidDocuments = false;
-
-		if (searchEnabled) {
-			searchEnabled = false;
-			invalidDocuments = true;
-			updateSearchPanel();
-		}
-
-		if (model.getDocumentTypeIndex() != documentTypeIndex) {
-			selectDocumentTypeMenuItem(documentTypeIndex);
-			model.setDocumentTypeIndex(documentTypeIndex);
-			invalidDocuments = true;
-		}
-
-		/* Tositetiedot on haettava tietokannasta, jos tositelaji on muuttunut
-		 * tai haku on kytketty pois päältä. */
-		if (invalidDocuments) {
-			try {
-				model.fetchDocuments(index);
-			}
-			catch (DataAccessException e) {
-				String message = "Tositetietojen hakeminen epäonnistui";
-				logger.log(Level.SEVERE, message, e);
-				SwingUtils.showDataAccessErrorMessage(this, e, message);
-				return;
-			}
-
-			updatePosition();
-			updateDocument();
-			updateTotalRow();
-		}
-		else {
-			goToDocument(index);
-		}
+		documentNavigator.findDocumentByNumber();
 	}
 
 	/**
 	 * Kytkee tositteiden haun päälle tai pois päältä.
 	 */
 	public void toggleSearchPanel() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		searchEnabled = !searchEnabled;
-		updateSearchPanel();
-
-		if (!searchEnabled) {
-			/* Kun haku kytketään pois päältä, haetaan valitun
-			 * tositelajin kaikki tositteet.
-			 */
-			try {
-				model.fetchDocuments(-1);
-			}
-			catch (DataAccessException e) {
-				String message = "Tositteiden hakeminen epäonnistui";
-				logger.log(Level.SEVERE, message, e);
-				SwingUtils.showDataAccessErrorMessage(this, e, message);
-				return;
-			}
-
-			updatePosition();
-			updateDocument();
-			updateTotalRow();
-		}
+		documentNavigator.toggleSearchPanel();
 	}
 
 	/**
 	 * Etsii tositteita käyttäjän antamalla hakusanalla.
 	 */
 	public void searchDocuments() {
-		if (!saveDocumentIfChanged()) {
-			return;
-		}
-
-		int count;
-
-		try {
-			count = model.search(searchPhraseTextField.getText());
-		}
-		catch (DataAccessException e) {
-			String message = "Tositteiden hakeminen epäonnistui";
-			logger.log(Level.SEVERE, message, e);
-			SwingUtils.showDataAccessErrorMessage(this, e, message);
-			return;
-		}
-
-		if (count == 0) {
-			SwingUtils.showInformationMessage(this,
-					"Yhtään tositetta ei löytynyt.");
-		}
-		else {
-			updatePosition();
-			updateDocument();
-			updateTotalRow();
-		}
+		documentNavigator.searchDocuments();
 	}
 
 	/**
@@ -1915,7 +1690,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Päivittää tositteen järjestysnumeron, tositteiden
 	 * lukumäärän ja tositelajin tilariville.
 	 */
-	protected void updatePosition() {
+	public void updatePosition() {
 		// Use UI updater for Phase 7 refactoring
 		uiUpdater.updatePosition();
 		
@@ -1937,7 +1712,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/**
 	 * Päivittää tositteen tiedot.
 	 */
-	protected void updateDocument() {
+	public void updateDocument() {
 		// Use UI updater for Phase 7 refactoring
 		uiUpdater.updateDocument();
 		
@@ -1952,7 +1727,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/**
 	 * Päivittää summarivin tiedot.
 	 */
-	protected void updateTotalRow() {
+	public void updateTotalRow() {
 		debitTotal = BigDecimal.ZERO;
 		creditTotal = BigDecimal.ZERO;
 		int count = model.getEntryCount();
@@ -2003,7 +1778,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 *
 	 * @param index uuden tositelajin järjestysnumero
 	 */
-	protected void selectDocumentTypeMenuItem(int index) {
+	public void selectDocumentTypeMenuItem(int index) {
 		int oldIndex = model.getDocumentTypeIndex();
 
 		if (!saveDocumentIfChanged()) {
@@ -2020,7 +1795,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	/**
 	 * Näyttää tai piilottaa hakupaneelin.
 	 */
-	protected void updateSearchPanel() {
+	public void updateSearchPanel() {
 		// Use UI updater for Phase 7 refactoring
 		uiUpdater.updateSearchPanel(searchEnabled);
 	}
@@ -2112,7 +1887,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 *
 	 * @return <code>false</code>, jos tallentaminen epäonnistuu
 	 */
-	protected boolean saveDocumentIfChanged() {
+	public boolean saveDocumentIfChanged() {
 		stopEditing();
 
 		if (!model.isDocumentChanged() || !model.isDocumentEditable()) {
@@ -2404,7 +2179,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * @param number tositenumero
 	 * @return tositelajin järjestysnumero tai -1, jos tositelajia ei löytynyt
 	 */
-	protected int findDocumentTypeByNumber(int number) {
+	public int findDocumentTypeByNumber(int number) {
 		int index = 0;
 
 		for (DocumentType type : registry.getDocumentTypes()) {
@@ -2462,7 +2237,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	 * Generoi vapaan tiedostonimen tietokannalle.
 	 * Jos "kirjanpito.sqlite" on olemassa, ehdottaa "kirjanpito_2.sqlite" jne.
 	 */
-	private File generateUniqueFileName(File directory, String baseName) {
+	public File generateUniqueFileName(File directory, String baseName) {
 		File file = new File(directory, baseName + ".sqlite");
 		if (!file.exists()) {
 			return file;
@@ -2480,6 +2255,68 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 			}
 		}
 		return new File(directory, baseName + "_" + System.currentTimeMillis() + ".sqlite");
+	}
+
+	// ========================================
+	// ACCESSORS FOR DocumentMenuHandler
+	// ========================================
+
+	/**
+	 * Palauttaa DocumentModel-instanssin.
+	 * @return model
+	 */
+	public DocumentModel getModel() {
+		return model;
+	}
+
+	/**
+	 * Palauttaa DocumentModel-instanssin.
+	 * Implementoi NavigationCallbacks.getDocumentModel().
+	 * @return model
+	 */
+	public DocumentModel getDocumentModel() {
+		return model;
+	}
+
+	/**
+	 * Palauttaa SQLite-tiedostosuodattimen.
+	 * @return sqliteFileFilter
+	 */
+	public FileFilter getSqliteFileFilter() {
+		return sqliteFileFilter;
+	}
+
+	/**
+	 * Palauttaa EntryTableModel-instanssin.
+	 * @return tableModel
+	 */
+	public EntryTableModel getTableModel() {
+		return tableModel;
+	}
+
+	/**
+	 * Palauttaa entryTable-instanssin.
+	 * @return entryTable
+	 */
+	public JTable getEntryTable() {
+		return entryTable;
+	}
+
+	/**
+	 * Palauttaa Registry-instanssin.
+	 * @return registry
+	 */
+	public Registry getRegistry() {
+		return registry;
+	}
+
+	/**
+	 * Palauttaa pääikkunan dialogeja varten.
+	 * Implementoi NavigationCallbacks.getParentWindow().
+	 * @return this frame
+	 */
+	public java.awt.Window getParentWindow() {
+		return this;
 	}
 
 	// ========================================
@@ -2636,38 +2473,7 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	private ActionListener vatDocumentListener = menuHandler.getVatDocumentListener();
 
 	/* Ohita vienti ALV-laskelmassa */
-	private AbstractAction setIgnoreFlagToEntryAction = new AbstractAction() {
-		private static final long serialVersionUID = 1L;
-
-		public void actionPerformed(ActionEvent e) {
-			int[] rows = entryTable.getSelectedRows();
-
-			if (rows.length == 0) {
-				return;
-			}
-
-			boolean ignore = !model.getEntry(rows[0]).getFlag(0);
-
-			for (int index : rows) {
-				Entry entry = model.getEntry(index);
-				Account account = registry.getAccountById(entry.getAccountId());
-
-				if (account == null) {
-					continue;
-				}
-
-				if (account.getVatCode() == 2 || account.getVatCode() == 3) {
-					entry.setFlag(0, ignore);
-				}
-				else {
-					entry.setFlag(0, false);
-				}
-
-				model.setDocumentChanged();
-				tableModel.fireTableRowsUpdated(index, index);
-			}
-		}
-	};
+	private Action setIgnoreFlagToEntryAction = menuHandler.getSetIgnoreFlagToEntryAction();
 
 	/* Muuta tositenumeroita */
 	private ActionListener numberShiftListener = menuHandler.getNumberShiftListener();

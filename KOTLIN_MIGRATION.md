@@ -13,13 +13,13 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 
 ## What Has Been Done
 
-### 1. Maven Configuration
+### 1. Gradle Configuration
 
-- Upgraded to Kotlin 2.3.0 (from 2.1.10) to support Java 25
-- Configured kotlin-maven-plugin with Java 25 target (jvmTarget=25)
-- Added kotlin-stdlib dependency (version 2.3.0)
+- Upgraded to Kotlin 2.1.0 with Java 21 toolchain
+- Configured Kotlin plugin with Java 21 target (jvmTarget=21)
+- Added kotlin-stdlib dependency
 - Configured mixed Java/Kotlin compilation
-- Maven compiler release set to 25
+- Compose Desktop support enabled
 
 ### 2. Directory Structure
 
@@ -92,20 +92,22 @@ Dialog and threading utilities:
 
 ### Prerequisites
 
-- Java 25 (Eclipse Adoptium JDK)
-- Maven 3.9+
-- Kotlin 2.3.0 (auto-downloaded by Maven)
+- Java 21+ (Eclipse Adoptium JDK)
+- Gradle 8.11+ (wrapper included)
+- Kotlin 2.1.0 (auto-downloaded by Gradle)
 
 ### Build Commands
 ```bash
 # Clean compile
-mvn clean compile
+./gradlew clean compileJava compileKotlin
 
 # Build JAR with dependencies
-mvn package
+./gradlew jar
 
 # Run application
-java -jar target/tilitin-2.1.1.jar
+./gradlew run
+# or
+java -jar build/libs/tilitin-2.2.3.jar
 ```
 
 ## Migration Strategy
@@ -308,7 +310,7 @@ panel.addWithConstraints(
 ```
 
 ## Files Modified
-- [pom.xml](pom.xml) - Added Kotlin configuration
+- [build.gradle.kts](build.gradle.kts) - Gradle/Kotlin configuration
 - Created [src/main/kotlin/kirjanpito/ui/SwingExtensions.kt](src/main/kotlin/kirjanpito/ui/SwingExtensions.kt)
 - Created [src/main/kotlin/kirjanpito/ui/ValidationUtils.kt](src/main/kotlin/kirjanpito/ui/ValidationUtils.kt)
 - Created [src/main/kotlin/kirjanpito/ui/DialogUtils.kt](src/main/kotlin/kirjanpito/ui/DialogUtils.kt)

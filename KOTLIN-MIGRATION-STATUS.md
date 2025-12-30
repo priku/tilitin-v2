@@ -128,11 +128,11 @@ Lisätty `DatabaseExtensions.kt`:iin:
 
 ```bash
 # Kehitykseen
-mvn compile exec:java
+./gradlew run
 
 # JAR-paketilla
-mvn clean package
-java -jar target/tilitin-2.2.3.jar
+./gradlew jar
+java -jar build/libs/tilitin-2.2.3.jar
 ```
 
 ---

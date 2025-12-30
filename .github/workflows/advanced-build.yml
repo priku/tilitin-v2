@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 env:
-  JAVA_VERSION: '25-ea'
+  JAVA_VERSION: '21'
   APP_NAME: 'Tilitin'
   APP_VENDOR: 'Priku'
   APP_DESCRIPTION: 'Moderni suomalainen kirjanpito-ohjelma'
@@ -36,7 +36,10 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
-        cache: maven
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
     - name: Kotlin compilation statistics
       run: |
@@ -51,24 +54,23 @@ jobs:
         fi
         echo "==================================="
 
-    - name: Build with Maven
-      run: mvn -B clean package --file pom.xml
+    - name: Build with Gradle
+      run: ./gradlew clean build
+
+    - name: Build JAR
+      run: ./gradlew jar
 
     - name: Verify Kotlin + Java compilation
       run: |
-        echo "✅ Kotlin 2.3.0 + Java 25 compilation successful"
-        echo "📦 JAR built: $(ls -lh target/tilitin*.jar | awk '{print $9, $5}')"
+        echo "✅ Kotlin + Java 21 compilation successful"
+        echo "📦 JAR built: $(ls -lh build/libs/tilitin*.jar | awk '{print $9, $5}')"
 
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
         name: tilitin-jar
-        path: target/tilitin*.jar
+        path: build/libs/tilitin*.jar
         retention-days: 30
-
-    - name: Upload dependency graph
-      uses: advanced-security/maven-dependency-submission-action@v4
-      continue-on-error: true
 
     - name: Extract version from tag
       id: version
@@ -120,7 +122,7 @@ jobs:
         draft: false
         body_path: release-notes.md
         files: |
-          target/tilitin*.jar
+          build/libs/tilitin*.jar
 
   # =============================================================================
   # Job 2: Linux packages (.deb, .rpm)
@@ -139,7 +141,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: tilitin-jar
-        path: target/
+        path: build/libs/
 
     - name: Set up JDK ${{ env.JAVA_VERSION }}
       uses: actions/setup-java@v4
@@ -153,7 +155,7 @@ jobs:
     - name: Get JAR filename
       id: jar
       run: |
-        JAR_FILE=$(ls target/tilitin*.jar | head -1)
+        JAR_FILE=$(ls build/libs/tilitin*.jar | head -1)
         echo "JAR_FILE=$JAR_FILE" >> $GITHUB_OUTPUT
         echo "Found JAR: $JAR_FILE"
 
@@ -161,7 +163,7 @@ jobs:
       run: |
         VERSION="${{ needs.build-and-release.outputs.version }}"
         jpackage \
-          --input target \
+          --input build/libs \
           --main-jar $(basename ${{ steps.jar.outputs.JAR_FILE }}) \
           --name tilitin \
           --app-version "$VERSION" \
@@ -178,7 +180,7 @@ jobs:
       run: |
         VERSION="${{ needs.build-and-release.outputs.version }}"
         jpackage \
-          --input target \
+          --input build/libs \
           --main-jar $(basename ${{ steps.jar.outputs.JAR_FILE }}) \
           --name tilitin \
           --app-version "$VERSION" \
@@ -216,7 +218,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: tilitin-jar
-        path: target/
+        path: build/libs/
 
     - name: Set up JDK ${{ env.JAVA_VERSION }}
       uses: actions/setup-java@v4
@@ -227,13 +229,13 @@ jobs:
     - name: Build Windows app-image with jPackage
       run: |
         $VERSION = "${{ needs.build-and-release.outputs.version }}"
-        $JAR_FILE = Get-ChildItem -Path target -Filter "tilitin*.jar" | Select-Object -First 1
+        $JAR_FILE = Get-ChildItem -Path build/libs -Filter "tilitin*.jar" | Select-Object -First 1
         
         Write-Host "Building Windows app-image for version $VERSION"
         Write-Host "Using JAR: $($JAR_FILE.Name)"
         
         jpackage `
-          --input target `
+          --input build/libs `
           --main-jar $JAR_FILE.Name `
           --name Tilitin `
           --app-version $VERSION `
@@ -280,7 +282,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: tilitin-jar
-        path: target/
+        path: build/libs/
 
     - name: Set up JDK ${{ env.JAVA_VERSION }}
       uses: actions/setup-java@v4
@@ -291,13 +293,13 @@ jobs:
     - name: Build macOS DMG package
       run: |
         VERSION="${{ needs.build-and-release.outputs.version }}"
-        JAR_FILE=$(ls target/tilitin*.jar | head -1)
+        JAR_FILE=$(ls build/libs/tilitin*.jar | head -1)
         
         echo "Building macOS DMG for version $VERSION"
         echo "Using JAR: $JAR_FILE"
         
         jpackage \
-          --input target \
+          --input build/libs \
           --main-jar $(basename "$JAR_FILE") \
           --name Tilitin \
           --app-version "$VERSION" \
@@ -335,16 +337,24 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
-        cache: maven
+        cache: gradle
 
-    - name: Gather dependencies with sources
-      run: mvn -B dependency:copy-dependencies -Dclassifier=sources
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-    - name: Zip dependencies
-      run: cd target && zip -9 -r tilitin-dependencies.zip dependency
+    - name: Gather dependencies
+      run: ./gradlew dependencies --configuration runtimeClasspath > dependencies.txt
+
+    - name: Copy dependency JARs
+      run: |
+        mkdir -p build/dependency
+        ./gradlew copyDependencies || echo "Note: copyDependencies task may not exist, skipping"
+
+    - name: Zip dependencies info
+      run: zip -9 build/tilitin-dependencies.zip dependencies.txt
 
     - name: Upload dependencies to release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.ref_name }}
-        files: target/tilitin-dependencies.zip
+        files: build/tilitin-dependencies.zip

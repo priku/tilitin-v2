@@ -1,8 +1,16 @@
 package kirjanpito.ui;
 
 import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JFileChooser;
+
+import kirjanpito.db.Account;
+import kirjanpito.db.Entry;
 import kirjanpito.models.DocumentModel;
+import kirjanpito.util.AppSettings;
 
 /**
  * Handles menu action listeners for DocumentFrame.
@@ -28,6 +36,73 @@ public class DocumentMenuHandler {
 	// ========================================
 	// FILE MENU LISTENERS
 	// ========================================
+
+	public ActionListener getNewDatabaseListener() {
+		return e -> {
+			File dbDir = frame.getModel().getDatabaseDir();
+			if (dbDir == null) {
+				dbDir = new File(AppSettings.getInstance().getDirectoryPath());
+			}
+			
+			// Ehdota automaattisesti vapaata nimeä
+			File suggestedFile = frame.generateUniqueFileName(dbDir, "kirjanpito");
+			
+			final JFileChooser fileChooser = new JFileChooser(dbDir);
+			fileChooser.setFileFilter(frame.getSqliteFileFilter());
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setDialogTitle("Uusi tietokanta");
+			fileChooser.setSelectedFile(suggestedFile);
+			File file = null;
+
+			while (true) {
+				fileChooser.showSaveDialog(frame);
+				file = fileChooser.getSelectedFile();
+
+				if (file == null) {
+					return;
+				}
+
+				if (!file.getName().toLowerCase().endsWith(".sqlite")) {
+					file = new File(file.getAbsolutePath() + ".sqlite");
+				}
+
+				if (file.exists()) {
+					SwingUtils.showErrorMessage(frame, String.format(
+							"Tiedosto %s on jo olemassa. Valitse toinen nimi.", file.getAbsolutePath()));
+					// Ehdota seuraavaa vapaata nimeä
+					String currentName = file.getName().replace(".sqlite", "");
+					File nextSuggestion = frame.generateUniqueFileName(file.getParentFile(), currentName);
+					fileChooser.setSelectedFile(nextSuggestion);
+				}
+				else {
+					break;
+				}
+			}
+
+			frame.openSqliteDataSource(file);
+		};
+	}
+
+	public ActionListener getOpenDatabaseListener() {
+		return e -> {
+			final JFileChooser fileChooser = new JFileChooser(frame.getModel().getDatabaseDir());
+			fileChooser.setFileFilter(frame.getSqliteFileFilter());
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			fileChooser.setDialogTitle("Avaa tietokanta");
+			fileChooser.showOpenDialog(frame);
+			File file = fileChooser.getSelectedFile();
+
+			if (file == null) {
+				return;
+			}
+
+			frame.openSqliteDataSource(file);
+		};
+	}
+
+	public ActionListener getDatabaseSettingsListener() {
+		return e -> frame.showDatabaseSettings();
+	}
 
 	public ActionListener getQuitListener() {
 		return e -> frame.quit();
@@ -151,6 +226,45 @@ public class DocumentMenuHandler {
 
 	public ActionListener getVatChangeListener() {
 		return e -> frame.showVATChangeDialog();
+	}
+
+	/**
+	 * Palauttaa Ohita vienti ALV-laskelmassa -toiminnon.
+	 * Tämä on AbstractAction koska sitä käytetään ActionMap:issa.
+	 */
+	public Action getSetIgnoreFlagToEntryAction() {
+		return new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				int[] rows = frame.getEntryTable().getSelectedRows();
+
+				if (rows.length == 0) {
+					return;
+				}
+
+				boolean ignore = !frame.getModel().getEntry(rows[0]).getFlag(0);
+
+				for (int index : rows) {
+					Entry entry = frame.getModel().getEntry(index);
+					Account account = frame.getRegistry().getAccountById(entry.getAccountId());
+
+					if (account == null) {
+						continue;
+					}
+
+					if (account.getVatCode() == 2 || account.getVatCode() == 3) {
+						entry.setFlag(0, ignore);
+					}
+					else {
+						entry.setFlag(0, false);
+					}
+
+					frame.getModel().setDocumentChanged();
+					frame.getTableModel().fireTableRowsUpdated(index, index);
+				}
+			}
+		};
 	}
 
 	// ========================================
