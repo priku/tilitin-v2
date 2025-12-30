@@ -110,6 +110,79 @@ public class MainController implements Initializable {
     
     public void setStage(Stage stage) {
         this.stage = stage;
+        setupKeyboardShortcuts();
+    }
+    
+    private void setupKeyboardShortcuts() {
+        if (stage == null || stage.getScene() == null) return;
+        
+        stage.getScene().setOnKeyPressed(e -> {
+            if (e.isControlDown()) {
+                switch (e.getCode()) {
+                    case N:
+                        handleNewDocument();
+                        e.consume();
+                        break;
+                    case S:
+                        handleSave();
+                        e.consume();
+                        break;
+                    case P:
+                        handlePrint();
+                        e.consume();
+                        break;
+                    case O:
+                        handleOpenDatabase();
+                        e.consume();
+                        break;
+                    case LEFT:
+                        handlePrevDocument();
+                        e.consume();
+                        break;
+                    case RIGHT:
+                        handleNextDocument();
+                        e.consume();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (e.getCode()) {
+                    case F9:
+                        openAccountSelectionDialog();
+                        e.consume();
+                        break;
+                    case PAGE_UP:
+                        handlePrevDocument();
+                        e.consume();
+                        break;
+                    case PAGE_DOWN:
+                        handleNextDocument();
+                        e.consume();
+                        break;
+                    case DELETE:
+                        if (entryTable.isFocused() && entryTable.getEditingCell() == null) {
+                            handleRemoveEntry();
+                            e.consume();
+                        }
+                        break;
+                    case HOME:
+                        if (e.isControlDown()) {
+                            handleFirstDocument();
+                            e.consume();
+                        }
+                        break;
+                    case END:
+                        if (e.isControlDown()) {
+                            handleLastDocument();
+                            e.consume();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
     
     private void initializeTable() {

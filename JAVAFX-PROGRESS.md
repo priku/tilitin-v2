@@ -1,9 +1,12 @@
 # JavaFX Migration Progress
 
-## Status: Phase 1 Complete ✅
+## Status: Phase 5 Complete ✅ - 90% VALMIS!
 
 **Aloitettu:** 2025-12-31
 **Päivitetty:** 2025-12-31
+
+### Valmis käytettäväksi! 
+Kaikki perustoiminnot on toteutettu.
 
 ---
 
@@ -40,11 +43,52 @@
 | VAT handling | ✅ | 🔴 Korkea |
 | Delete document | ✅ | 🟡 Keskitaso |
 | Copy/Paste entries | ✅ | 🟡 Keskitaso |
-| Date picker validation | ⏳ | 🟡 Keskitaso |
+| Date picker validation | ✅ | 🟡 Keskitaso |
 
 ---
 
-## ⏳ Phase 3: Dialogit
+## ✅ Phase 3: Dialogit (VALMIS)
+
+| Dialogi | Status |
+|---------|--------|
+| AccountSelectionDialogFX | ✅ F9-haku |
+| COADialogFX | ✅ Tilikartta |
+| DocumentTypeDialogFX | ✅ Tositelajit |
+| SettingsDialogFX | ✅ Asetukset |
+| Period info | ✅ Info-dialogi |
+| Database info | ✅ Info-dialogi |
+
+---
+
+## ✅ Phase 4: Raportit (VALMIS)
+
+| Raportti | Status |
+|----------|--------|
+| Päiväkirja | ✅ |
+| Pääkirja | ✅ |
+| Tuloslaskelma | ✅ |
+| Tase | ✅ |
+| Export to .txt | ✅ |
+| Print | ✅ |
+
+---
+
+## ✅ Phase 5: Keyboard Shortcuts & Polish (VALMIS)
+
+| Toiminto | Status |
+|----------|--------|
+| Ctrl+N (new doc) | ✅ |
+| Ctrl+S (save) | ✅ |
+| Ctrl+P (print) | ✅ |
+| Ctrl+O (open) | ✅ |
+| Ctrl+Left/Right (nav) | ✅ |
+| F9 (account search) | ✅ |
+| PageUp/Down (nav) | ✅ |
+| Delete (remove entry) | ✅ |
+
+---
+
+## ✅ Phase 3: Dialogit
 
 | Dialogi | Swing-versio | JavaFX | Status |
 |---------|--------------|--------|--------|
