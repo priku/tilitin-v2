@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
@@ -65,9 +66,17 @@ public class MainController implements Initializable {
     private Stage stage;
     private DataSource dataSource;
     private String databaseName;  // SQLite tiedostonimi
+    
+    // Period and documents
+    private Period currentPeriod;
+    private List<Document> documents;
+    private int currentDocumentIndex = -1;
     private Document currentDocument;
     private List<Entry> currentEntries;
     private List<Account> accounts;
+    private int documentCount = 0;
+    
+    // UI data
     private ObservableList<EntryRow> entries;
     private DecimalFormat currencyFormat;
     
@@ -137,6 +146,9 @@ public class MainController implements Initializable {
         boolean hasDatabase = dataSource != null;
         boolean hasDocument = currentDocument != null;
         
+        // Päivitä tositelaskuri
+        totalDocumentsLabel.setText(String.valueOf(documentCount));
+        
         // Päivitä kentät
         if (hasDocument) {
             // Päivämäärä
@@ -166,7 +178,6 @@ public class MainController implements Initializable {
         // Status bar
         if (hasDatabase && databaseName != null) {
             databaseLabel.setText(databaseName);
-            periodIndicator.setText("📊 Tilikausi aktiivinen");
         } else {
             databaseLabel.setText("Ei tietokantaa");
             periodIndicator.setText("");
@@ -321,31 +332,64 @@ public class MainController implements Initializable {
     // Navigation handlers
     @FXML
     private void handlePrevDocument() {
-        setStatus("Edellinen tosite");
-        // TODO: DocumentNavigator
+        if (documents == null || documents.isEmpty()) return;
+        
+        if (currentDocumentIndex > 0) {
+            currentDocumentIndex--;
+            loadDocument(documents.get(currentDocumentIndex));
+            setStatus("Tosite " + currentDocument.getNumber());
+        } else {
+            setStatus("Ensimmäinen tosite");
+        }
     }
     
     @FXML
     private void handleNextDocument() {
-        setStatus("Seuraava tosite");
-        // TODO: DocumentNavigator
+        if (documents == null || documents.isEmpty()) return;
+        
+        if (currentDocumentIndex < documents.size() - 1) {
+            currentDocumentIndex++;
+            loadDocument(documents.get(currentDocumentIndex));
+            setStatus("Tosite " + currentDocument.getNumber());
+        } else {
+            setStatus("Viimeinen tosite");
+        }
     }
     
     @FXML
     private void handleFirstDocument() {
-        setStatus("Ensimmäinen tosite");
-        // TODO: DocumentNavigator
+        if (documents == null || documents.isEmpty()) return;
+        
+        currentDocumentIndex = 0;
+        loadDocument(documents.get(0));
+        setStatus("Ensimmäinen tosite: " + currentDocument.getNumber());
     }
     
     @FXML
     private void handleLastDocument() {
-        setStatus("Viimeinen tosite");
-        // TODO: DocumentNavigator
+        if (documents == null || documents.isEmpty()) return;
+        
+        currentDocumentIndex = documents.size() - 1;
+        loadDocument(documents.get(currentDocumentIndex));
+        setStatus("Viimeinen tosite: " + currentDocument.getNumber());
     }
     
     @FXML
     private void handleGotoDocument() {
-        showNotImplemented("Siirry tositteeseen");
+        // Näytä dialogi
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Siirry tositteeseen");
+        dialog.setHeaderText("Syötä tositenumero");
+        dialog.setContentText("Tosite:");
+        
+        dialog.showAndWait().ifPresent(text -> {
+            try {
+                int docNum = Integer.parseInt(text);
+                gotoDocumentNumber(docNum);
+            } catch (NumberFormatException e) {
+                setStatus("Virheellinen tositenumero");
+            }
+        });
     }
     
     @FXML
@@ -353,22 +397,95 @@ public class MainController implements Initializable {
         String text = documentNumberField.getText();
         try {
             int docNum = Integer.parseInt(text);
-            setStatus("Siirrytään tositteeseen " + docNum);
-            // TODO: DocumentNavigator.gotoDocument(docNum)
+            gotoDocumentNumber(docNum);
         } catch (NumberFormatException e) {
             setStatus("Virheellinen tositenumero");
         }
     }
     
+    private void gotoDocumentNumber(int docNum) {
+        if (documents == null) return;
+        
+        for (int i = 0; i < documents.size(); i++) {
+            if (documents.get(i).getNumber() == docNum) {
+                currentDocumentIndex = i;
+                loadDocument(documents.get(i));
+                setStatus("Tosite " + docNum);
+                return;
+            }
+        }
+        setStatus("Tositetta " + docNum + " ei löytynyt");
+    }
+    
     @FXML
     private void handleNewDocument() {
-        setStatus("Uusi tosite");
-        // TODO: Luo uusi tosite
+        if (dataSource == null || currentPeriod == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
+        }
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
+            
+            // Luo uusi tosite
+            Document newDoc = documentDAO.create(currentPeriod.getId(), 1, 999999);
+            session.commit();
+            
+            // Lisää listaan ja siirry siihen
+            documents.add(newDoc);
+            documentCount = documents.size();
+            currentDocumentIndex = documents.size() - 1;
+            loadDocument(newDoc);
+            
+            setStatus("Uusi tosite " + newDoc.getNumber() + " luotu");
+            
+        } catch (Exception e) {
+            showError("Virhe luotaessa tositetta", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
     
     @FXML
     private void handleSearch() {
-        showNotImplemented("Haku");
+        String query = searchField != null ? searchField.getText() : "";
+        if (query.isEmpty()) {
+            setStatus("Kirjoita hakusana");
+            return;
+        }
+        
+        if (dataSource == null || currentPeriod == null) return;
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
+            
+            List<Document> results = documentDAO.getByPeriodIdAndPhrase(
+                currentPeriod.getId(), query, 0, 100);
+            
+            if (!results.isEmpty()) {
+                documents = results;
+                documentCount = results.size();
+                currentDocumentIndex = 0;
+                loadDocument(results.get(0));
+                setStatus("Löytyi " + results.size() + " tositetta hakusanalla '" + query + "'");
+            } else {
+                setStatus("Ei tuloksia hakusanalla '" + query + "'");
+            }
+            
+        } catch (Exception e) {
+            setStatus("Hakuvirhe: " + e.getMessage());
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
     
     // Registry handlers
@@ -470,13 +587,10 @@ public class MainController implements Initializable {
             this.dataSource = ds;
             this.databaseName = file.getName();
             
-            // Lataa tilit
-            loadAccounts();
+            // Lataa kaikki data
+            loadAllData();
             
-            setStatus("Avattu: " + file.getName());
-            
-            // Päivitä UI
-            updateUI();
+            setStatus("Avattu: " + file.getName() + " - " + documentCount + " tositetta");
             
         } catch (Exception e) {
             showError("Virhe avattaessa tietokantaa", e.getMessage());
@@ -484,17 +598,94 @@ public class MainController implements Initializable {
         }
     }
     
-    private void loadAccounts() {
+    private void loadAllData() {
         if (dataSource == null) return;
         
+        Session session = null;
         try {
-            Session session = dataSource.openSession();
+            session = dataSource.openSession();
+            
+            // 1. Lataa tilit
             AccountDAO accountDAO = dataSource.getAccountDAO(session);
             accounts = accountDAO.getAll();
-            session.close();
+            System.out.println("Ladattu " + accounts.size() + " tiliä");
+            
+            // 2. Lataa tilikausi
+            PeriodDAO periodDAO = dataSource.getPeriodDAO(session);
+            currentPeriod = periodDAO.getCurrent();
+            
+            if (currentPeriod != null) {
+                System.out.println("Tilikausi: " + currentPeriod.getStartDate() + " - " + currentPeriod.getEndDate());
+                
+                // 3. Lataa tositteet
+                DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
+                documentCount = documentDAO.getCountByPeriodId(currentPeriod.getId(), 1);
+                documents = documentDAO.getByPeriodId(currentPeriod.getId(), 1);
+                System.out.println("Ladattu " + documents.size() + " tositetta");
+                
+                // 4. Siirry ensimmäiseen tositteeseen
+                if (!documents.isEmpty()) {
+                    currentDocumentIndex = 0;
+                    loadDocument(documents.get(0));
+                } else {
+                    currentDocumentIndex = -1;
+                    currentDocument = null;
+                    currentEntries = null;
+                }
+                
+                // Päivitä UI
+                updateUI();
+                updatePeriodLabel();
+            } else {
+                setStatus("Ei tilikautta");
+            }
+            
         } catch (Exception e) {
-            System.err.println("Virhe ladattaessa tilejä: " + e.getMessage());
-            accounts = new ArrayList<>();
+            System.err.println("Virhe ladattaessa dataa: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    
+    private void loadDocument(Document doc) {
+        if (dataSource == null || doc == null) return;
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            
+            currentDocument = doc;
+            
+            // Lataa viennit
+            EntryDAO entryDAO = dataSource.getEntryDAO(session);
+            currentEntries = entryDAO.getByDocumentId(doc.getId());
+            System.out.println("Tosite " + doc.getNumber() + ": " + currentEntries.size() + " vientiä");
+            
+            // Päivitä UI
+            updateUI();
+            
+        } catch (Exception e) {
+            System.err.println("Virhe ladattaessa tositetta: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    
+    private void updatePeriodLabel() {
+        if (currentPeriod != null) {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy");
+            String periodStr = sdf.format(currentPeriod.getStartDate()) + " - " + sdf.format(currentPeriod.getEndDate());
+            periodLabel.setText("Tilikausi: " + periodStr);
+            periodIndicator.setText(periodStr);
+        } else {
+            periodLabel.setText("Tilikausi: -");
+            periodIndicator.setText("");
         }
     }
     
