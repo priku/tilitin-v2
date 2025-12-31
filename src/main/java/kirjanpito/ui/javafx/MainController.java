@@ -6,6 +6,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -15,6 +18,8 @@ import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
+import kirjanpito.util.AppSettings;
+import kirjanpito.util.RecentDatabases;
 import kirjanpito.util.Registry;
 
 import java.io.File;
@@ -107,7 +112,11 @@ public class MainController implements Initializable {
         // Alusta UI
         updateUI();
         
-        setStatus("Valmis - Avaa tietokanta aloittaaksesi");
+        // Täytä Recent Databases -menu
+        updateRecentDatabasesMenu();
+        
+        // Yritä avata viimeisin tietokanta automaattisesti
+        tryAutoOpenLastDatabase();
     }
     
     public void setStage(Stage stage) {
@@ -1141,6 +1150,13 @@ public class MainController implements Initializable {
             registry = new Registry();
             registry.setDataSource(dataSource);
             
+            // Tallenna viimeisimpien tietokantojen listaan
+            String dbUrl = "jdbc:sqlite:" + file.getAbsolutePath().replace(File.separatorChar, '/');
+            AppSettings settings = AppSettings.getInstance();
+            settings.set("database.url", dbUrl);
+            RecentDatabases.getInstance().addDatabase(dbUrl);
+            updateRecentDatabasesMenu();
+            
             // Lataa kaikki data
             loadAllData();
             
@@ -1247,6 +1263,112 @@ public class MainController implements Initializable {
     }
     
     // ========== Helpers ==========
+    
+    /**
+     * Yrittää avata viimeisimmän tietokannan automaattisesti käynnistyksessä.
+     */
+    private void tryAutoOpenLastDatabase() {
+        AppSettings settings = AppSettings.getInstance();
+        String dbUrl = settings.getString("database.url", null);
+        
+        if (dbUrl != null && !dbUrl.isEmpty()) {
+            // Tarkista onko SQLite-tiedosto
+            if (dbUrl.startsWith("jdbc:sqlite:")) {
+                String filePath = dbUrl.substring("jdbc:sqlite:".length());
+                File file = new File(filePath);
+                
+                if (file.exists()) {
+                    // Avaa automaattisesti taustalla
+                    Platform.runLater(() -> {
+                        try {
+                            openDatabase(file);
+                        } catch (Exception e) {
+                            System.err.println("Virhe avattaessa viimeisintä tietokantaa: " + e.getMessage());
+                            setStatus("Ei voitu avata viimeisintä tietokantaa");
+                        }
+                    });
+                    return;
+                }
+            }
+        }
+        
+        setStatus("Valmis - Avaa tietokanta aloittaaksesi");
+    }
+    
+    /**
+     * Päivittää Recent Databases -menun.
+     */
+    private void updateRecentDatabasesMenu() {
+        if (recentDatabasesMenu == null) return;
+        
+        recentDatabasesMenu.getItems().clear();
+        
+        RecentDatabases recent = RecentDatabases.getInstance();
+        List<String> databases = recent.getRecentDatabases();
+        
+        if (databases.isEmpty()) {
+            MenuItem emptyItem = new MenuItem("(ei viimeisimpiä)");
+            emptyItem.setDisable(true);
+            recentDatabasesMenu.getItems().add(emptyItem);
+        } else {
+            int index = 1;
+            for (String dbUrl : databases) {
+                String displayName = RecentDatabases.getDisplayName(dbUrl);
+                MenuItem item = new MenuItem(index + ". " + displayName);
+                
+                // Määritä accelerator (1-9)
+                if (index <= 9) {
+                    KeyCode keyCode = KeyCode.getKeyCode("DIGIT" + index);
+                    if (keyCode != null) {
+                        item.setAccelerator(new KeyCodeCombination(keyCode, KeyCombination.CONTROL_DOWN));
+                    }
+                }
+                
+                // Avaa tietokanta kun klikataan
+                String finalDbUrl = dbUrl;
+                item.setOnAction(e -> openRecentDatabase(finalDbUrl));
+                
+                recentDatabasesMenu.getItems().add(item);
+                index++;
+            }
+            
+            recentDatabasesMenu.getItems().add(new SeparatorMenuItem());
+            
+            MenuItem clearItem = new MenuItem("Tyhjennä lista");
+            clearItem.setOnAction(e -> {
+                RecentDatabases.getInstance().clearAll();
+                updateRecentDatabasesMenu();
+            });
+            recentDatabasesMenu.getItems().add(clearItem);
+        }
+    }
+    
+    /**
+     * Avaa viimeisimmistä listasta valitun tietokannan.
+     */
+    private void openRecentDatabase(String dbUrl) {
+        if (dbUrl == null || dbUrl.isEmpty()) return;
+        
+        try {
+            if (dbUrl.startsWith("jdbc:sqlite:")) {
+                String filePath = dbUrl.substring("jdbc:sqlite:".length());
+                File file = new File(filePath);
+                
+                if (file.exists()) {
+                    openDatabase(file);
+                } else {
+                    showError("Tiedosto ei löydy", "Tiedostoa ei löydy: " + filePath);
+                    // Poista listasta jos tiedosto ei ole olemassa
+                    RecentDatabases.getInstance().removeDatabase(dbUrl);
+                    updateRecentDatabasesMenu();
+                }
+            } else {
+                setStatus("Vain SQLite-tietokannat tuetaan tällä hetkellä");
+            }
+        } catch (Exception e) {
+            showError("Virhe", "Virhe avattaessa tietokantaa: " + e.getMessage());
+        }
+    }
     
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
