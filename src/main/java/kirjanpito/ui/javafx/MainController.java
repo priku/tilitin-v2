@@ -49,6 +49,8 @@ public class MainController implements Initializable {
     
     @FXML private TextField documentNumberField;
     @FXML private TextField searchField;
+    @FXML private CheckMenuItem searchMenuItem;
+    @FXML private Menu docTypeMenu;
     @FXML private Label totalDocumentsLabel;
     @FXML private Label periodIndicator;
     @FXML private DatePicker datePicker;
@@ -663,7 +665,7 @@ public class MainController implements Initializable {
     @FXML
     private void handleQuit() {
         shutdown();
-        stage.close();
+        Platform.exit();
     }
     
     // Entry handlers
@@ -1205,6 +1207,109 @@ public class MainController implements Initializable {
         alert.setHeaderText("Tilitin");
         alert.setContentText("Kirjanpito-ohjelma\nVersio 2.3.0 (JavaFX)\n\n© 2025");
         alert.showAndWait();
+    }
+    
+    @FXML
+    private void handleBackupSettings() {
+        showNotImplemented("Varmuuskopiointi");
+    }
+    
+    @FXML
+    private void handleRestoreBackup() {
+        showNotImplemented("Palauta varmuuskopiosta");
+    }
+    
+    @FXML
+    private void handleToggleSearch() {
+        // Toggle search panel visibility
+        if (searchField != null) {
+            searchField.setVisible(!searchField.isVisible());
+        }
+    }
+    
+    @FXML
+    private void handleAccountSummary() {
+        showNotImplemented("Tilien saldot");
+    }
+    
+    @FXML
+    private void handlePrintDocument() {
+        handlePrint();
+    }
+    
+    @FXML
+    private void handleAccountStatement() {
+        showNotImplemented("Tiliote");
+    }
+    
+    @FXML
+    private void handleIncomeStatementDetailed() {
+        showNotImplemented("Tuloslaskelma erittelyin");
+    }
+    
+    @FXML
+    private void handleBalanceSheetDetailed() {
+        showNotImplemented("Tase erittelyin");
+    }
+    
+    @FXML
+    private void handleVatReport() {
+        showNotImplemented("ALV-laskelma tileittäin");
+    }
+    
+    @FXML
+    private void handleCoa0() {
+        showNotImplemented("Tilikartta - Kaikki tilit");
+    }
+    
+    @FXML
+    private void handleCoa1() {
+        showNotImplemented("Tilikartta - Vain käytössä olevat tilit");
+    }
+    
+    @FXML
+    private void handleCoa2() {
+        showNotImplemented("Tilikartta - Vain suosikkitilit");
+    }
+    
+    @FXML
+    private void handleEditReports() {
+        showNotImplemented("Raporttien muokkaus");
+    }
+    
+    @FXML
+    private void handleSetIgnoreFlag() {
+        showNotImplemented("Ohita vienti ALV-laskelmassa");
+    }
+    
+    @FXML
+    private void handleBalanceComparison() {
+        showNotImplemented("Tilien saldojen vertailu");
+    }
+    
+    @FXML
+    private void handleNumberShift() {
+        showNotImplemented("Muuta tositenumeroita");
+    }
+    
+    @FXML
+    private void handleVatChange() {
+        showNotImplemented("ALV-kantojen muutokset");
+    }
+    
+    @FXML
+    private void handleExport() {
+        showNotImplemented("Vie tiedostoon");
+    }
+    
+    @FXML
+    private void handleCsvImport() {
+        showNotImplemented("Tuo CSV-tiedostosta");
+    }
+    
+    @FXML
+    private void handleDebug() {
+        showNotImplemented("Virheenjäljitystietoja");
     }
     
     // ========== Database operations ==========

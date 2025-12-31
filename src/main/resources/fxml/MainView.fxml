@@ -17,16 +17,13 @@
             <MenuBar fx:id="menuBar" useSystemMenuBar="true">
                 <!-- Tiedosto -->
                 <Menu text="Tiedosto">
-                    <MenuItem text="Uusi tietokanta..." fx:id="newDatabaseItem" onAction="#handleNewDatabase"/>
-                    <MenuItem text="Avaa tietokanta..." fx:id="openDatabaseItem" onAction="#handleOpenDatabase" accelerator="Ctrl+O"/>
+                    <MenuItem text="Uusi..." fx:id="newDatabaseItem" onAction="#handleNewDatabase" accelerator="Ctrl+U"/>
+                    <MenuItem text="Avaa..." fx:id="openDatabaseItem" onAction="#handleOpenDatabase" accelerator="Ctrl+O"/>
                     <SeparatorMenuItem/>
                     <Menu text="Viimeisimmät" fx:id="recentDatabasesMenu"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem text="Tallenna" fx:id="saveItem" onAction="#handleSave" accelerator="Ctrl+S"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem text="Tulosta..." fx:id="printItem" onAction="#handlePrint" accelerator="Ctrl+P"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem text="Asetukset..." fx:id="settingsItem" onAction="#handleSettings"/>
+                    <MenuItem text="Tietokanta-asetukset..." onAction="#handleDatabaseSettings" accelerator="Ctrl+D"/>
+                    <MenuItem text="Varmuuskopiointi..." onAction="#handleBackupSettings"/>
+                    <MenuItem text="Palauta varmuuskopiosta..." onAction="#handleRestoreBackup"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Lopeta" onAction="#handleQuit" accelerator="Ctrl+Q"/>
                 </Menu>
@@ -57,38 +54,59 @@
                 
                 <!-- Siirry -->
                 <Menu text="Siirry">
-                    <MenuItem text="Edellinen tosite" fx:id="prevDocItem" onAction="#handlePrevDocument" accelerator="Ctrl+Left"/>
-                    <MenuItem text="Seuraava tosite" fx:id="nextDocItem" onAction="#handleNextDocument" accelerator="Ctrl+Right"/>
+                    <MenuItem text="Edellinen" fx:id="prevDocItem" onAction="#handlePrevDocument" accelerator="Page_Up"/>
+                    <MenuItem text="Seuraava" fx:id="nextDocItem" onAction="#handleNextDocument" accelerator="Page_Down"/>
                     <SeparatorMenuItem/>
-                    <MenuItem text="Ensimmäinen tosite" fx:id="firstDocItem" onAction="#handleFirstDocument" accelerator="Ctrl+Home"/>
-                    <MenuItem text="Viimeinen tosite" fx:id="lastDocItem" onAction="#handleLastDocument" accelerator="Ctrl+End"/>
+                    <MenuItem text="Ensimmäinen" fx:id="firstDocItem" onAction="#handleFirstDocument" accelerator="Ctrl+Page_Up"/>
+                    <MenuItem text="Viimeinen" fx:id="lastDocItem" onAction="#handleLastDocument" accelerator="Ctrl+Page_Down"/>
                     <SeparatorMenuItem/>
-                    <MenuItem text="Siirry tositteeseen..." fx:id="gotoDocItem" onAction="#handleGotoDocument" accelerator="Ctrl+G"/>
+                    <MenuItem text="Hae numerolla..." fx:id="gotoDocItem" onAction="#handleGotoDocument" accelerator="Ctrl+G"/>
+                    <CheckMenuItem text="Etsi..." fx:id="searchMenuItem" onAction="#handleToggleSearch" accelerator="Ctrl+F"/>
                 </Menu>
                 
-                <!-- Rekisterit -->
-                <Menu text="Rekisterit">
-                    <MenuItem text="Tilikartta..." fx:id="coaItem" onAction="#handleChartOfAccounts"/>
-                    <MenuItem text="Tositelajit..." fx:id="docTypesItem" onAction="#handleDocumentTypes"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem text="Tilikauden tiedot..." fx:id="periodItem" onAction="#handlePeriodSettings"/>
-                    <MenuItem text="Tietokannan asetukset..." fx:id="dbSettingsItem" onAction="#handleDatabaseSettings"/>
+                <!-- Tositelaji -->
+                <Menu text="Tositelaji" fx:id="docTypeMenu">
+                    <!-- Tositelajit lisätään dynaamisesti -->
                 </Menu>
                 
-                <!-- Raportit -->
-                <Menu text="Raportit">
-                    <MenuItem text="Päiväkirja" onAction="#handleJournalReport"/>
-                    <MenuItem text="Pääkirja" onAction="#handleLedgerReport"/>
+                <!-- Tulosteet -->
+                <Menu text="Tulosteet">
+                    <MenuItem text="Tilien saldot" onAction="#handleAccountSummary" accelerator="Ctrl+1"/>
+                    <MenuItem text="Tosite" onAction="#handlePrintDocument" accelerator="Ctrl+2"/>
+                    <MenuItem text="Tiliote" onAction="#handleAccountStatement" accelerator="Ctrl+3"/>
+                    <MenuItem text="Tuloslaskelma" onAction="#handleIncomeStatement" accelerator="Ctrl+4"/>
+                    <MenuItem text="Tuloslaskelma erittelyin" onAction="#handleIncomeStatementDetailed" accelerator="Ctrl+5"/>
+                    <MenuItem text="Tase" onAction="#handleBalanceSheet" accelerator="Ctrl+6"/>
+                    <MenuItem text="Tase erittelyin" onAction="#handleBalanceSheetDetailed" accelerator="Ctrl+7"/>
+                    <MenuItem text="Päiväkirja" onAction="#handleJournalReport" accelerator="Ctrl+8"/>
+                    <MenuItem text="Pääkirja" onAction="#handleLedgerReport" accelerator="Ctrl+9"/>
+                    <MenuItem text="ALV-laskelma tileittäin" onAction="#handleVatReport" accelerator="Ctrl+0"/>
+                    <Menu text="Tilikartta">
+                        <MenuItem text="Vain käytössä olevat tilit" onAction="#handleCoa1"/>
+                        <MenuItem text="Vain suosikkitilit" onAction="#handleCoa2"/>
+                        <MenuItem text="Kaikki tilit" onAction="#handleCoa0"/>
+                    </Menu>
                     <SeparatorMenuItem/>
-                    <MenuItem text="Tuloslaskelma" onAction="#handleIncomeStatement"/>
-                    <MenuItem text="Tase" onAction="#handleBalanceSheet"/>
+                    <MenuItem text="Muokkaa" onAction="#handleEditReports"/>
+                </Menu>
+                
+                <!-- Työkalut -->
+                <Menu text="Työkalut">
+                    <MenuItem text="ALV-tilien päättäminen" onAction="#handleVatDocument" accelerator="Ctrl+Shift+V"/>
+                    <MenuItem text="Ohita vienti ALV-laskelmassa" onAction="#handleSetIgnoreFlag"/>
+                    <MenuItem text="Tilien saldojen vertailu" onAction="#handleBalanceComparison"/>
+                    <MenuItem text="Muuta tositenumeroita" onAction="#handleNumberShift"/>
+                    <MenuItem text="ALV-kantojen muutokset" onAction="#handleVatChange"/>
+                    <MenuItem text="Vie tiedostoon" onAction="#handleExport" accelerator="Ctrl+E"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tuo CSV-tiedostosta..." onAction="#handleCsvImport" accelerator="Ctrl+I"/>
                 </Menu>
                 
                 <!-- Ohje -->
                 <Menu text="Ohje">
-                    <MenuItem text="Käyttöohje" onAction="#handleHelp" accelerator="F1"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem text="Tietoja..." onAction="#handleAbout"/>
+                    <MenuItem text="Sisältö" onAction="#handleHelp" accelerator="F1"/>
+                    <MenuItem text="Virheenjäljitystietoja" onAction="#handleDebug"/>
+                    <MenuItem text="Tietoja ohjelmasta" onAction="#handleAbout"/>
                 </Menu>
             </MenuBar>
             
