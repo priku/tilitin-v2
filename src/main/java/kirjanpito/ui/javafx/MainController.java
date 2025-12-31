@@ -50,6 +50,7 @@ public class MainController implements Initializable {
     @FXML private TextField documentNumberField;
     @FXML private TextField searchField;
     @FXML private CheckMenuItem searchMenuItem;
+    @FXML private Button searchBtn;
     @FXML private Menu docTypeMenu;
     @FXML private Label totalDocumentsLabel;
     @FXML private Label periodIndicator;
@@ -1222,8 +1223,17 @@ public class MainController implements Initializable {
     @FXML
     private void handleToggleSearch() {
         // Toggle search panel visibility
-        if (searchField != null) {
-            searchField.setVisible(!searchField.isVisible());
+        if (searchField != null && searchMenuItem != null) {
+            boolean isVisible = searchField.isVisible();
+            searchField.setVisible(!isVisible);
+            searchMenuItem.setSelected(!isVisible);
+            
+            // Also toggle search button visibility
+            if (searchBtn != null) {
+                searchBtn.setVisible(!isVisible);
+            }
+            
+            setStatus(isVisible ? "Haku piilotettu" : "Haku näkyvissä");
         }
     }
     
