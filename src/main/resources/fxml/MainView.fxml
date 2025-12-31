@@ -49,7 +49,8 @@
                     <MenuItem text="Tilikartta..." onAction="#handleChartOfAccounts" accelerator="Ctrl+T"/>
                     <MenuItem text="Alkusaldot..." onAction="#handleStartingBalances" accelerator="Ctrl+B"/>
                     <MenuItem text="Perustiedot..." onAction="#handlePeriodSettings" accelerator="Ctrl+Shift+P"/>
-                    <MenuItem text="Asetukset..." onAction="#handleSettings" accelerator="Ctrl+Comma"/>
+                    <MenuItem text="Kirjausasetukset..." onAction="#handleSettings" accelerator="Ctrl+Shift+S"/>
+                    <MenuItem text="Ulkoasu..." onAction="#handleAppearance" accelerator="Ctrl+Shift+A"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="ALV-merkintä" onAction="#handleVatDocument" accelerator="Ctrl+Shift+V"/>
                 </Menu>

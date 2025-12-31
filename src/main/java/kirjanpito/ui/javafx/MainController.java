@@ -1118,6 +1118,12 @@ public class MainController implements Initializable {
     }
     
     @FXML
+    private void handleAppearance() {
+        // JavaFX-versiossa Ulkoasu on sama kuin Asetukset
+        handleSettings();
+    }
+    
+    @FXML
     private void handleEditEntryTemplates() {
         showNotImplemented("Vientimallien muokkaus");
     }
