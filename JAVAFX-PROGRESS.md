@@ -1,12 +1,12 @@
 # JavaFX Migration Progress
 
-## Status: VALMIS ✅ - 95% Complete!
+## Status: VALMIS ✅ - 100% Complete!
 
 **Aloitettu:** 2025-12-31
 **Valmis:** 2025-12-31
 
 ### ✅ Käyttövalmis!
-Kaikki perustoiminnot on toteutettu. Sovellus on käyttövalmis.
+Kaikki perustoiminnot on toteutettu. Sovellus on täysin käyttövalmis!
 
 ---
 
@@ -88,11 +88,20 @@ Kaikki perustoiminnot on toteutettu. Sovellus on käyttövalmis.
 
 ---
 
+## ✅ Phase 6: Loput toiminnot (VALMIS)
+
+| Toiminto | Status |
+|----------|--------|
+| Liitteet (attachments) | ✅ |
+| Help dialog | ✅ |
+| Print document | ✅ |
+
+---
+
 ## ⏳ Myöhemmin (ei kriittisiä)
 
 | Toiminto | Prioriteetti |
 |----------|--------------|
-| Liitteet (attachments) | 🟡 |
 | CSV-tuonti | 🟡 |
 | Varmuuskopiointi | 🟢 |
 | ALV-laskelma | 🟢 |
@@ -106,8 +115,9 @@ Kaikki perustoiminnot on toteutettu. Sovellus on käyttövalmis.
 ```
 src/main/java/kirjanpito/ui/javafx/
 ├── JavaFXApp.java              # Application entry point
-├── MainController.java         # Main window controller (~1100 lines)
+├── MainController.java         # Main window controller (~1200 lines)
 ├── EntryRowModel.java          # Entry table model
+├── PrintHelper.java            # Document printing
 ├── cells/
 │   ├── AccountTableCell.java   # Account autocomplete cell
 │   ├── AmountTableCell.java    # Currency amount cell
@@ -117,7 +127,9 @@ src/main/java/kirjanpito/ui/javafx/
     ├── COADialogFX.java               # Chart of accounts
     ├── DocumentTypeDialogFX.java      # Document types
     ├── ReportDialogFX.java            # Reports
-    └── SettingsDialogFX.java          # Settings
+    ├── SettingsDialogFX.java          # Settings
+    ├── AttachmentsDialogFX.java       # PDF attachments
+    └── HelpDialogFX.java               # Help dialog
 
 src/main/resources/fxml/
 ├── MainView.fxml               # Main window layout
@@ -135,7 +147,8 @@ src/main/resources/fxml/
 | Dialogit | 6 | 6 | 100% |
 | Raportit | 6 | 6 | 100% |
 | Shortcuts | 8 | 8 | 100% |
-| **Yhteensä** | **43** | **43** | **100%** |
+| Loput | 3 | 3 | 100% |
+| **Yhteensä** | **46** | **46** | **100%** |
 
 > Myöhemmin-tehtävät ovat lisäominaisuuksia, eivät kriittisiä.
 
