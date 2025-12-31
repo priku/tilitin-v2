@@ -33,13 +33,25 @@
                 
                 <!-- Muokkaa -->
                 <Menu text="Muokkaa">
-                    <MenuItem text="Lisää vienti" fx:id="addEntryItem" onAction="#handleAddEntry" accelerator="Ctrl+N"/>
-                    <MenuItem text="Poista vienti" fx:id="removeEntryItem" onAction="#handleRemoveEntry" accelerator="Ctrl+D"/>
-                    <SeparatorMenuItem/>
-                    <MenuItem text="Poista tosite" onAction="#handleDeleteDocument"/>
-                    <SeparatorMenuItem/>
                     <MenuItem text="Kopioi" fx:id="copyItem" onAction="#handleCopy" accelerator="Ctrl+C"/>
                     <MenuItem text="Liitä" fx:id="pasteItem" onAction="#handlePaste" accelerator="Ctrl+V"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Uusi tosite" onAction="#handleNewDocument" accelerator="Ctrl+N"/>
+                    <MenuItem text="Poista tosite" onAction="#handleDeleteDocument" accelerator="Ctrl+Delete"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Lisää vienti" fx:id="addEntryItem" onAction="#handleAddEntry" accelerator="F8"/>
+                    <MenuItem text="Poista vienti" fx:id="removeEntryItem" onAction="#handleRemoveEntry" accelerator="Shift+Delete"/>
+                    <Menu text="Vientimallit">
+                        <MenuItem text="Muokkaa" onAction="#handleEditEntryTemplates" accelerator="Ctrl+M"/>
+                        <MenuItem text="Luo tositteesta" onAction="#handleCreateEntryTemplate" accelerator="Ctrl+K"/>
+                    </Menu>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tilikartta..." onAction="#handleChartOfAccounts" accelerator="Ctrl+T"/>
+                    <MenuItem text="Alkusaldot..." onAction="#handleStartingBalances" accelerator="Ctrl+B"/>
+                    <MenuItem text="Perustiedot..." onAction="#handlePeriodSettings" accelerator="Ctrl+Shift+P"/>
+                    <MenuItem text="Asetukset..." onAction="#handleSettings" accelerator="Ctrl+Comma"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="ALV-merkintä" onAction="#handleVatDocument" accelerator="Ctrl+Shift+V"/>
                 </Menu>
                 
                 <!-- Siirry -->

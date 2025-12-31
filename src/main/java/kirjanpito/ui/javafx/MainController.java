@@ -1118,6 +1118,26 @@ public class MainController implements Initializable {
     }
     
     @FXML
+    private void handleEditEntryTemplates() {
+        showNotImplemented("Vientimallien muokkaus");
+    }
+    
+    @FXML
+    private void handleCreateEntryTemplate() {
+        showNotImplemented("Vientimallin luominen");
+    }
+    
+    @FXML
+    private void handleStartingBalances() {
+        showNotImplemented("Alkusaldot");
+    }
+    
+    @FXML
+    private void handleVatDocument() {
+        showNotImplemented("ALV-tilien päättäminen");
+    }
+    
+    @FXML
     private void handleAttachment() {
         if (currentDocument == null) {
             setStatus("Valitse ensin tosite");
@@ -1453,6 +1473,10 @@ public class MainController implements Initializable {
         } catch (Exception e) {
             showError("Virhe", "Virhe avattaessa tietokantaa: " + e.getMessage());
         }
+    }
+    
+    private void showNotImplemented(String feature) {
+        setStatus(feature + " - ei vielä toteutettu");
     }
     
     private void showError(String title, String message) {
