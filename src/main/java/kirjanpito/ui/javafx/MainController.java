@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
+import kirjanpito.db.DataAccessException;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
 import kirjanpito.util.AppSettings;
@@ -1157,7 +1158,23 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleStartingBalances() {
-        showNotImplemented("Alkusaldot");
+        if (dataSource == null || registry == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
+        }
+        
+        try {
+            kirjanpito.models.StartingBalanceModel balanceModel = new kirjanpito.models.StartingBalanceModel(registry);
+            balanceModel.initialize();
+            StartingBalanceDialogFX dialog = new StartingBalanceDialogFX(stage, balanceModel);
+            dialog.show();
+        } catch (DataAccessException e) {
+            showError("Virhe avattaessa alkusaldojen muokkausikkunaa", e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            showError("Virhe avattaessa alkusaldojen muokkausikkunaa", e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @FXML
