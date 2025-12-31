@@ -2,12 +2,17 @@ package kirjanpito.ui.javafx.cells;
 
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.util.Callback;
 import kirjanpito.ui.javafx.EntryRowModel;
 
 /**
  * Editoitava taulukkosolu selitteelle.
  */
 public class DescriptionTableCell extends TableCell<EntryRowModel, String> {
+    
+    public static Callback<TableColumn<EntryRowModel, String>, TableCell<EntryRowModel, String>> forTableColumn() {
+        return param -> new DescriptionTableCell();
+    }
     
     private TextField textField;
     

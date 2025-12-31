@@ -1128,12 +1128,31 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleEditEntryTemplates() {
-        showNotImplemented("Vientimallien muokkaus");
+        if (dataSource == null || registry == null) {
+            setStatus("Avaa ensin tietokanta");
+            return;
+        }
+        
+        try {
+            kirjanpito.models.EntryTemplateModel templateModel = new kirjanpito.models.EntryTemplateModel(registry);
+            EntryTemplateDialogFX dialog = new EntryTemplateDialogFX(stage, registry, templateModel);
+            dialog.show();
+        } catch (Exception e) {
+            showError("Virhe avattaessa vientimallien muokkausikkunaa", e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @FXML
     private void handleCreateEntryTemplate() {
-        showNotImplemented("Vientimallin luominen");
+        if (dataSource == null || currentDocument == null) {
+            setStatus("Avaa ensin tosite");
+            return;
+        }
+        
+        // TODO: Implement createEntryTemplateFromDocument logic
+        // This requires DocumentModel which is not yet integrated
+        showNotImplemented("Vientimallin luominen tositteesta");
     }
     
     @FXML
