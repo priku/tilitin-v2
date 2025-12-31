@@ -313,11 +313,48 @@ public class MainController implements Initializable {
             new FileChooser.ExtensionFilter("Kaikki tiedostot", "*.*")
         );
         
-        // Oletushakemisto
+        // Lataa viimeisin hakemisto asetuksista
+        // Yritä ensin hakea viimeisimmän tietokannan hakemisto
+        AppSettings settings = AppSettings.getInstance();
+        String dbUrl = settings.getString("database.url", null);
+        
+        File lastDir = null;
+        if (dbUrl != null && dbUrl.startsWith("jdbc:sqlite:")) {
+            String filePath = dbUrl.substring("jdbc:sqlite:".length());
+            File dbFile = new File(filePath);
+            if (dbFile.exists()) {
+                lastDir = dbFile.getParentFile();
+            }
+        }
+        
+        // Jos ei löydy tietokannasta, yritä asetuksista
+        if (lastDir == null) {
+            String lastDirStr = settings.getString("database.directory", null);
+            if (lastDirStr != null && !lastDirStr.isEmpty()) {
+                lastDir = new File(lastDirStr);
+            }
+        }
+        
+        if (lastDir != null && lastDir.exists() && lastDir.isDirectory()) {
+            fileChooser.setInitialDirectory(lastDir);
+        } else {
+            setDefaultDirectory();
+        }
+    }
+    
+    private void setDefaultDirectory() {
         String userHome = System.getProperty("user.home");
         File defaultDir = new File(userHome, "Tilitin");
         if (defaultDir.exists()) {
             fileChooser.setInitialDirectory(defaultDir);
+        } else {
+            // Jos Tilitin-kansiota ei ole, käytä Documents-kansiota
+            File documentsDir = new File(userHome, "Documents");
+            if (documentsDir.exists()) {
+                fileChooser.setInitialDirectory(documentsDir);
+            } else {
+                fileChooser.setInitialDirectory(new File(userHome));
+            }
         }
     }
     
@@ -465,6 +502,8 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Uusi tietokanta");
         File file = fileChooser.showSaveDialog(stage);
         if (file != null) {
+            // Tallenna viimeisin hakemisto
+            saveLastDirectory(file.getParentFile());
             createNewDatabase(file);
         }
     }
@@ -474,7 +513,19 @@ public class MainController implements Initializable {
         fileChooser.setTitle("Avaa tietokanta");
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
+            // Tallenna viimeisin hakemisto
+            saveLastDirectory(file.getParentFile());
             openDatabase(file);
+        }
+    }
+    
+    /**
+     * Tallentaa viimeisimmän hakemiston asetuksiin.
+     */
+    private void saveLastDirectory(File directory) {
+        if (directory != null && directory.exists() && directory.isDirectory()) {
+            AppSettings settings = AppSettings.getInstance();
+            settings.set("database.directory", directory.getAbsolutePath());
         }
     }
     
