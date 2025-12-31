@@ -15,6 +15,7 @@ import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
+import kirjanpito.util.Registry;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -69,6 +70,7 @@ public class MainController implements Initializable {
     private Stage stage;
     private DataSource dataSource;
     private String databaseName;  // SQLite tiedostonimi
+    private Registry registry;
     
     // Period and documents
     private Period currentPeriod;
@@ -547,7 +549,12 @@ public class MainController implements Initializable {
     
     @FXML
     private void handlePrint() {
-        showNotImplemented("Tulostus");
+        if (currentDocument == null || currentEntries == null || currentEntries.isEmpty()) {
+            setStatus("Ei tulostettavaa");
+            return;
+        }
+        
+        PrintHelper.printDocument(stage, dataSource, currentDocument, currentEntries, accounts, registry);
     }
     
     @FXML
@@ -1005,7 +1012,13 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleAttachment() {
-        showNotImplemented("Liite");
+        if (currentDocument == null) {
+            setStatus("Valitse ensin tosite");
+            return;
+        }
+        
+        AttachmentsDialogFX dialog = new AttachmentsDialogFX(stage, dataSource, currentDocument);
+        dialog.show();
     }
     
     // Report handlers
@@ -1048,7 +1061,8 @@ public class MainController implements Initializable {
     // Help handlers
     @FXML
     private void handleHelp() {
-        showNotImplemented("Ohje");
+        HelpDialogFX dialog = new HelpDialogFX(stage);
+        dialog.show();
     }
     
     @FXML
@@ -1096,6 +1110,10 @@ public class MainController implements Initializable {
             
             this.dataSource = ds;
             this.databaseName = file.getName();
+            
+            // Alusta Registry
+            registry = new Registry();
+            registry.setDataSource(dataSource);
             
             // Lataa kaikki data
             loadAllData();
