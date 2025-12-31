@@ -11,6 +11,8 @@ import javafx.stage.Window;
 
 import kirjanpito.util.AppSettings;
 
+import java.util.function.Consumer;
+
 /**
  * JavaFX asetukset-dialogi.
  */
@@ -121,10 +123,31 @@ public class SettingsDialogFX {
         settings.set("autoSave", autoSaveCheck.isSelected());
         settings.set("showVatColumn", showVatColumnCheck.isSelected());
         settings.set("backupInterval", backupIntervalSpinner.getValue());
-        settings.set("theme", themeCombo.getValue());
+        String newTheme = themeCombo.getValue();
+        String oldTheme = settings.getString("theme", "Vaalea");
+        settings.set("theme", newTheme);
         
         settings.save();
+        
+        // Jos teema muuttui, ilmoita pääikkunalle
+        if (!newTheme.equals(oldTheme)) {
+            // Tämä vaatii pääikkunan referenssin - toteutetaan callback
+            onThemeChanged(newTheme);
+        }
+        
         dialog.close();
+    }
+    
+    private Consumer<String> onThemeChangedCallback;
+    
+    public void setOnThemeChanged(Consumer<String> callback) {
+        this.onThemeChangedCallback = callback;
+    }
+    
+    private void onThemeChanged(String theme) {
+        if (onThemeChangedCallback != null) {
+            onThemeChangedCallback.accept(theme);
+        }
     }
     
     public void show() {

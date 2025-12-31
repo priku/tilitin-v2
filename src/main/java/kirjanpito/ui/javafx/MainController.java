@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
@@ -122,6 +123,35 @@ public class MainController implements Initializable {
     public void setStage(Stage stage) {
         this.stage = stage;
         setupKeyboardShortcuts();
+        applyTheme(); // Lataa teema käynnistyksessä
+    }
+    
+    /**
+     * Soveltaa teeman Scene:en.
+     */
+    private void applyTheme() {
+        if (stage == null || stage.getScene() == null) return;
+        
+        Scene scene = stage.getScene();
+        AppSettings settings = AppSettings.getInstance();
+        String theme = settings.getString("theme", "Vaalea");
+        
+        // Poista vanhat stylesheetit
+        scene.getStylesheets().clear();
+        
+        // Lisää uusi teema
+        if ("Tumma".equalsIgnoreCase(theme) || "Dark".equalsIgnoreCase(theme)) {
+            String darkCss = getClass().getResource("/fxml/styles-dark.css").toExternalForm();
+            scene.getStylesheets().add(darkCss);
+        } else if ("Järjestelmä".equalsIgnoreCase(theme) || "System".equalsIgnoreCase(theme)) {
+            // Järjestelmäteema - käytä oletusta
+            String lightCss = getClass().getResource("/fxml/styles.css").toExternalForm();
+            scene.getStylesheets().add(lightCss);
+        } else {
+            // Vaalea (oletus)
+            String lightCss = getClass().getResource("/fxml/styles.css").toExternalForm();
+            scene.getStylesheets().add(lightCss);
+        }
     }
     
     private void setupKeyboardShortcuts() {
@@ -1080,6 +1110,10 @@ public class MainController implements Initializable {
     @FXML
     private void handleSettings() {
         SettingsDialogFX dialog = new SettingsDialogFX(stage);
+        dialog.setOnThemeChanged(theme -> {
+            // Sovella teema heti kun se vaihdetaan
+            applyTheme();
+        });
         dialog.show();
     }
     
