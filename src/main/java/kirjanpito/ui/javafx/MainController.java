@@ -426,11 +426,24 @@ public class MainController implements Initializable {
     
     public void shutdown() {
         // Tallenna muutokset ennen sulkemista
+        if (dataSource != null && currentDocument != null) {
+            try {
+                // Tallenna nykyinen tosite jos on muutoksia
+                if (hasUnsavedChanges()) {
+                    handleSave();
+                }
+            } catch (Exception e) {
+                System.err.println("Virhe tallennettaessa tositetta ennen sulkemista: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
+        // Sulje tietokantayhteys
         if (dataSource != null) {
             try {
-                // TODO: Tallenna muutokset
                 dataSource.close();
             } catch (Exception e) {
+                System.err.println("Virhe suljettaessa tietokantaa: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -1086,8 +1099,21 @@ public class MainController implements Initializable {
                 file = new File(path + ".sqlite");
             }
             
-            // TODO: Luo tietokanta SQLiteDataSource avulla
-            setStatus("Tietokanta luotu: " + file.getName());
+            // Tarkista onko tiedosto jo olemassa
+            if (file.exists()) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Tiedosto on olemassa");
+                alert.setHeaderText("Tiedosto on jo olemassa");
+                alert.setContentText("Tiedosto " + file.getName() + " on jo olemassa.\n\nHaluatko korvata sen?");
+                
+                if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.CANCEL) {
+                    return;
+                }
+            }
+            
+            // SQLite luo tietokannan automaattisesti jos se ei ole olemassa
+            // Avaa tietokanta (luo sen jos ei ole olemassa)
+            openDatabase(file);
             
         } catch (Exception e) {
             showError("Virhe luotaessa tietokantaa", e.getMessage());
@@ -1221,10 +1247,6 @@ public class MainController implements Initializable {
     }
     
     // ========== Helpers ==========
-    
-    private void showNotImplemented(String feature) {
-        setStatus(feature + " - ei vielä toteutettu");
-    }
     
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
