@@ -49,8 +49,8 @@
 ## ⚠️ Osittain toteutetut (näyttävät "ei vielä toteutettu")
 
 ### Muokkaa-valikko
-- ⚠️ `handleEditEntryTemplates()` - Vientimallien muokkaus
-- ⚠️ `handleCreateEntryTemplate()` - Vientimallin luominen
+- ✅ `handleEditEntryTemplates()` - Vientimallien muokkaus (**VALMIS** - EntryTemplateDialogFX)
+- ⚠️ `handleCreateEntryTemplate()` - Vientimallin luominen tositteesta
 - ⚠️ `handleStartingBalances()` - Alkusaldot
 - ⚠️ `handleVatDocument()` - ALV-merkintä
 
@@ -82,9 +82,13 @@
 
 ## 📊 Yhteenveto
 
-- **Toteutettu ja toimii:** 25 handleria
-- **Osittain toteutettu (placeholder):** 18 handleria
+- **Toteutettu ja toimii:** 26 handleria (60%)
+- **Osittain toteutettu (placeholder):** 17 handleria (40%)
 - **Yhteensä:** 43 handleria
+
+### Viimeisin päivitys
+- ✅ EntryTemplateDialogFX toteutettu (2025-01-XX)
+- ✅ `handleEditEntryTemplates()` nyt toimii
 
 ## ✅ Kaikki FXML-handlerit on määritelty
 
