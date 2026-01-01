@@ -50,6 +50,7 @@ public class MainController implements Initializable {
     @FXML private MenuBar menuBar;
     @FXML private ToolBar toolBar;
     @FXML private Menu recentDatabasesMenu;
+    @FXML private Menu entryTemplateMenu;
     
     @FXML private TextField documentNumberField;
     @FXML private TextField searchField;
@@ -332,8 +333,164 @@ public class MainController implements Initializable {
             }
         });
         
+        // Set up context menu
+        setupEntryTableContextMenu();
+        
         // Set up smart navigation handler
         setupEntryTableNavigation();
+    }
+    
+    /**
+     * Luo kontekstivalikko vienti-taulukolle.
+     */
+    private void setupEntryTableContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        
+        MenuItem insertAbove = new MenuItem("Lisää vienti yläpuolelle");
+        insertAbove.setOnAction(e -> {
+            int index = entryTable.getSelectionModel().getSelectedIndex();
+            insertEntryAtIndex(index >= 0 ? index : 0);
+        });
+        
+        MenuItem insertBelow = new MenuItem("Lisää vienti alapuolelle");
+        insertBelow.setOnAction(e -> {
+            int index = entryTable.getSelectionModel().getSelectedIndex();
+            insertEntryAtIndex(index >= 0 ? index + 1 : entries.size());
+        });
+        
+        MenuItem deleteEntry = new MenuItem("Poista vienti");
+        deleteEntry.setAccelerator(new KeyCodeCombination(KeyCode.DELETE, KeyCombination.SHIFT_DOWN));
+        deleteEntry.setOnAction(e -> handleRemoveEntry());
+        
+        SeparatorMenuItem sep1 = new SeparatorMenuItem();
+        
+        MenuItem copyEntry = new MenuItem("Kopioi vienti");
+        copyEntry.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
+        copyEntry.setOnAction(e -> copySelectedEntries());
+        
+        MenuItem pasteEntry = new MenuItem("Liitä vienti");
+        pasteEntry.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN));
+        pasteEntry.setOnAction(e -> pasteEntries());
+        
+        SeparatorMenuItem sep2 = new SeparatorMenuItem();
+        
+        MenuItem toggleDebitCredit = new MenuItem("Vaihda debet/kredit (*)");
+        toggleDebitCredit.setOnAction(e -> {
+            EntryRowModel selected = entryTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                selected.toggleDebitCredit();
+                entryTable.refresh();
+                updateTotals();
+                setStatus("Debet/Kredit vaihdettu");
+            }
+        });
+        
+        MenuItem selectAccount = new MenuItem("Valitse tili... (F9)");
+        selectAccount.setOnAction(e -> openAccountSelectionDialog());
+        
+        contextMenu.getItems().addAll(
+            insertAbove, insertBelow, deleteEntry,
+            sep1,
+            copyEntry, pasteEntry,
+            sep2,
+            toggleDebitCredit, selectAccount
+        );
+        
+        // Update menu item states
+        contextMenu.setOnShowing(e -> {
+            boolean hasSelection = !entryTable.getSelectionModel().getSelectedItems().isEmpty();
+            deleteEntry.setDisable(!hasSelection);
+            copyEntry.setDisable(!hasSelection);
+            toggleDebitCredit.setDisable(!hasSelection);
+            selectAccount.setDisable(!hasSelection);
+            pasteEntry.setDisable(clipboard == null || clipboard.isEmpty());
+        });
+        
+        entryTable.setContextMenu(contextMenu);
+    }
+    
+    /**
+     * Lisää vienti annettuun indeksiin.
+     */
+    private void insertEntryAtIndex(int index) {
+        if (dataSource == null || currentDocument == null) return;
+        
+        Entry entry = new Entry();
+        entry.setDocumentId(currentDocument.getId());
+        entry.setRowNumber(index + 1);
+        
+        EntryRowModel newRow = new EntryRowModel(index + 1, entry, null);
+        
+        // Insert at index and update row numbers
+        entries.add(index, newRow);
+        for (int i = 0; i < entries.size(); i++) {
+            entries.get(i).setRowNumber(i + 1);
+            entries.get(i).getOriginalEntry().setRowNumber(i + 1);
+        }
+        
+        entryTable.getSelectionModel().select(index);
+        setStatus("Vienti lisätty riville " + (index + 1));
+    }
+    
+    /**
+     * Kopioi valitut viennit leikepöydälle.
+     */
+    private void copySelectedEntries() {
+        ObservableList<EntryRowModel> selected = entryTable.getSelectionModel().getSelectedItems();
+        if (selected.isEmpty()) return;
+        
+        clipboard = new ArrayList<>();
+        for (EntryRowModel row : selected) {
+            // Create a copy
+            Entry entryCopy = new Entry();
+            entryCopy.setAccountId(row.getOriginalEntry().getAccountId());
+            entryCopy.setDescription(row.getOriginalEntry().getDescription());
+            entryCopy.setDebit(row.getOriginalEntry().isDebit());
+            entryCopy.setAmount(row.getOriginalEntry().getAmount());
+            entryCopy.setFlags(row.getOriginalEntry().getFlags());
+            
+            EntryRowModel rowCopy = new EntryRowModel(0, entryCopy, row.getAccount());
+            clipboard.add(rowCopy);
+        }
+        
+        setStatus("Kopioitu " + clipboard.size() + " vientiä");
+    }
+    
+    /**
+     * Liitä viennit leikepöydältä.
+     */
+    private void pasteEntries() {
+        if (clipboard == null || clipboard.isEmpty()) return;
+        if (dataSource == null || currentDocument == null) return;
+        
+        int insertIndex = entryTable.getSelectionModel().getSelectedIndex();
+        if (insertIndex < 0) insertIndex = entries.size();
+        
+        for (int i = 0; i < clipboard.size(); i++) {
+            EntryRowModel source = clipboard.get(i);
+            
+            Entry entry = new Entry();
+            entry.setDocumentId(currentDocument.getId());
+            entry.setAccountId(source.getOriginalEntry().getAccountId());
+            entry.setDescription(source.getOriginalEntry().getDescription());
+            entry.setDebit(source.getOriginalEntry().isDebit());
+            entry.setAmount(source.getOriginalEntry().getAmount());
+            entry.setFlags(source.getOriginalEntry().getFlags());
+            entry.setRowNumber(insertIndex + i + 1);
+            
+            EntryRowModel newRow = new EntryRowModel(insertIndex + i + 1, entry, source.getAccount());
+            
+            entries.add(insertIndex + i, newRow);
+        }
+        
+        // Update row numbers
+        for (int i = 0; i < entries.size(); i++) {
+            entries.get(i).setRowNumber(i + 1);
+            entries.get(i).getOriginalEntry().setRowNumber(i + 1);
+        }
+        
+        updateTotals();
+        setStatus("Liitetty " + clipboard.size() + " vientiä");
     }
     
     /**
@@ -1314,16 +1471,18 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleAbout() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Tietoja");
-        alert.setHeaderText("Tilitin");
-        alert.setContentText("Kirjanpito-ohjelma\nVersio 2.3.0 (JavaFX)\n\n© 2025");
-        alert.showAndWait();
+        kirjanpito.ui.javafx.dialogs.AboutDialogFX.showAbout(stage);
     }
     
     @FXML
     private void handleBackupSettings() {
-        showNotImplemented("Varmuuskopiointi");
+        try {
+            kirjanpito.ui.javafx.dialogs.BackupSettingsDialogFX dialog = 
+                new kirjanpito.ui.javafx.dialogs.BackupSettingsDialogFX(stage);
+            dialog.showAndWait();
+        } catch (Exception e) {
+            showError("Virhe avattaessa varmuuskopiointiasetuksia", e.getMessage());
+        }
     }
     
     @FXML
@@ -1425,7 +1584,86 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleCsvImport() {
-        showNotImplemented("Tuo CSV-tiedostosta");
+        try {
+            List<Account> accounts = registry.getAccounts();
+            Period period = currentPeriod;
+            
+            if (period == null) {
+                showError("Virhe", "Avaa ensin tilikausi ennen CSV-tuontia.");
+                return;
+            }
+            
+            var dialog = kirjanpito.ui.javafx.dialogs.CSVImportDialogFX.create(
+                stage, accounts, period);
+            
+            if (dialog.showAndWait()) {
+                List<kirjanpito.ui.javafx.dialogs.CSVImportDialogFX.ImportedEntry> importedEntries = 
+                    dialog.getImportedEntries();
+                
+                if (importedEntries != null && !importedEntries.isEmpty()) {
+                    // Import entries as new documents using DAO directly
+                    Session session = null;
+                    int imported = 0;
+                    
+                    try {
+                        session = dataSource.openSession();
+                        var documentDAO = dataSource.getDocumentDAO(session);
+                        var entryDAO = dataSource.getEntryDAO(session);
+                        
+                        // Get next document number
+                        int nextNumber = documentDAO.getCountByPeriodId(period.getId(), 1) + 1;
+                        
+                        for (var importEntry : importedEntries) {
+                            try {
+                                // Create a new document for each entry
+                                kirjanpito.db.Document doc = new kirjanpito.db.Document();
+                                doc.setDate(java.sql.Date.valueOf(importEntry.date));
+                                doc.setPeriodId(period.getId());
+                                doc.setNumber(nextNumber++);
+                                
+                                documentDAO.save(doc);
+                                
+                                // Create debit entry (bank account)
+                                kirjanpito.db.Entry bankEntry = new kirjanpito.db.Entry();
+                                bankEntry.setDocumentId(doc.getId());
+                                bankEntry.setAccountId(importEntry.account.getId());
+                                bankEntry.setDescription(importEntry.description);
+                                bankEntry.setRowNumber(0);
+                                
+                                if (importEntry.amount.compareTo(java.math.BigDecimal.ZERO) >= 0) {
+                                    bankEntry.setDebit(true);
+                                    bankEntry.setAmount(importEntry.amount);
+                                } else {
+                                    bankEntry.setDebit(false);
+                                    bankEntry.setAmount(importEntry.amount.abs());
+                                }
+                                
+                                entryDAO.save(bankEntry);
+                                imported++;
+                                
+                            } catch (Exception e) {
+                                System.err.println("Error importing entry: " + e.getMessage());
+                            }
+                        }
+                        
+                    } finally {
+                        if (session != null) {
+                            session.close();
+                        }
+                    }
+                    
+                    // Refresh document list
+                    loadAllData();
+                    
+                    showInfo("Tuonti valmis", 
+                        "Tuotiin " + imported + " tositetta.\n\n" +
+                        "Huom: Vastatili on jätettävä tyhjäksi - täydennä manuaalisesti.");
+                }
+            }
+            
+        } catch (Exception e) {
+            showError("CSV-tuontivirhe", e.getMessage());
+        }
     }
     
     @FXML
@@ -1561,6 +1799,9 @@ public class MainController implements Initializable {
                 // Päivitä UI
                 updateUI();
                 updatePeriodLabel();
+                
+                // Päivitä vientimallivalikko
+                updateEntryTemplateMenu();
             } else {
                 setStatus("Ei tilikautta");
             }
@@ -1729,8 +1970,145 @@ public class MainController implements Initializable {
         }
     }
     
+    /**
+     * Päivittää vientimallivalikon dynaamisesti.
+     */
+    private void updateEntryTemplateMenu() {
+        if (entryTemplateMenu == null || registry == null) return;
+        
+        // Poista kaikki paitsi viimeiset kaksi itemiä (separaattori + Muokkaa + Luo tositteesta)
+        // Tallenna viimeiset 3 (separator + 2 menuitem)
+        int itemCount = entryTemplateMenu.getItems().size();
+        var lastItems = new java.util.ArrayList<>(entryTemplateMenu.getItems().subList(Math.max(0, itemCount - 3), itemCount));
+        
+        entryTemplateMenu.getItems().clear();
+        
+        try {
+            List<kirjanpito.db.EntryTemplate> templates = registry.getEntryTemplates();
+            
+            if (templates != null && !templates.isEmpty()) {
+                int prevNumber = -1;
+                int count = 0;
+                
+                for (kirjanpito.db.EntryTemplate template : templates) {
+                    if (template.getNumber() != prevNumber) {
+                        prevNumber = template.getNumber();
+                        
+                        MenuItem item = new MenuItem(template.getName());
+                        final int templateNumber = template.getNumber();
+                        item.setOnAction(e -> applyEntryTemplate(templateNumber));
+                        
+                        // Alt+1 - Alt+0 pikanäppäimet ensimmäisille 10:lle
+                        if (template.getNumber() >= 1 && template.getNumber() <= 10) {
+                            int keyNum = template.getNumber() % 10;
+                            KeyCode keyCode = KeyCode.valueOf("DIGIT" + keyNum);
+                            item.setAccelerator(new KeyCodeCombination(keyCode, KeyCombination.ALT_DOWN));
+                        }
+                        
+                        entryTemplateMenu.getItems().add(item);
+                        count++;
+                    }
+                }
+                
+                if (count == 0) {
+                    MenuItem emptyItem = new MenuItem("Ei vientimalleja");
+                    emptyItem.setDisable(true);
+                    entryTemplateMenu.getItems().add(emptyItem);
+                }
+            } else {
+                MenuItem emptyItem = new MenuItem("Ei vientimalleja");
+                emptyItem.setDisable(true);
+                entryTemplateMenu.getItems().add(emptyItem);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Virhe ladattaessa vientimalleja: " + e.getMessage());
+            MenuItem errorItem = new MenuItem("Virhe ladattaessa malleja");
+            errorItem.setDisable(true);
+            entryTemplateMenu.getItems().add(errorItem);
+        }
+        
+        // Lisää vakioitemet takaisin
+        entryTemplateMenu.getItems().addAll(lastItems);
+    }
+    
+    /**
+     * Soveltaa vientimallin nykyiseen tositteeseen.
+     */
+    private void applyEntryTemplate(int templateNumber) {
+        if (registry == null || currentDocument == null) {
+            setStatus("Avaa ensin tosite");
+            return;
+        }
+        
+        try {
+            List<kirjanpito.db.EntryTemplate> templates = registry.getEntryTemplates();
+            
+            // Etsi mallin viennit
+            java.util.List<kirjanpito.db.EntryTemplate> templateEntries = new java.util.ArrayList<>();
+            String templateName = null;
+            
+            for (kirjanpito.db.EntryTemplate t : templates) {
+                if (t.getNumber() == templateNumber) {
+                    templateEntries.add(t);
+                    if (templateName == null) {
+                        templateName = t.getName();
+                    }
+                }
+            }
+            
+            if (templateEntries.isEmpty()) {
+                setStatus("Vientimallia ei löytynyt");
+                return;
+            }
+            
+            // Lisää mallin viennit tositteeseen
+            int addedCount = 0;
+            for (kirjanpito.db.EntryTemplate t : templateEntries) {
+                EntryRowModel newRow = new EntryRowModel();
+                newRow.setRowNumber(entries.size() + 1);
+                
+                // Etsi tili
+                for (Account acc : accounts) {
+                    if (acc.getId() == t.getAccountId()) {
+                        newRow.setAccount(acc);
+                        break;
+                    }
+                }
+                
+                newRow.setDescription(t.getDescription() != null ? t.getDescription() : "");
+                
+                if (t.isDebit()) {
+                    newRow.setDebit(t.getAmount());
+                    newRow.setCredit(null);
+                } else {
+                    newRow.setDebit(null);
+                    newRow.setCredit(t.getAmount());
+                }
+                
+                entries.add(newRow);
+                addedCount++;
+            }
+            
+            entryTable.refresh();
+            updateTotals();
+            setStatus("Lisätty vientimalli: " + templateName + " (" + addedCount + " vientiä)");
+            
+        } catch (Exception e) {
+            showError("Virhe sovellettaessa vientimallia", e.getMessage());
+        }
+    }
+    
     private void showNotImplemented(String feature) {
         setStatus(feature + " - ei vielä toteutettu");
+    }
+    
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
     
     private void showError(String title, String message) {

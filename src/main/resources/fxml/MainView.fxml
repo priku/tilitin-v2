@@ -38,9 +38,11 @@
                     <SeparatorMenuItem/>
                     <MenuItem text="Lisää vienti" fx:id="addEntryItem" onAction="#handleAddEntry" accelerator="F8"/>
                     <MenuItem text="Poista vienti" fx:id="removeEntryItem" onAction="#handleRemoveEntry" accelerator="Shift+Delete"/>
-                    <Menu text="Vientimallit">
-                        <MenuItem text="Muokkaa" onAction="#handleEditEntryTemplates" accelerator="Ctrl+M"/>
-                        <MenuItem text="Luo tositteesta" onAction="#handleCreateEntryTemplate" accelerator="Ctrl+K"/>
+                    <Menu fx:id="entryTemplateMenu" text="Vientimallit">
+                        <!-- Templates populated dynamically -->
+                        <SeparatorMenuItem/>
+                        <MenuItem text="Muokkaa..." onAction="#handleEditEntryTemplates" accelerator="Ctrl+M"/>
+                        <MenuItem text="Luo tositteesta..." onAction="#handleCreateEntryTemplate" accelerator="Ctrl+K"/>
                     </Menu>
                     <SeparatorMenuItem/>
                     <MenuItem text="Tilikartta..." onAction="#handleChartOfAccounts" accelerator="Ctrl+T"/>
