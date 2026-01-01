@@ -7,6 +7,41 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.1.1] - 2026-01-01
+
+# Tilitin 2.1.1
+
+## 📦 Lataa ohjelmisto
+
+| Käyttöjärjestelmä | Lataa | Koko |
+|-------------------|-------|------|
+| 🪟 **Windows** | [Tilitin-2.1.1-setup.exe](https://github.com/priku/tilitin-v2/releases/download/v2.1.1/Tilitin-2.1.1-setup.exe) | ~69 MB |
+| 🍎 **Mac (Apple Silicon)** | [Tilitin-2.1.1-arm64.dmg](https://github.com/priku/tilitin-v2/releases/download/v2.1.1/Tilitin-2.1.1-arm64.dmg) | ~99 MB |
+| 🍎 **Mac (Intel)** | [Tilitin-2.1.1.dmg](https://github.com/priku/tilitin-v2/releases/download/v2.1.1/Tilitin-2.1.1.dmg) | ~99 MB |
+| 🐧 **Linux (Ubuntu/Debian)** | [tilitin_2.1.1_amd64.deb](https://github.com/priku/tilitin-v2/releases/download/v2.1.1/tilitin_2.1.1_amd64.deb) | ~76 MB |
+| 🐧 **Linux (Fedora/Red Hat)** | [tilitin-2.1.1-1.x86_64.rpm](https://github.com/priku/tilitin-v2/releases/download/v2.1.1/tilitin-2.1.1-1.x86_64.rpm) | ~95 MB |
+| ☕ **Muu (JAR)** | [tilitin-2.1.1-all.jar](https://github.com/priku/tilitin-v2/releases/download/v2.1.1/tilitin-2.1.1-all.jar) | ~40 MB |
+
+> **Mac-käyttäjille:** Apple Silicon tarkoittaa M1/M2/M3/M4-prosessoreita. Jos macOS estää ohjelman avaamisen, katso [asennusohjeet](https://github.com/priku/tilitin-v2#macos-käyttäjille).
+
+---
+
+### 🔧 Korjattu
+
+- Korjattu Windows-asennusohjelman luonti (CI/CD)
+- Lisätty Apple Silicon (M1/M2/M3/M4) Mac-tuki
+- Päivitetty release-sivun latauslinkit
+
+---
+
+## 📖 Lisätietoja
+
+- [Käyttöohjeet](https://github.com/priku/tilitin-v2/blob/master/README.md)
+- [Kaikki muutokset](https://github.com/priku/tilitin-v2/blob/master/CHANGELOG.md)
+- [Ilmoita ongelmasta](https://github.com/priku/tilitin-v2/issues)
+
+---
+
 ## [2.1.0] - 2026-01-01
 
 # Tilitin 2.1.0
