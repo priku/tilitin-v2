@@ -6,9 +6,15 @@ import java.util.ArrayList;
 
 public class CSVReader {
 	private Reader reader;
+	private char separator;
 	
 	public CSVReader(Reader reader) {
+		this(reader, ',');
+	}
+	
+	public CSVReader(Reader reader, char separator) {
 		this.reader = reader;
+		this.separator = separator;
 	}
 	
 	public String[] readLine() throws IOException {
@@ -27,7 +33,7 @@ public class CSVReader {
 					c = 0;
 				}
 			}
-			else if (c == ',' && !quoted) {
+			else if (c == separator && !quoted) {
 				fields.add(buffer.toString());
 				buffer = new StringBuilder();
 			}

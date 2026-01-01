@@ -133,8 +133,12 @@
                 <Separator orientation="VERTICAL"/>
                 
                 <!-- Navigation -->
-                <Button fx:id="firstBtn" text="⏮" styleClass="nav-button" onAction="#handleFirstDocument"/>
-                <Button fx:id="prevBtn" text="◀" styleClass="nav-button" onAction="#handlePrevDocument"/>
+                <Button fx:id="firstBtn" text="&lt;&lt;" styleClass="nav-button" onAction="#handleFirstDocument" minWidth="36">
+                    <font><Font size="14" name="System Bold"/></font>
+                </Button>
+                <Button fx:id="prevBtn" text="&lt;" styleClass="nav-button" onAction="#handlePrevDocument" minWidth="36">
+                    <font><Font size="14" name="System Bold"/></font>
+                </Button>
                 
                 <HBox alignment="CENTER" spacing="4">
                     <TextField fx:id="documentNumberField" prefWidth="70" styleClass="doc-number-field" 
@@ -143,8 +147,12 @@
                     <Label fx:id="totalDocumentsLabel" text="0" style="-fx-font-weight: 600;"/>
                 </HBox>
                 
-                <Button fx:id="nextBtn" text="▶" styleClass="nav-button" onAction="#handleNextDocument"/>
-                <Button fx:id="lastBtn" text="⏭" styleClass="nav-button" onAction="#handleLastDocument"/>
+                <Button fx:id="nextBtn" text="&gt;" styleClass="nav-button" onAction="#handleNextDocument" minWidth="36">
+                    <font><Font size="14" name="System Bold"/></font>
+                </Button>
+                <Button fx:id="lastBtn" text="&gt;&gt;" styleClass="nav-button" onAction="#handleLastDocument" minWidth="36">
+                    <font><Font size="14" name="System Bold"/></font>
+                </Button>
                 
                 <Separator orientation="VERTICAL"/>
                 

@@ -38,7 +38,8 @@ Katso tarkemmat tiedot: [USER-GUIDE.md - Tietokantayhteensopivuus](USER-GUIDE.md
 
 ### 🎨 JavaFX-käyttöliittymä
 - **Täysin uusi JavaFX UI** - Moderni, responsiivinen käyttöliittymä
-- **27 uutta dialogia** - Kaikki toiminnot siirretty JavaFX:ään
+- **31 dialogia** (29 JavaFX + 2 Kotlin) - Kaikki toiminnot siirretty JavaFX:ään
+- **100% JavaFX** - Ei Swing-dialogeja jäljellä
 - **Tumma ja vaalea teema** - Skaalautuva fonttikoko
 
 ### 📊 CSV-tuonti

@@ -20,7 +20,7 @@ kotlin {
 // JavaFX configuration
 javafx {
     version = "21"
-    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing", "javafx.web")
 }
 
 // Detect current OS for JavaFX dependencies
@@ -42,6 +42,7 @@ dependencies {
     implementation("org.openjfx:javafx-swing:21:$javafxPlatform")
     implementation("org.openjfx:javafx-base:21:$javafxPlatform")
     implementation("org.openjfx:javafx-graphics:21:$javafxPlatform")
+    implementation("org.openjfx:javafx-web:21:$javafxPlatform")
     
     // Kotlin
     implementation(kotlin("stdlib"))
@@ -65,6 +66,16 @@ dependencies {
     implementation("com.formdev:flatlaf:3.6")
     implementation("com.formdev:flatlaf-extras:3.6")
     implementation("com.formdev:flatlaf-intellij-themes:3.6")
+    
+    // Testing
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    testImplementation("org.mockito:mockito-core:5.11.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.11.0")
+    testImplementation("org.testfx:testfx-core:4.0.18")
+    testImplementation("org.testfx:testfx-junit5:4.0.18")
 }
 
 sourceSets {
@@ -77,6 +88,17 @@ sourceSets {
         }
         resources {
             srcDirs("src/main/resources")
+        }
+    }
+    test {
+        java {
+            srcDirs("src/test/java")
+        }
+        kotlin {
+            srcDirs("src/test/kotlin")
+        }
+        resources {
+            srcDirs("src/test/resources")
         }
     }
 }
@@ -115,6 +137,15 @@ tasks.jar {
             "Implementation-Title" to "Tilitin",
             "Implementation-Version" to project.version
         )
+    }
+}
+
+// Configure test task
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 }
 

@@ -132,6 +132,26 @@
     -fx-max-height: 36;
     -fx-padding: 0;
     -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+    -fx-background-color: #f1f5f9;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+.nav-button:pressed {
+    -fx-background-color: #cbd5e1;
+}
+
+.nav-button:disabled {
+    -fx-text-fill: #94a3b8;
+    -fx-background-color: #f8fafc;
 }
 
 /* ===== TABLE VIEW ===== */

@@ -139,6 +139,36 @@
     -fx-background-color: #64748b;
 }
 
+/* Navigation buttons */
+.nav-button {
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-max-width: 36;
+    -fx-max-height: 36;
+    -fx-padding: 0;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e2e8f0;
+    -fx-background-color: #334155;
+    -fx-border-color: #475569;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: #475569;
+}
+
+.nav-button:pressed {
+    -fx-background-color: #64748b;
+}
+
+.nav-button:disabled {
+    -fx-text-fill: #64748b;
+    -fx-background-color: #1e293b;
+}
+
 .button.primary {
     -fx-background-color: #3b82f6;
     -fx-text-fill: #ffffff;

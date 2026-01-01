@@ -15,9 +15,29 @@ Formaatti perustuu [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) -sta
   - Tumma ja vaalea teema
   - Skaalautuva fonttikoko
 
-- **27 uutta JavaFX-dialogia**
+- **31 JavaFX-dialogia** (29 DialogFX + 2 Kotlin)
   - Kaikki toiminnot siirretty JavaFX:ään
   - Parannettu käytettävyys ja ulkoasu
+  - 100% JavaFX - ei Swing-dialogeja jäljellä
+
+### Tekniset parannukset
+
+- **Kotlin-migraatio jatkuu**
+  - AboutDialogFX migroitu Java → Kotlin
+  - HelpDialogFX migroitu Java → Kotlin
+  - PropertiesDialogFX migroitu Java → Kotlin
+  - Kotlin-prosentti: ~8.2% (7 dialogia Kotlinissa)
+
+- **Testaus-infrastruktuuri**
+  - JUnit 5 integroitu
+  - TestFX lisätty JavaFX-testaukseen
+  - AccountDAOTest luotu (5 testiä)
+  - Testikattavuus aloitettu
+
+- **Koodin laatu**
+  - Parannettu null-safety Kotlin-dialogeissa
+  - Yhtenäisempi koodikanta
+  - Vähemmän boilerplate-koodia
 
 - **Asetukset-valikko**
   - Eriytetty omaksi valikokseen

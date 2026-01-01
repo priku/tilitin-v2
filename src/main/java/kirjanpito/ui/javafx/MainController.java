@@ -151,28 +151,40 @@ public class MainController implements Initializable {
      * Soveltaa teeman Scene:en.
      */
     private void applyTheme() {
-        if (stage == null || stage.getScene() == null) return;
+        if (stage == null || stage.getScene() == null) {
+            System.out.println("⚠️ applyTheme: stage or scene is null");
+            return;
+        }
         
         Scene scene = stage.getScene();
         AppSettings settings = AppSettings.getInstance();
         String theme = settings.getString("theme", "Vaalea");
         
+        System.out.println("🎨 applyTheme: theme = '" + theme + "'");
+        
         // Poista vanhat stylesheetit
         scene.getStylesheets().clear();
+        System.out.println("🎨 Cleared stylesheets");
         
         // Lisää uusi teema
+        String cssPath;
         if ("Tumma".equalsIgnoreCase(theme) || "Dark".equalsIgnoreCase(theme)) {
-            String darkCss = getClass().getResource("/fxml/styles-dark.css").toExternalForm();
-            scene.getStylesheets().add(darkCss);
-        } else if ("Järjestelmä".equalsIgnoreCase(theme) || "System".equalsIgnoreCase(theme)) {
-            // Järjestelmäteema - käytä oletusta
-            String lightCss = getClass().getResource("/fxml/styles.css").toExternalForm();
-            scene.getStylesheets().add(lightCss);
+            cssPath = "/fxml/styles-dark.css";
         } else {
-            // Vaalea (oletus)
-            String lightCss = getClass().getResource("/fxml/styles.css").toExternalForm();
-            scene.getStylesheets().add(lightCss);
+            // Vaalea, Järjestelmä tai oletus
+            cssPath = "/fxml/styles.css";
         }
+        
+        var cssResource = getClass().getResource(cssPath);
+        if (cssResource == null) {
+            System.err.println("❌ CSS resource not found: " + cssPath);
+            return;
+        }
+        
+        String cssUrl = cssResource.toExternalForm();
+        scene.getStylesheets().add(cssUrl);
+        System.out.println("✅ Applied CSS: " + cssUrl);
+        System.out.println("🎨 Stylesheets now: " + scene.getStylesheets());
     }
     
     private void setupKeyboardShortcuts() {
@@ -1692,25 +1704,72 @@ public class MainController implements Initializable {
     @FXML
     private void handleJournalReport() {
         if (!checkReportPrereqs()) return;
-        new ReportDialogFX(stage, ReportDialogFX.ReportType.JOURNAL, dataSource, currentPeriod, accounts).show();
+        List<Period> allPeriods = getAllPeriods();
+        kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
+            stage, 
+            kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.JOURNAL, 
+            dataSource, currentPeriod, accounts, allPeriods,
+            account -> {
+                openLedgerForAccount(account);
+                return kotlin.Unit.INSTANCE;
+            }
+        ).show();
     }
     
     @FXML
     private void handleLedgerReport() {
         if (!checkReportPrereqs()) return;
-        new ReportDialogFX(stage, ReportDialogFX.ReportType.LEDGER, dataSource, currentPeriod, accounts).show();
+        List<Period> allPeriods = getAllPeriods();
+        kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
+            stage,
+            kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.LEDGER,
+            dataSource, currentPeriod, accounts, allPeriods, null
+        ).show();
     }
     
     @FXML
     private void handleIncomeStatement() {
         if (!checkReportPrereqs()) return;
-        new ReportDialogFX(stage, ReportDialogFX.ReportType.INCOME_STATEMENT, dataSource, currentPeriod, accounts).show();
+        List<Period> allPeriods = getAllPeriods();
+        kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
+            stage,
+            kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.INCOME_STATEMENT,
+            dataSource, currentPeriod, accounts, allPeriods, null
+        ).show();
     }
     
     @FXML
     private void handleBalanceSheet() {
         if (!checkReportPrereqs()) return;
-        new ReportDialogFX(stage, ReportDialogFX.ReportType.BALANCE_SHEET, dataSource, currentPeriod, accounts).show();
+        List<Period> allPeriods = getAllPeriods();
+        kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
+            stage,
+            kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.BALANCE_SHEET,
+            dataSource, currentPeriod, accounts, allPeriods, null
+        ).show();
+    }
+    
+    private List<Period> getAllPeriods() {
+        try {
+            Session session = dataSource.openSession();
+            try {
+                return dataSource.getPeriodDAO(session).getAll();
+            } finally {
+                session.close();
+            }
+        } catch (Exception e) {
+            return java.util.Collections.singletonList(currentPeriod);
+        }
+    }
+    
+    private void openLedgerForAccount(kirjanpito.db.Account account) {
+        // Open ledger filtered to specific account
+        List<Period> allPeriods = getAllPeriods();
+        kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
+            stage,
+            kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.LEDGER,
+            dataSource, currentPeriod, accounts, allPeriods, null
+        ).show();
     }
     
     private boolean checkReportPrereqs() {
@@ -2229,11 +2288,11 @@ public class MainController implements Initializable {
                 return;
             }
             
-            var dialog = kirjanpito.ui.javafx.dialogs.CSVImportDialogFX.create(
+            var dialog = kirjanpito.ui.javafx.dialogs.CSVImportDialog.Companion.create(
                 stage, accounts, period);
             
             if (dialog.showAndWait()) {
-                List<kirjanpito.ui.javafx.dialogs.CSVImportDialogFX.ImportedEntry> importedEntries = 
+                List<kirjanpito.ui.javafx.dialogs.CSVImportDialog.ImportedEntry> importedEntries = 
                     dialog.getImportedEntries();
                 
                 if (importedEntries != null && !importedEntries.isEmpty()) {
@@ -2253,7 +2312,7 @@ public class MainController implements Initializable {
                             try {
                                 // Create a new document for each entry
                                 kirjanpito.db.Document doc = new kirjanpito.db.Document();
-                                doc.setDate(java.sql.Date.valueOf(importEntry.date));
+                                doc.setDate(java.sql.Date.valueOf(importEntry.getDate()));
                                 doc.setPeriodId(period.getId());
                                 doc.setNumber(nextNumber++);
                                 
@@ -2262,16 +2321,16 @@ public class MainController implements Initializable {
                                 // Create debit entry (bank account)
                                 kirjanpito.db.Entry bankEntry = new kirjanpito.db.Entry();
                                 bankEntry.setDocumentId(doc.getId());
-                                bankEntry.setAccountId(importEntry.account.getId());
-                                bankEntry.setDescription(importEntry.description);
+                                bankEntry.setAccountId(importEntry.getAccount().getId());
+                                bankEntry.setDescription(importEntry.getDescription());
                                 bankEntry.setRowNumber(0);
                                 
-                                if (importEntry.amount.compareTo(java.math.BigDecimal.ZERO) >= 0) {
+                                if (importEntry.getAmount().compareTo(java.math.BigDecimal.ZERO) >= 0) {
                                     bankEntry.setDebit(true);
-                                    bankEntry.setAmount(importEntry.amount);
+                                    bankEntry.setAmount(importEntry.getAmount());
                                 } else {
                                     bankEntry.setDebit(false);
-                                    bankEntry.setAmount(importEntry.amount.abs());
+                                    bankEntry.setAmount(importEntry.getAmount().abs());
                                 }
                                 
                                 entryDAO.save(bankEntry);
@@ -2281,6 +2340,9 @@ public class MainController implements Initializable {
                                 System.err.println("Error importing entry: " + e.getMessage());
                             }
                         }
+                        
+                        // Commit the transaction
+                        session.commit();
                         
                     } finally {
                         if (session != null) {
@@ -2330,14 +2392,65 @@ public class MainController implements Initializable {
                 if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.CANCEL) {
                     return;
                 }
+                // Poista vanha tiedosto
+                file.delete();
             }
             
-            // SQLite luo tietokannan automaattisesti jos se ei ole olemassa
-            // Avaa tietokanta (luo sen jos ei ole olemassa)
+            // Avaa uusi tyhjä tietokanta
             openDatabase(file);
+            
+            // Tarkista onko tietokanta tyhjä (ei tilejä) ja näytä tilikarttamallin valinta
+            if (accounts == null || accounts.isEmpty()) {
+                initializeNewDatabase();
+            }
             
         } catch (Exception e) {
             showError("Virhe luotaessa tietokantaa", e.getMessage());
+        }
+    }
+    
+    /**
+     * Alustaa uuden tyhjän tietokannan tilikarttamallilla.
+     */
+    private void initializeNewDatabase() {
+        System.out.println("=== initializeNewDatabase() kutsuttu ===");
+        if (registry == null || dataSource == null) {
+            System.out.println("registry tai dataSource on null, palataan");
+            return;
+        }
+        
+        try {
+            // Luo model tilikarttamallien hakua varten
+            DataSourceInitializationModel model = new DataSourceInitializationModel();
+            System.out.println("Tilikarttamalleja: " + model.getModelCount());
+            
+            // Näytä dialogi tilikarttamallin valintaan
+            DataSourceInitializationDialogFX dialog = new DataSourceInitializationDialogFX(
+                stage, registry, model);
+            System.out.println("Näytetään dialogi...");
+            dialog.show();
+            System.out.println("Dialogi suljettu");
+            
+            // Hae worker ja odota sen valmistumista
+            DataSourceInitializationWorker worker = dialog.getWorker();
+            System.out.println("Worker: " + (worker != null ? "OK" : "NULL (peruutettu)"));
+            if (worker != null) {
+                // Odota workerin valmistumista (get() blokkaa kunnes valmis)
+                try {
+                    System.out.println("Odotetaan workerin valmistumista...");
+                    worker.get(); // Blokkaa kunnes worker on valmis
+                    System.out.println("Worker valmis, ladataan data...");
+                    loadAllData();
+                    setStatus("Tietokanta alustettu");
+                } catch (Exception ex) {
+                    showError("Virhe alustettaessa tietokantaa", ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+            
+        } catch (Exception e) {
+            showError("Virhe alustettaessa tietokantaa", e.getMessage());
+            e.printStackTrace();
         }
     }
     
@@ -2364,6 +2477,7 @@ public class MainController implements Initializable {
             
             // Lataa registry data
             try {
+                registry.fetchChartOfAccounts(); // Lataa tilit registryyn
                 registry.fetchDocumentTypes();
                 registry.fetchEntryTemplates();
             } catch (DataAccessException e) {
@@ -2375,6 +2489,7 @@ public class MainController implements Initializable {
             String dbUrl = "jdbc:sqlite:" + file.getAbsolutePath().replace(File.separatorChar, '/');
             AppSettings settings = AppSettings.getInstance();
             settings.set("database.url", dbUrl);
+            settings.save(); // Tallenna asetukset heti levylle
             RecentDatabases.getInstance().addDatabase(dbUrl);
             updateRecentDatabasesMenu();
             

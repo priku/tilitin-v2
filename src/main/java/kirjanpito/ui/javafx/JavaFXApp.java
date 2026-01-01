@@ -42,18 +42,16 @@ public class JavaFXApp extends Application {
             
             // Hae controller
             mainController = loader.getController();
-            mainController.setStage(primaryStage);
             
-            // Luo scene
+            // Luo scene ENSIN
             Scene scene = new Scene(root, DEFAULT_WIDTH, DEFAULT_HEIGHT);
             
-            // Lataa CSS-tyyli
-            String css = getClass().getResource("/fxml/styles.css").toExternalForm();
-            scene.getStylesheets().add(css);
-            
-            // Aseta ikkuna
+            // Aseta scene stageen ENNEN setStage-kutsua
             primaryStage.setTitle(APP_TITLE);
             primaryStage.setScene(scene);
+            
+            // NYT vasta kutsu setStage - scene on jo asetettu, joten applyTheme toimii
+            mainController.setStage(primaryStage);
             
             // Lataa ikoni
             loadAppIcon();
