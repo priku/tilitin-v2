@@ -36,6 +36,28 @@ Ohjelman teki alun perin Tommi Helineva ([helineva.net/tilitin](https://helineva
 
 ---
 
+## ⚠️ Tietokantayhteensopivuus
+
+### Tärkeää ennen käyttöönottoa
+
+Tilitin 2.1 päivittää tietokannan automaattisesti **versiosta 13 → 14** ensimmäisellä avauksella. Tämä mahdollistaa:
+
+- ✅ **Vapaamuotoiset ALV-prosentit** (esim. 25,5%, 14%, 10%)
+- ✅ Tulevat ALV-muutokset ilman ohjelmapäivitystä
+
+### ⚠️ Yhteensopivuusvaroitus
+
+| Suunta | Toimii | Selitys |
+|--------|--------|---------|
+| Helineva 1.6.1 → Tilitin 2.1 | ✅ Kyllä | Päivittyy automaattisesti |
+| Tilitin 2.1 → Helineva 1.6.1 | ❌ Ei | Vanha versio ei ymmärrä uutta skeemaa |
+
+**💾 Ota varmuuskopio ennen ensimmäistä avausta!**
+
+Katso tarkemmat tiedot: [USER-GUIDE.md - Tietokantayhteensopivuus](USER-GUIDE.md#tietokantayhteensopivuus)
+
+---
+
 ## 📦 Asennus
 
 ### Windows (suositeltu)
