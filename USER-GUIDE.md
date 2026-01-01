@@ -1,6 +1,6 @@
 # Tilitin - Käyttäjän opas
 
-**Versio 2.1** | Ilmainen kirjanpito-ohjelma pk-yrityksille ja yhdistyksille
+Ilmainen kirjanpito-ohjelma pk-yrityksille ja yhdistyksille
 
 ---
 

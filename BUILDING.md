@@ -1,4 +1,4 @@
-# Tilitin 2.2 - Build-ohjeet
+# Tilitin - Build-ohjeet
 
 ## Vaatimukset
 
@@ -19,11 +19,11 @@
 ./gradlew jar
 ```
 
-Tuottaa: `build/libs/tilitin-2.2.0.jar`
+Tuottaa: `build/libs/tilitin-X.X.X.jar`
 
 Suorita:
 ```bash
-java -jar build/libs/tilitin-2.2.0.jar
+java -jar build/libs/tilitin-X.X.X.jar
 ```
 
 ## Kääntäminen
@@ -50,8 +50,8 @@ build-windows.bat
 ```
 
 Tuottaa:
-- `dist/windows/Tilitin 2.0/Tilitin 2.0.exe`
-- `dist/windows/Tilitin 2.0/` (koko sovelluskansio)
+- `dist/windows/Tilitin/Tilitin.exe`
+- `dist/windows/Tilitin/` (koko sovelluskansio)
 
 Sovellus sisältää JRE:n, joten Java-asennusta ei tarvita.
 
@@ -105,13 +105,13 @@ Tuottaa:
 Ennen julkaisua, allekirjoita asennusohjelma:
 
 ```bash
-signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist/installer/Tilitin-2.2.0-setup.exe
+signtool sign /fd SHA256 /a /f cert.pfx /p PASSWORD dist/installer/Tilitin-X.X.X-setup.exe
 ```
 
 Tai jos sertifikaatti on Windows Certificate Storessa:
 
 ```bash
-signtool sign /fd SHA256 /n "Tilitin Project" dist/installer/Tilitin-2.2.0-setup.exe
+signtool sign /fd SHA256 /n "Tilitin Project" dist/installer/Tilitin-X.X.X-setup.exe
 ```
 
 ## Testaus

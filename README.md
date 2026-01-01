@@ -1,4 +1,4 @@
-# Tilitin 2.1
+# Tilitin
 
 [![Build Status](https://github.com/priku/tilitin-v2/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-v2/actions)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/)
@@ -62,7 +62,7 @@ Katso tarkemmat tiedot: [USER-GUIDE.md - Tietokantayhteensopivuus](USER-GUIDE.md
 
 ### Windows (suositeltu)
 
-1. Lataa **[Tilitin-2.1.0-setup.exe](https://github.com/priku/tilitin-v2/releases/latest)**
+1. Lataa **[Tilitin-setup.exe](https://github.com/priku/tilitin-v2/releases/latest)** (releases-sivulta)
 2. Tuplaklikkaa ja seuraa ohjeita
 3. Käynnistä Start-valikosta
 
@@ -70,28 +70,30 @@ Katso tarkemmat tiedot: [USER-GUIDE.md - Tietokantayhteensopivuus](USER-GUIDE.md
 
 ### macOS
 
-1. Lataa **[Tilitin-2.1.0.dmg](https://github.com/priku/tilitin-v2/releases/latest)**
+1. Lataa **[Tilitin.dmg](https://github.com/priku/tilitin-v2/releases/latest)** (releases-sivulta)
+   - **Apple Silicon (M1/M2/M3/M4):** `Tilitin-X.X.X-arm64.dmg`
+   - **Intel:** `Tilitin-X.X.X.dmg`
 2. Avaa DMG ja vedä Tilitin Applications-kansioon
 3. Jos macOS estää: Järjestelmäasetukset → Tietosuoja ja turvallisuus → Avaa silti
 
 ### Linux
 
-**Debian/Ubuntu:**
-```bash
-wget https://github.com/priku/tilitin-v2/releases/latest/download/tilitin_2.1.0_amd64.deb
-sudo dpkg -i tilitin_2.1.0_amd64.deb
-```
+Lataa [releases-sivulta](https://github.com/priku/tilitin-v2/releases/latest):
+- **Debian/Ubuntu:** `tilitin_X.X.X_amd64.deb`
+- **Fedora/Red Hat:** `tilitin-X.X.X-1.x86_64.rpm`
 
-**Fedora/Red Hat:**
 ```bash
-wget https://github.com/priku/tilitin-v2/releases/latest/download/tilitin-2.1.0-1.x86_64.rpm
-sudo rpm -i tilitin-2.1.0-1.x86_64.rpm
+# Debian/Ubuntu
+sudo dpkg -i tilitin_*.deb
+
+# Fedora/Red Hat  
+sudo rpm -i tilitin-*.rpm
 ```
 
 ### JAR-tiedostolla (kaikki alustat)
 
 1. Asenna [Java 21+](https://adoptium.net/)
-2. Lataa `tilitin-2.1.0.jar` [releases-sivulta](https://github.com/priku/tilitin-v2/releases/latest)
+2. Lataa `tilitin-X.X.X-all.jar` [releases-sivulta](https://github.com/priku/tilitin-v2/releases/latest)
 3. Tuplaklikkaa JAR-tiedostoa
 
 ---

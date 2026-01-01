@@ -50,7 +50,7 @@ cd tilitin-modernized
 
 # Tai JAR-paketilla
 ./gradlew jar
-java -jar build/libs/tilitin-2.2.3.jar
+java -jar build/libs/tilitin-X.X.X.jar
 ```
 
 ## Kehityskäytännöt

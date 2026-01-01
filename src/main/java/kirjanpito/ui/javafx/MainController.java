@@ -1329,21 +1329,40 @@ public class MainController implements Initializable {
     
     @FXML
     private void handlePeriodSettings() {
-        if (currentPeriod == null) {
-            setStatus("Ei tilikautta");
+        if (registry == null || dataSource == null) {
+            setStatus("Ei tietokantaa");
             return;
         }
         
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd.MM.yyyy");
-        String info = "Tilikausi: " + sdf.format(currentPeriod.getStartDate()) + 
-                      " - " + sdf.format(currentPeriod.getEndDate()) +
-                      "\nLukittu: " + (currentPeriod.isLocked() ? "Kyllä" : "Ei");
+        // Luo PropertiesModel ja näytä dialogi
+        PropertiesModel propertiesModel = new PropertiesModel(registry);
         
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Tilikauden tiedot");
-        alert.setHeaderText("Nykyinen tilikausi");
-        alert.setContentText(info);
-        alert.showAndWait();
+        try {
+            propertiesModel.initialize();
+        } catch (DataAccessException e) {
+            showError("Asetuksien hakeminen epäonnistui", e.getMessage());
+            return;
+        }
+        
+        PropertiesDialogFX dialog = new PropertiesDialogFX(stage, propertiesModel);
+        dialog.show();
+        
+        // Jos tallennettiin, päivitä näyttö
+        if (dialog.isSaved()) {
+            try {
+                // Päivitä tilikausi jos se vaihtui
+                Period newPeriod = propertiesModel.getPeriod(propertiesModel.getCurrentPeriodIndex());
+                if (newPeriod != null && (currentPeriod == null || newPeriod.getId() != currentPeriod.getId())) {
+                    currentPeriod = newPeriod;
+                    registry.setPeriod(currentPeriod);
+                    updateUI();
+                }
+                
+                setStatus("Asetukset tallennettu");
+            } catch (Exception e) {
+                // Ignore update errors, data was saved successfully
+            }
+        }
     }
     
     @FXML
