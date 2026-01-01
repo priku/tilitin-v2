@@ -1487,7 +1487,14 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleRestoreBackup() {
-        showNotImplemented("Palauta varmuuskopiosta");
+        RestoreBackupDialogFX dialog = new RestoreBackupDialogFX(stage);
+        dialog.showAndWait();
+        
+        // If a database was restored, try to open it
+        File restoredFile = dialog.getRestoredDatabaseFile();
+        if (restoredFile != null && restoredFile.exists()) {
+            openDatabase(restoredFile);
+        }
     }
     
     @FXML
@@ -1579,7 +1586,12 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleExport() {
-        showNotImplemented("Vie tiedostoon");
+        if (currentPeriod == null) {
+            showError("Virhe", "Avaa ensin tilikausi ennen vientiä.");
+            return;
+        }
+        
+        DataExportDialogFX.showExportDialog(stage, registry, currentPeriod);
     }
     
     @FXML
