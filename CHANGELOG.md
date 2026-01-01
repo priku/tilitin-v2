@@ -9,14 +9,30 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ## [2.1.0] - 2026-01-01
 
-### 🎉 Tilitin 2.1 - JavaFX Major Release
+# Tilitin 2.1.0
+
+## 📦 Lataa ohjelmisto
+
+| Käyttöjärjestelmä | Lataa | Koko |
+|-------------------|-------|------|
+| 🪟 **Windows** | [Tilitin-2.1.0-setup.exe](https://github.com/priku/tilitin-v2/releases/download/v2.1.0/Tilitin-2.1.0-setup.exe) | ~69 MB |
+| 🍎 **Mac** | [Tilitin-2.1.0.dmg](https://github.com/priku/tilitin-v2/releases/download/v2.1.0/Tilitin-2.1.0.dmg) | ~99 MB |
+| 🐧 **Linux (Ubuntu/Debian)** | [tilitin_2.1.0_amd64.deb](https://github.com/priku/tilitin-v2/releases/download/v2.1.0/tilitin_2.1.0_amd64.deb) | ~76 MB |
+| 🐧 **Linux (Fedora/Red Hat)** | [tilitin-2.1.0-1.x86_64.rpm](https://github.com/priku/tilitin-v2/releases/download/v2.1.0/tilitin-2.1.0-1.x86_64.rpm) | ~95 MB |
+| ☕ **Muu (JAR)** | [tilitin-2.1.0-all.jar](https://github.com/priku/tilitin-v2/releases/download/v2.1.0/tilitin-2.1.0-all.jar) | ~40 MB |
+
+> **Mac-käyttäjille:** Jos macOS estää ohjelman avaamisen, katso [asennusohjeet](https://github.com/priku/tilitin-v2#macos-käyttäjille).
+
+---
+
+## 🎉 Tilitin 2.1 - JavaFX Major Release
 
 **Tila:** ✅ Julkaistu
 **Toteutusaika:** 2025-12 → 2026-01
 
 Tilitin 2.1 on merkittävä päivitys, joka siirtää sovelluksen moderniin JavaFX-käyttöliittymään.
 
-### 🚀 Uutta
+### ✨ Uutta
 
 - **Täysin uusi JavaFX-käyttöliittymä**
   - Moderni, responsiivinen design
@@ -36,15 +52,23 @@ Tilitin 2.1 on merkittävä päivitys, joka siirtää sovelluksen moderniin Java
 - **PrintPreviewStageFX** - JavaFX tulosteiden esikatselu
 - **CSV-tuonti** - Pankkitiliotteen tuonti
 
-### Muutettu
+### 🔧 Muutettu
 
 - Java 21 vaaditaan
 - Gradle Kotlin DSL
 - Parannettu suorituskyky
 
-### Poistettu
+### 🗑️ Poistettu
 
 - Compose Desktop -kokeilu (korvattu JavaFX:llä)
+
+---
+
+## 📖 Lisätietoja
+
+- [Käyttöohjeet](https://github.com/priku/tilitin-v2/blob/master/README.md)
+- [Kaikki muutokset](https://github.com/priku/tilitin-v2/blob/master/CHANGELOG.md)
+- [Ilmoita ongelmasta](https://github.com/priku/tilitin-v2/issues)
 
 ---
 
