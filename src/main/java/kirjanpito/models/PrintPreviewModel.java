@@ -3,10 +3,8 @@ package kirjanpito.models;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -33,10 +31,10 @@ import kirjanpito.util.AppSettings;
 import kirjanpito.util.CSVWriter;
 import kirjanpito.util.ODFSpreadsheet;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfWriter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
 /**
  * Malli tulosteiden esikatseluikkunalle.
@@ -286,52 +284,56 @@ public class PrintPreviewModel {
 	
 	/**
 	 * Tallentaa tulosteen PDF-tiedostoon.
-	 * 
+	 *
 	 * @param file PDF-tiedosto
 	 */
 	public void writePDF(File file) throws IOException {
 		PrintCanvas oldCanvas = print.getCanvas();
 		AppSettings settings = AppSettings.getInstance();
 		String orientation = settings.getString("paper.orientation", "");
-		
+		PDDocument document = null;
+
 		try {
-			OutputStream output = new FileOutputStream(file);
-			Document document;
+			document = new PDDocument();
 
-			if (orientation.equalsIgnoreCase("landscape") ||
-					orientation.equalsIgnoreCase("reverse-landscape")) {
-				document = new Document(PageSize.A4.rotate());
-			}
-			else {
-				document = new Document();
-			}
-			
-			PdfWriter writer = PdfWriter.getInstance(document, output);
-			document.open();
-			document.addTitle(print.getTitle());
-			document.addCreator(Kirjanpito.APP_NAME + " " +
-					Kirjanpito.APP_VERSION);
-			document.addCreationDate();
+			// Set document metadata
+			PDDocumentInformation info = document.getDocumentInformation();
+			info.setTitle(print.getTitle());
+			info.setCreator(Kirjanpito.APP_NAME + " " + Kirjanpito.APP_VERSION);
+			info.setProducer(Kirjanpito.APP_NAME + " " + Kirjanpito.APP_VERSION);
+			info.setCreationDate(java.util.Calendar.getInstance());
 
-			print.setCanvas(new PDFCanvas(document, writer));
 			int pageCount = print.getPageCount();
-			int pageIndex = 0;
-			print.printPage(pageIndex);
-			pageIndex++;
-			
-			while (pageIndex < pageCount) {
-				document.newPage();
+
+			for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+				// Create page with correct orientation
+				PDRectangle pageSize;
+				if (orientation.equalsIgnoreCase("landscape") ||
+						orientation.equalsIgnoreCase("reverse-landscape")) {
+					pageSize = PDRectangle.A4;
+					pageSize = new PDRectangle(pageSize.getHeight(), pageSize.getWidth());
+				}
+				else {
+					pageSize = PDRectangle.A4;
+				}
+
+				PDPage page = new PDPage(pageSize);
+				document.addPage(page);
+
+				// Create canvas for this page
+				PDFCanvas canvas = new PDFCanvas(document, page);
+				print.setCanvas(canvas);
 				print.printPage(pageIndex);
-				pageIndex++;
+				canvas.close();
 			}
-			
-			document.close();
-			output.close();
-		}
-		catch (DocumentException e) {
-			e.printStackTrace();
+
+			// Save document
+			document.save(file);
 		}
 		finally {
+			if (document != null) {
+				document.close();
+			}
 			print.setCanvas(oldCanvas);
 		}
 	}

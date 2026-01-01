@@ -52,7 +52,6 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.4")
     
     // PDF generation
-    implementation("com.itextpdf:itextpdf:5.5.13.4")
     implementation("org.apache.pdfbox:pdfbox:3.0.3")
     
     // CSV handling

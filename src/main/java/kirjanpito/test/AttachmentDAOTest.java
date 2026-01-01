@@ -3,11 +3,12 @@ package kirjanpito.test;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import kirjanpito.db.*;
 import kirjanpito.models.Attachment;
 import kirjanpito.util.PdfUtils;
@@ -300,20 +301,30 @@ public class AttachmentDAOTest {
     }
     
     /**
-     * Creates a valid PDF for testing using iText.
+     * Creates a valid PDF for testing using Apache PDFBox.
      * This creates a simple 1-page PDF document.
      */
     private static byte[] createTestPdfData() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Document document = new Document(PageSize.A4);
-            PdfWriter.getInstance(document, baos);
-            document.open();
-            document.add(new Paragraph("Test PDF Document"));
-            document.add(new Paragraph("This is a test PDF created for AttachmentDAO testing."));
+            PDDocument document = new PDDocument();
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.beginText();
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+            contentStream.newLineAtOffset(50, 750);
+            contentStream.showText("Test PDF Document");
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("This is a test PDF created for AttachmentDAO testing.");
+            contentStream.endText();
+            contentStream.close();
+
+            document.save(baos);
             document.close();
             return baos.toByteArray();
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to create test PDF", e);
         }
     }
@@ -324,21 +335,27 @@ public class AttachmentDAOTest {
     private static byte[] createMultiPagePdfData(int pageCount) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Document document = new Document(PageSize.A4);
-            PdfWriter.getInstance(document, baos);
-            document.open();
-            
+            PDDocument document = new PDDocument();
+
             for (int i = 1; i <= pageCount; i++) {
-                if (i > 1) {
-                    document.newPage();
-                }
-                document.add(new Paragraph("Test PDF Document - Page " + i));
-                document.add(new Paragraph("This is page " + i + " of " + pageCount + "."));
+                PDPage page = new PDPage(PDRectangle.A4);
+                document.addPage(page);
+
+                PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                contentStream.newLineAtOffset(50, 750);
+                contentStream.showText("Test PDF Document - Page " + i);
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("This is page " + i + " of " + pageCount + ".");
+                contentStream.endText();
+                contentStream.close();
             }
-            
+
+            document.save(baos);
             document.close();
             return baos.toByteArray();
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to create multi-page PDF", e);
         }
     }
