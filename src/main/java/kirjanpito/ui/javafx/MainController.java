@@ -2210,12 +2210,22 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleCsvImport() {
+        if (registry == null || dataSource == null) {
+            showError("CSV-tuontivirhe", "Avaa ensin tietokanta ennen CSV-tuontia.");
+            return;
+        }
+        
         try {
             List<Account> accounts = registry.getAccounts();
             Period period = currentPeriod;
             
+            if (accounts == null || accounts.isEmpty()) {
+                showError("CSV-tuontivirhe", "Tietokannassa ei ole tilejä. Luo ensin tilikartta.");
+                return;
+            }
+            
             if (period == null) {
-                showError("Virhe", "Avaa ensin tilikausi ennen CSV-tuontia.");
+                showError("CSV-tuontivirhe", "Avaa ensin tilikausi ennen CSV-tuontia.");
                 return;
             }
             
