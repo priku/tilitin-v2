@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.2.0"
     id("org.openjfx.javafxplugin") version "0.1.0"
     application
 }
@@ -47,24 +47,24 @@ dependencies {
     implementation(kotlin("stdlib"))
     
     // Database drivers
-    implementation("org.xerial:sqlite-jdbc:3.45.1.0")
-    implementation("com.mysql:mysql-connector-j:9.2.0")
-    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+    implementation("com.mysql:mysql-connector-j:9.3.0")
+    implementation("org.postgresql:postgresql:42.7.7")
     
     // PDF generation
-    implementation("org.apache.pdfbox:pdfbox:3.0.3")
+    implementation("org.apache.pdfbox:pdfbox:3.0.6")
     
     // CSV handling
-    implementation("com.opencsv:opencsv:5.9")
+    implementation("com.opencsv:opencsv:5.10")
     
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.16")
     implementation("org.slf4j:slf4j-simple:2.0.16")
     
     // Modern Look and Feel (for Swing interop)
-    implementation("com.formdev:flatlaf:3.5.4")
-    implementation("com.formdev:flatlaf-extras:3.5.4")
-    implementation("com.formdev:flatlaf-intellij-themes:3.5.4")
+    implementation("com.formdev:flatlaf:3.6")
+    implementation("com.formdev:flatlaf-extras:3.6")
+    implementation("com.formdev:flatlaf-intellij-themes:3.6")
 }
 
 sourceSets {
