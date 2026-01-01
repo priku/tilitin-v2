@@ -18,6 +18,10 @@ import javafx.beans.property.SimpleStringProperty;
 import kirjanpito.db.*;
 import kirjanpito.db.sqlite.SQLiteDataSource;
 import kirjanpito.db.DataAccessException;
+import kirjanpito.models.*;
+import kirjanpito.reports.*;
+import kirjanpito.ui.PrintPreviewFrame;
+import kirjanpito.ui.ReportEditorDialog;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
 import kirjanpito.ui.javafx.EntryTableNavigationHandler;
@@ -1721,7 +1725,63 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleAccountSummary() {
-        showNotImplemented("Tilien saldot");
+        if (currentPeriod == null) {
+            showError("Virhe", "Avaa ensin tietokanta");
+            return;
+        }
+        
+        // Save current document first
+        handleSave();
+        
+        AppSettings appSettings = AppSettings.getInstance();
+        AccountSummaryOptionsDialogFX dialog = AccountSummaryOptionsDialogFX.create(stage, currentPeriod);
+        dialog.setPreviousPeriodVisible(appSettings.getBoolean("previous-period", false));
+        
+        if (dialog.showAndWait()) {
+            boolean previousPeriodVisible = dialog.isPreviousPeriodVisible();
+            appSettings.set("previous-period", previousPeriodVisible);
+            int printedAccounts = dialog.getPrintedAccounts();
+            
+            // Create and run the model on background thread, then show preview on EDT
+            javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    AccountSummaryModel printModel = new AccountSummaryModel();
+                    printModel.setRegistry(registry);
+                    printModel.setPeriod(currentPeriod);
+                    printModel.setStartDate(dialog.getStartDate());
+                    printModel.setEndDate(dialog.getEndDate());
+                    printModel.setPreviousPeriodVisible(previousPeriodVisible);
+                    printModel.setPrintedAccounts(printedAccounts);
+                    printModel.run();
+                    
+                    // Show PrintPreviewFrame on EDT
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        showPrintPreview(printModel, new AccountSummaryPrint(printModel, printedAccounts != 1));
+                    });
+                    return null;
+                }
+            };
+            
+            task.setOnFailed(e -> {
+                Throwable ex = task.getException();
+                showError("Virhe", "Tulosteen luominen epäonnistui: " + ex.getMessage());
+            });
+            
+            new Thread(task).start();
+        }
+    }
+    
+    /** Shows PrintPreviewFrame for the given print model and print. */
+    private void showPrintPreview(PrintModel printModel, kirjanpito.reports.Print print) {
+        print.setSettings(registry.getSettings());
+        PrintPreviewModel previewModel = new PrintPreviewModel();
+        PrintPreviewFrame frame = new PrintPreviewFrame(null, previewModel);
+        frame.create();
+        previewModel.setPrintModel(printModel);
+        previewModel.setPrint(print);
+        frame.updatePrint();
+        frame.setVisible(true);
     }
     
     @FXML
@@ -1731,42 +1791,266 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleAccountStatement() {
-        showNotImplemented("Tiliote");
+        if (currentPeriod == null || dataSource == null) {
+            showError("Virhe", "Avaa ensin tietokanta");
+            return;
+        }
+        
+        // Save current document first
+        handleSave();
+        
+        // Get currently selected account for default selection
+        Account defaultAccount = null;
+        int selectedRow = entryTable.getSelectionModel().getSelectedIndex();
+        if (selectedRow >= 0 && selectedRow < entries.size()) {
+            EntryRowModel row = entries.get(selectedRow);
+            if (row.getEntry() != null && row.getEntry().getAccountId() > 0) {
+                defaultAccount = registry.getAccountById(row.getEntry().getAccountId());
+            }
+        }
+        
+        AppSettings appSettings = AppSettings.getInstance();
+        AccountStatementOptionsDialogFX dialog = AccountStatementOptionsDialogFX.create(stage, registry, currentPeriod);
+        dialog.setOrderByDate(appSettings.getString("sort-entries", "number").equals("date"));
+        if (defaultAccount != null) {
+            dialog.selectAccount(defaultAccount);
+        }
+        
+        if (dialog.showAndWait()) {
+            Account account = dialog.getSelectedAccount();
+            if (account == null) {
+                showError("Virhe", "Valitse tili");
+                return;
+            }
+            
+            boolean orderByDate = dialog.isOrderByDate();
+            appSettings.set("sort-entries", orderByDate ? "date" : "number");
+            
+            // Create and run the model on background thread, then show preview on EDT
+            javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    AccountStatementModel printModel = new AccountStatementModel();
+                    printModel.setDataSource(dataSource);
+                    printModel.setSettings(registry.getSettings());
+                    printModel.setPeriod(currentPeriod);
+                    printModel.setAccount(account);
+                    printModel.setStartDate(dialog.getStartDate());
+                    printModel.setEndDate(dialog.getEndDate());
+                    printModel.setOrderBy(orderByDate ? AccountStatementModel.ORDER_BY_DATE : AccountStatementModel.ORDER_BY_NUMBER);
+                    printModel.run();
+                    
+                    // Show PrintPreviewFrame on EDT
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        showPrintPreview(printModel, new AccountStatementPrint(printModel));
+                    });
+                    return null;
+                }
+            };
+            
+            task.setOnFailed(e -> {
+                Throwable ex = task.getException();
+                showError("Virhe", "Tulosteen luominen epäonnistui: " + ex.getMessage());
+            });
+            
+            new Thread(task).start();
+        }
     }
     
     @FXML
     private void handleIncomeStatementDetailed() {
-        showNotImplemented("Tuloslaskelma erittelyin");
+        showFinancialStatement(true, FinancialStatementModel.TYPE_INCOME_STATEMENT_DETAILED);
     }
     
     @FXML
     private void handleBalanceSheetDetailed() {
-        showNotImplemented("Tase erittelyin");
+        showFinancialStatement(false, FinancialStatementModel.TYPE_BALANCE_SHEET_DETAILED);
+    }
+    
+    /** Helper method for showing financial statements (income statement/balance sheet). */
+    private void showFinancialStatement(boolean isIncomeStatement, int reportType) {
+        if (currentPeriod == null || dataSource == null) {
+            showError("Virhe", "Avaa ensin tietokanta");
+            return;
+        }
+        
+        handleSave();
+        
+        // Fetch periods for the dialog
+        List<Period> periods;
+        try {
+            Session sess = dataSource.openSession();
+            try {
+                periods = dataSource.getPeriodDAO(sess).getAll();
+                // Remove periods that start after current period
+                periods.removeIf(p -> p.getStartDate().after(currentPeriod.getStartDate()));
+            } finally {
+                sess.close();
+            }
+        } catch (DataAccessException e) {
+            showError("Virhe", "Tilikausien haku epäonnistui: " + e.getMessage());
+            return;
+        }
+        
+        FinancialStatementOptionsDialogFX dialog;
+        if (isIncomeStatement) {
+            dialog = FinancialStatementOptionsDialogFX.createIncomeStatement(stage, periods);
+        } else {
+            dialog = FinancialStatementOptionsDialogFX.createBalanceSheet(stage, periods);
+        }
+        
+        if (dialog.showAndWait()) {
+            Date[] startDates = dialog.getStartDates();
+            Date[] endDates = dialog.getEndDates();
+            boolean pageBreakEnabled = dialog.isPageBreakEnabled();
+            
+            if (startDates == null || endDates == null) {
+                return;
+            }
+            
+            javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    FinancialStatementModel printModel = new FinancialStatementModel(reportType);
+                    printModel.setDataSource(dataSource);
+                    printModel.setSettings(registry.getSettings());
+                    printModel.setAccounts(registry.getAccounts());
+                    printModel.setStartDates(startDates);
+                    printModel.setEndDates(endDates);
+                    if (!isIncomeStatement) {
+                        printModel.setPageBreakEnabled(pageBreakEnabled);
+                    }
+                    printModel.run();
+                    
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        showPrintPreview(printModel, new FinancialStatementPrint(printModel));
+                    });
+                    return null;
+                }
+            };
+            
+            task.setOnFailed(e -> {
+                Throwable ex = task.getException();
+                showError("Virhe", "Tulosteen luominen epäonnistui: " + ex.getMessage());
+            });
+            
+            new Thread(task).start();
+        }
     }
     
     @FXML
     private void handleVatReport() {
-        showNotImplemented("ALV-laskelma tileittäin");
+        if (currentPeriod == null || dataSource == null) {
+            showError("Virhe", "Avaa ensin tietokanta");
+            return;
+        }
+        
+        handleSave();
+        
+        VATReportDialogFX dialog = VATReportDialogFX.create(stage, currentPeriod);
+        
+        if (dialog.showAndWait()) {
+            Date startDate = dialog.getStartDate();
+            Date endDate = dialog.getEndDate();
+            
+            javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    VATReportModel printModel = new VATReportModel();
+                    printModel.setDataSource(dataSource);
+                    printModel.setSettings(registry.getSettings());
+                    printModel.setPeriod(currentPeriod);
+                    printModel.setStartDate(startDate);
+                    printModel.setEndDate(endDate);
+                    printModel.run();
+                    
+                    javax.swing.SwingUtilities.invokeLater(() -> {
+                        showPrintPreview(printModel, new VATReportPrint(printModel));
+                    });
+                    return null;
+                }
+            };
+            
+            task.setOnFailed(e -> {
+                Throwable ex = task.getException();
+                showError("Virhe", "ALV-laskelman luominen epäonnistui: " + ex.getMessage());
+            });
+            
+            new Thread(task).start();
+        }
     }
     
     @FXML
     private void handleCoa0() {
-        showNotImplemented("Tilikartta - Kaikki tilit");
+        showCOAReport(COAPrintModel.ALL_ACCOUNTS); // All accounts
     }
     
     @FXML
     private void handleCoa1() {
-        showNotImplemented("Tilikartta - Vain käytössä olevat tilit");
+        showCOAReport(COAPrintModel.USED_ACCOUNTS); // Used accounts only
     }
     
     @FXML
     private void handleCoa2() {
-        showNotImplemented("Tilikartta - Vain suosikkitilit");
+        showCOAReport(COAPrintModel.FAVOURITE_ACCOUNTS); // Favorite accounts only
+    }
+    
+    /** Helper method for showing chart of accounts reports. */
+    private void showCOAReport(int mode) {
+        if (currentPeriod == null || dataSource == null) {
+            showError("Virhe", "Avaa ensin tietokanta");
+            return;
+        }
+        
+        handleSave();
+        
+        javafx.concurrent.Task<Void> task = new javafx.concurrent.Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                COAPrintModel printModel = new COAPrintModel();
+                printModel.setRegistry(registry);
+                printModel.setMode(mode);
+                printModel.run();
+                
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    showPrintPreview(printModel, new COAPrint(printModel));
+                });
+                return null;
+            }
+        };
+        
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            showError("Virhe", "Tilikartan tulostus epäonnistui: " + ex.getMessage());
+        });
+        
+        new Thread(task).start();
     }
     
     @FXML
     private void handleEditReports() {
-        showNotImplemented("Raporttien muokkaus");
+        if (registry == null) {
+            showError("Virhe", "Avaa ensin tietokanta");
+            return;
+        }
+        
+        // Use the existing Swing dialog for report editing
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            ReportEditorModel editorModel = new ReportEditorModel(registry);
+            ReportEditorDialog dialog = new ReportEditorDialog(null, editorModel);
+            
+            try {
+                editorModel.load();
+            } catch (DataAccessException e) {
+                Platform.runLater(() -> {
+                    showError("Virhe", "Tulostetietojen hakeminen epäonnistui: " + e.getMessage());
+                });
+                return;
+            }
+            
+            dialog.create();
+            dialog.setVisible(true);
+        });
     }
     
     @FXML
@@ -1864,7 +2148,10 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleVatChange() {
-        showNotImplemented("ALV-kantojen muutokset");
+        VATChangeDialogFX dialog = new VATChangeDialogFX(stage, registry);
+        dialog.show();
+        // Refresh data after potential changes
+        loadAllData();
     }
     
     @FXML
