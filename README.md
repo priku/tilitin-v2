@@ -1,28 +1,36 @@
-# Tilitin 2.2
+# Tilitin 2.1
 
-[![Build Status](https://github.com/priku/tilitin-modernized/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-modernized/actions)
-[![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://adoptium.net/)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-blue.svg)](https://kotlinlang.org/)
+[![Build Status](https://github.com/priku/tilitin-v2/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-v2/actions)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-blue.svg)](https://kotlinlang.org/)
+[![JavaFX](https://img.shields.io/badge/JavaFX-21-green.svg)](https://openjfx.io/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg)](COPYING)
 
 **Tilitin** on ilmainen, avoimen lähdekoodin kirjanpito-ohjelma suomalaisille pk-yrityksille ja yhdistyksille.
 
-Ohjelman teki alun perin Tommi Helineva ([helineva.net/tilitin](https://helineva.net/tilitin/)). Modernisointia on tehnyt Jouni Seppänen (2024) ja priku (2025).
+Ohjelman teki alun perin Tommi Helineva ([helineva.net/tilitin](https://helineva.net/tilitin/)). Modernisointia on tehnyt Jouni Seppänen (2024) ja priku (2025-2026).
 
 ---
 
-## ✨ Uusimmat ominaisuudet
+## ✨ Uudet ominaisuudet v2.1
 
-### v2.2.0 - PDF-liitteiden tuki
-- 📎 **PDF-liitteet tositteisiin** - Liitä kuitteja ja laskuja suoraan tositteisiin
-- 📄 **Apache PDFBox 3.0.3** - Moderni PDF-käsittelykirjasto
-- 🗄️ **Automaattinen tietokantapäivitys** - Migraatio versioon 15
+### 🎨 JavaFX-käyttöliittymä
+- **Täysin uusi JavaFX UI** - Moderni, responsiivinen käyttöliittymä
+- **27 uutta dialogia** - Kaikki toiminnot siirretty JavaFX:ään
+- **Tumma ja vaalea teema** - Skaalautuva fonttikoko
 
-### Aiemmat versiot
-- 🦜 **Kotlin 2.3.0** + Java 25 -tuki
-- ✨ **FlatLaf-teema** - Vaalea ja tumma teema
-- 💾 **Varmuuskopiointijärjestelmä** - AutoBackup, pilvipalvelutuki
-- 📊 **CSV-vienti** - Excel-yhteensopiva (UTF-8 BOM)
+### 📊 CSV-tuonti
+- **Pankkitiliotteen tuonti** - Tuo kirjaukset CSV-tiedostosta
+- **Automaattinen tiliöinti** - Tunnistaa toistuvat maksut
+
+### 📎 PDF-liitteet
+- **PDF-liitteet tositteisiin** - Liitä kuitteja ja laskuja
+- **Apache PDFBox 3.0.3** - Moderni PDF-käsittely
+
+### ⚙️ Asetukset-valikko
+- **Ulkoasuasetukset** - Teema ja fonttikoko esikatselulla
+- **Pikanäppäimet** - Kaikki pikanäppäimet kategorioittain
+- **Asetusten vienti/tuonti** - Varmuuskopioi asetukset
 
 📋 Katso täydellinen versiohistoria: [CHANGELOG.md](CHANGELOG.md)
 
@@ -32,21 +40,64 @@ Ohjelman teki alun perin Tommi Helineva ([helineva.net/tilitin](https://helineva
 
 ### Windows (suositeltu)
 
-1. Lataa **[Tilitin-2.2.0-setup.exe](https://github.com/priku/tilitin-modernized/releases/latest)**
+1. Lataa **[Tilitin-2.1.0-setup.exe](https://github.com/priku/tilitin-v2/releases/latest)**
 2. Tuplaklikkaa ja seuraa ohjeita
 3. Käynnistä Start-valikosta
 
 > 💡 Asennusohjelma sisältää Javan - erillistä asennusta ei tarvita.
 
+### macOS
+
+1. Lataa **[Tilitin-2.1.0.dmg](https://github.com/priku/tilitin-v2/releases/latest)**
+2. Avaa DMG ja vedä Tilitin Applications-kansioon
+3. Jos macOS estää: Järjestelmäasetukset → Tietosuoja ja turvallisuus → Avaa silti
+
+### Linux
+
+**Debian/Ubuntu:**
+```bash
+wget https://github.com/priku/tilitin-v2/releases/latest/download/tilitin_2.1.0_amd64.deb
+sudo dpkg -i tilitin_2.1.0_amd64.deb
+```
+
+**Fedora/Red Hat:**
+```bash
+wget https://github.com/priku/tilitin-v2/releases/latest/download/tilitin-2.1.0-1.x86_64.rpm
+sudo rpm -i tilitin-2.1.0-1.x86_64.rpm
+```
+
 ### JAR-tiedostolla (kaikki alustat)
 
-1. Asenna [Java 25+](https://adoptium.net/)
-2. Lataa `tilitin-2.2.0.jar` [releases-sivulta](https://github.com/priku/tilitin-modernized/releases/latest)
+1. Asenna [Java 21+](https://adoptium.net/)
+2. Lataa `tilitin-2.1.0.jar` [releases-sivulta](https://github.com/priku/tilitin-v2/releases/latest)
 3. Tuplaklikkaa JAR-tiedostoa
 
 ---
 
-## 📖 Dokumentaatio
+## �️ Kehitysympäristö ja Build-infrastruktuuri
+
+**Kaikki build-työkalut ovat valmiina:**
+
+### Build-skriptit
+- `build-windows.bat` - Windows app-image (.exe)
+- `build-windows-installer.bat` - Windows MSI-asennusohjelma (WiX)
+- `build-inno-installer.bat` - Windows Inno Setup -asennusohjelma (suositus)
+- `build-macos.sh` - macOS .app bundle ja DMG
+- `create-macos-icon.sh` - macOS .icns-ikonin generointi
+
+### GitHub Actions CI/CD
+- `.github/workflows/advanced-build.yml` - Kattava multi-platform build
+- `.github/workflows/release.yml` - Automaattinen release tag-julkaisuille
+
+### Tuetut alustat
+- **Windows:** EXE (jPackage), MSI (WiX), Inno Setup installer
+- **macOS:** .app bundle, DMG-levykuva, ad-hoc code signing
+- **Linux:** DEB (Debian/Ubuntu), RPM (Fedora/RHEL)
+- **JAR:** Universaali Java 21+ -paketti
+
+---
+
+## �📖 Dokumentaatio
 
 ### Käyttäjille
 - **[USER-GUIDE.md](USER-GUIDE.md)** - 📖 Kattava käyttäjän opas

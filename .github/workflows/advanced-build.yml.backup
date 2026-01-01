@@ -1,0 +1,360 @@
+name: Advanced Build & Release
+
+on:
+  push:
+    branches: [ master, 'feature/**' ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  JAVA_VERSION: '21'
+  APP_NAME: 'Tilitin'
+  APP_VENDOR: 'Priku'
+  APP_DESCRIPTION: 'Moderni suomalainen kirjanpito-ohjelma'
+
+jobs:
+  # =============================================================================
+  # Job 1: Build JAR, test, and create GitHub Release
+  # =============================================================================
+  build-and-release:
+    name: ☕ Build JAR & Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Kotlin compilation statistics
+      run: |
+        echo "=== Kotlin Migration Progress ==="
+        KOTLIN_COUNT=$(find src/main/kotlin -name "*.kt" 2>/dev/null | wc -l || echo "0")
+        JAVA_COUNT=$(find src/main/java -name "*.java" 2>/dev/null | wc -l || echo "0")
+        echo "📊 Kotlin files: $KOTLIN_COUNT"
+        echo "📊 Java files: $JAVA_COUNT"
+        if [ $KOTLIN_COUNT -gt 0 ]; then
+          PERCENTAGE=$((KOTLIN_COUNT * 100 / (KOTLIN_COUNT + JAVA_COUNT)))
+          echo "📈 Kotlin adoption: ${PERCENTAGE}%"
+        fi
+        echo "==================================="
+
+    - name: Build with Gradle
+      run: ./gradlew clean build
+
+    - name: Build JAR
+      run: ./gradlew jar
+
+    - name: Verify Kotlin + Java compilation
+      run: |
+        echo "✅ Kotlin + Java 21 compilation successful"
+        echo "📦 JAR built: $(ls -lh build/libs/tilitin*.jar | awk '{print $9, $5}')"
+
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: tilitin-jar
+        path: build/libs/tilitin*.jar
+        retention-days: 30
+
+    - name: Extract version from tag
+      id: version
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+    - name: Extract release notes from CHANGELOG
+      if: startsWith(github.ref, 'refs/tags/v')
+      run: |
+        VERSION="${{ steps.version.outputs.VERSION }}"
+        echo "Extracting release notes for version $VERSION from CHANGELOG.md..."
+        
+        awk -v ver="$VERSION" '
+          /^## \[/ { 
+            if (found) exit
+            if (index($0, "[" ver "]") > 0) found=1 
+          }
+          found && /^---$/ { exit }
+          found { print }
+        ' CHANGELOG.md > release-notes.md
+        
+        if [ -s release-notes.md ]; then
+          echo "✅ Found release notes for v$VERSION ($(wc -l < release-notes.md) lines)"
+        else
+          echo "⚠️ No specific notes found, using default"
+          cat > release-notes.md << EOF
+        ## Tilitin v$VERSION
+        
+        ### Lataukset
+        
+        | Käyttöjärjestelmä | Tiedosto |
+        |-------------------|----------|
+        | 🪟 Windows | \`Tilitin-$VERSION-Setup.exe\` |
+        | 🍎 macOS | \`Tilitin-$VERSION.dmg\` |
+        | 🐧 Linux (Debian/Ubuntu) | \`tilitin_$VERSION-1_amd64.deb\` |
+        | 🐧 Linux (Red Hat/Fedora) | \`tilitin-$VERSION-1.x86_64.rpm\` |
+        | ☕ Cross-platform JAR | \`tilitin-$VERSION.jar\` |
+        
+        Katso täysi muutosloki: [CHANGELOG.md](https://github.com/priku/Tilitin2.0/blob/master/CHANGELOG.md)
+        EOF
+        fi
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Tilitin ${{ github.ref_name }}
+        draft: false
+        body_path: release-notes.md
+        files: |
+          build/libs/tilitin*.jar
+
+  # =============================================================================
+  # Job 2: Linux packages (.deb, .rpm)
+  # =============================================================================
+  linux-packages:
+    name: 🐧 Linux Packages
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: tilitin-jar
+        path: build/libs/
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Install packaging tools
+      run: sudo apt-get update && sudo apt-get install -y fakeroot rpm
+
+    - name: Get JAR filename
+      id: jar
+      run: |
+        JAR_FILE=$(ls build/libs/tilitin*.jar | head -1)
+        echo "JAR_FILE=$JAR_FILE" >> $GITHUB_OUTPUT
+        echo "Found JAR: $JAR_FILE"
+
+    - name: Build Linux DEB package
+      run: |
+        VERSION="${{ needs.build-and-release.outputs.version }}"
+        jpackage \
+          --input build/libs \
+          --main-jar $(basename ${{ steps.jar.outputs.JAR_FILE }}) \
+          --name tilitin \
+          --app-version "$VERSION" \
+          --vendor "${{ env.APP_VENDOR }}" \
+          --description "${{ env.APP_DESCRIPTION }}" \
+          --type deb \
+          --linux-shortcut \
+          --linux-menu-group "Office;Finance" \
+          --dest dist/
+        echo "✅ DEB package created"
+        ls -lh dist/*.deb
+
+    - name: Build Linux RPM package
+      run: |
+        VERSION="${{ needs.build-and-release.outputs.version }}"
+        jpackage \
+          --input build/libs \
+          --main-jar $(basename ${{ steps.jar.outputs.JAR_FILE }}) \
+          --name tilitin \
+          --app-version "$VERSION" \
+          --vendor "${{ env.APP_VENDOR }}" \
+          --description "${{ env.APP_DESCRIPTION }}" \
+          --type rpm \
+          --linux-shortcut \
+          --linux-menu-group "Office;Finance" \
+          --dest dist/
+        echo "✅ RPM package created"
+        ls -lh dist/*.rpm
+
+    - name: Upload Linux packages to release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: |
+          dist/*.deb
+          dist/*.rpm
+
+  # =============================================================================
+  # Job 3: Windows installer (.exe)
+  # =============================================================================
+  windows-installer:
+    name: 🪟 Windows Installer
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: tilitin-jar
+        path: build/libs/
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Build Windows app-image with jPackage
+      run: |
+        $VERSION = "${{ needs.build-and-release.outputs.version }}"
+        $JAR_FILE = Get-ChildItem -Path build/libs -Filter "tilitin*.jar" | Select-Object -First 1
+        
+        Write-Host "Building Windows app-image for version $VERSION"
+        Write-Host "Using JAR: $($JAR_FILE.Name)"
+        
+        jpackage `
+          --input build/libs `
+          --main-jar $JAR_FILE.Name `
+          --name Tilitin `
+          --app-version $VERSION `
+          --vendor "${{ env.APP_VENDOR }}" `
+          --description "${{ env.APP_DESCRIPTION }}" `
+          --type app-image `
+          --win-console `
+          --dest dist
+        
+        Write-Host "✅ Windows app-image created"
+        Get-ChildItem -Path dist -Recurse | Select-Object FullName
+      shell: pwsh
+
+    - name: Install Inno Setup
+      run: choco install innosetup -y
+
+    - name: Build Inno Setup installer
+      run: |
+        echo "Building Inno Setup installer..."
+        .\build-inno-installer.bat
+      shell: cmd
+
+    - name: Upload Windows installer to release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: |
+          dist/installer/*.exe
+
+  # =============================================================================
+  # Job 4: macOS package (.dmg)
+  # =============================================================================
+  macos-package:
+    name: 🍎 macOS Package
+    runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: tilitin-jar
+        path: build/libs/
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Build macOS DMG package
+      run: |
+        VERSION="${{ needs.build-and-release.outputs.version }}"
+        JAR_FILE=$(ls build/libs/tilitin*.jar | head -1)
+        
+        echo "Building macOS DMG for version $VERSION"
+        echo "Using JAR: $JAR_FILE"
+        
+        jpackage \
+          --input build/libs \
+          --main-jar $(basename "$JAR_FILE") \
+          --name Tilitin \
+          --app-version "$VERSION" \
+          --vendor "${{ env.APP_VENDOR }}" \
+          --description "${{ env.APP_DESCRIPTION }}" \
+          --type dmg \
+          --mac-package-name "Tilitin" \
+          --dest dist/
+        
+        echo "✅ macOS DMG created"
+        ls -lh dist/*.dmg
+
+    - name: Upload macOS package to release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: |
+          dist/*.dmg
+
+  # =============================================================================
+  # Job 5: Package dependencies (GPL compliance)
+  # =============================================================================
+  package-dependencies:
+    name: 📦 Package Dependencies
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Gather dependencies
+      run: ./gradlew dependencies --configuration runtimeClasspath > dependencies.txt
+
+    - name: Copy dependency JARs
+      run: |
+        mkdir -p build/dependency
+        ./gradlew copyDependencies || echo "Note: copyDependencies task may not exist, skipping"
+
+    - name: Zip dependencies info
+      run: zip -9 build/tilitin-dependencies.zip dependencies.txt
+
+    - name: Upload dependencies to release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: build/tilitin-dependencies.zip

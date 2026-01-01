@@ -7,14 +7,14 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
-## [3.0.0] - 2026-01-01
+## [2.1.0] - 2026-01-01
 
-### 🎉 Tilitin 3.0 - JavaFX Major Release
+### 🎉 Tilitin 2.1 - JavaFX Major Release
 
 **Tila:** ✅ Julkaistu
 **Toteutusaika:** 2025-12 → 2026-01
 
-Tilitin 3.0 on merkittävä päivitys, joka siirtää sovelluksen moderniin JavaFX-käyttöliittymään.
+Tilitin 2.1 on merkittävä päivitys, joka siirtää sovelluksen moderniin JavaFX-käyttöliittymään.
 
 ### 🚀 Uutta
 
