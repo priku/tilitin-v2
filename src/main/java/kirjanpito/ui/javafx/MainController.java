@@ -21,7 +21,6 @@ import kirjanpito.db.DataAccessException;
 import kirjanpito.models.*;
 import kirjanpito.reports.*;
 import kirjanpito.ui.PrintPreviewFrame;
-import kirjanpito.ui.ReportEditorDialog;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
 import kirjanpito.ui.javafx.EntryTableNavigationHandler;
@@ -2085,23 +2084,17 @@ public class MainController implements Initializable {
             return;
         }
         
-        // Use the existing Swing dialog for report editing
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            ReportEditorModel editorModel = new ReportEditorModel(registry);
-            ReportEditorDialog dialog = new ReportEditorDialog(null, editorModel);
-            
-            try {
-                editorModel.load();
-            } catch (DataAccessException e) {
-                Platform.runLater(() -> {
-                    showError("Virhe", "Tulostetietojen hakeminen epäonnistui: " + e.getMessage());
-                });
-                return;
-            }
-            
-            dialog.create();
-            dialog.setVisible(true);
-        });
+        ReportEditorModel editorModel = new ReportEditorModel(registry);
+        
+        try {
+            editorModel.load();
+        } catch (DataAccessException e) {
+            showError("Virhe", "Tulostetietojen hakeminen epäonnistui: " + e.getMessage());
+            return;
+        }
+        
+        ReportEditorDialogFX dialog = new ReportEditorDialogFX(stage, editorModel);
+        dialog.show();
     }
     
     @FXML
