@@ -7,6 +7,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import kirjanpito.util.AppSettings;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,6 +21,7 @@ import java.io.InputStream;
 public class JavaFXApp extends Application {
     
     private static final String APP_TITLE = "Tilitin";
+    private static final String APP_DATA_NAME = "Tilitin";
     private static final int DEFAULT_WIDTH = 1200;
     private static final int DEFAULT_HEIGHT = 700;
     
@@ -27,6 +31,9 @@ public class JavaFXApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+        
+        // Lataa asetukset ensin
+        initSettings();
         
         try {
             // Lataa FXML
@@ -60,6 +67,15 @@ public class JavaFXApp extends Application {
             System.err.println("❌ Virhe ladattaessa FXML: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Alustaa AppSettings-olion lataamalla asetukset tiedostosta.
+     */
+    private void initSettings() {
+        AppSettings settings = AppSettings.getInstance();
+        File settingsFile = new File(AppSettings.buildDirectoryPath(APP_DATA_NAME), "asetukset.properties");
+        settings.load(settingsFile);
     }
     
     private void loadAppIcon() {

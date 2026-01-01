@@ -1,5 +1,6 @@
 package kirjanpito.models;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +20,8 @@ public class DocumentTypeModel {
 	
 	public DocumentTypeModel(Registry registry) {
 		this.registry = registry;
-		this.documentTypes = registry.getDocumentTypes();
+		// Tehdään muokattava kopio, koska registry palauttaa muuttumattoman listan
+		this.documentTypes = new ArrayList<>(registry.getDocumentTypes());
 		changedDocumentTypes = new HashSet<DocumentType>();
 		deletedDocumentTypes = new HashSet<DocumentType>();
 	}

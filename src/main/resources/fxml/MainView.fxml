@@ -21,8 +21,6 @@
                     <MenuItem text="Avaa..." fx:id="openDatabaseItem" onAction="#handleOpenDatabase" accelerator="Ctrl+O"/>
                     <SeparatorMenuItem/>
                     <Menu text="Viimeisimmät" fx:id="recentDatabasesMenu"/>
-                    <MenuItem text="Tietokanta-asetukset..." onAction="#handleDatabaseSettings" accelerator="Ctrl+D"/>
-                    <MenuItem text="Varmuuskopiointi..." onAction="#handleBackupSettings"/>
                     <MenuItem text="Palauta varmuuskopiosta..." onAction="#handleRestoreBackup"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Lopeta" onAction="#handleQuit" accelerator="Ctrl+Q"/>
@@ -48,8 +46,6 @@
                     <MenuItem text="Tilikartta..." onAction="#handleChartOfAccounts" accelerator="Ctrl+T"/>
                     <MenuItem text="Alkusaldot..." onAction="#handleStartingBalances" accelerator="Ctrl+B"/>
                     <MenuItem text="Perustiedot..." onAction="#handlePeriodSettings" accelerator="Ctrl+Shift+P"/>
-                    <MenuItem text="Kirjausasetukset..." onAction="#handleSettings" accelerator="Ctrl+Shift+S"/>
-                    <MenuItem text="Ulkoasu..." onAction="#handleAppearance" accelerator="Ctrl+Shift+A"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="ALV-merkintä" onAction="#handleVatDocument" accelerator="Ctrl+Shift+V"/>
                 </Menu>
@@ -102,6 +98,20 @@
                     <MenuItem text="Vie tiedostoon" onAction="#handleExport" accelerator="Ctrl+E"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="Tuo CSV-tiedostosta..." onAction="#handleCsvImport" accelerator="Ctrl+I"/>
+                </Menu>
+                
+                <!-- Asetukset -->
+                <Menu text="Asetukset">
+                    <MenuItem text="Yleiset..." onAction="#handleSettings" accelerator="Ctrl+Shift+S"/>
+                    <MenuItem text="Ulkoasu..." onAction="#handleAppearance" accelerator="Ctrl+Shift+A"/>
+                    <MenuItem text="Pikanäppäimet..." onAction="#handleKeyboardShortcuts"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Tulostusasetukset..." onAction="#handlePrintSettings"/>
+                    <MenuItem text="Varmuuskopiointi..." onAction="#handleBackupSettings"/>
+                    <MenuItem text="Tietokanta..." onAction="#handleDatabaseSettings"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="Vie asetukset..." onAction="#handleExportSettings"/>
+                    <MenuItem text="Tuo asetukset..." onAction="#handleImportSettings"/>
                 </Menu>
                 
                 <!-- Ohje -->

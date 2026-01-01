@@ -7,6 +7,58 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
+## [2.2.5] - 2026-01-01
+
+### 🚀 Asetukset-valikko & Uudet asetustyökalut
+
+**Tila:** ✅ Valmis
+**Toteutusaika:** 2026-01-01
+
+### Lisätty
+
+- **Uusi Asetukset-valikko** 
+  - Eriytetty omaksi valikokseen päävalikkopalkkiin
+  - Looginen rakenne: Yleiset, Ulkoasu, Pikanäppäimet, Tulostusasetukset, Varmuuskopiointi, Tietokanta, Vie/Tuo asetukset
+
+- **AppearanceDialogFX.java** - Ulkoasuasetukset-dialogi
+  - Teeman valinta (Vaalea/Tumma)
+  - Fonttikoko-säädin (10-20pt) esikatselulla
+  - Live-esikatselu teemamuutoksille
+
+- **KeyboardShortcutsDialogFX.java** - Pikanäppäimet-dialogi
+  - Kaikki sovelluksen pikanäppäimet kategorioittain
+  - TitledPane-komponentit laajennettaville osioille
+  - 8 kategoriaa: Tiedosto, Tosite, Navigointi, Muokkaus, Tositelajit, Tulosteet, Asetukset, Ohje
+
+- **PrintSettingsDialogFX.java** - Tulostusasetukset-dialogi
+  - Paperikoko (A4, A5, Letter, Legal)
+  - Paperin suunta (Pysty/Vaaka)
+  - Marginaaliasetukset (ylä, ala, vasen, oikea)
+  - Lisäasetukset (ruudukko, sivunumerot)
+
+- **SettingsExportImportFX.java** - Asetusten vienti/tuonti
+  - Vie asetukset .properties-tiedostoon
+  - Tuo asetukset tiedostosta vahvistuksella
+  - Tuki kaikille AppSettings-asetuksille
+
+- **AppSettings.getFile()** - Uusi metodi asetustiedoston hakuun
+
+### Muutettu
+
+- **MainView.fxml**
+  - Asetukset-valikko lisätty uusilla kohteilla
+  - Poistettu duplikaatit Muokkaa- ja Tiedosto-valikoista
+
+- **MainController.java**
+  - Uudet handlerit: handleKeyboardShortcuts, handlePrintSettings, handleExportSettings, handleImportSettings
+  - handleAppearance kutsuu nyt AppearanceDialogFX:ää
+
+- **SettingsDialogFX.java** - Uudelleenkirjoitettu
+  - Nyt vain "Yleiset asetukset" (teema siirretty Ulkoasuun)
+  - Automaattinen tallennus, ALV-sarake, varmuuskopioväli
+
+---
+
 ## [2.2.4] - 2025-12-30
 
 ### 🚀 Modernization Session - Lambda Migration, DocumentFrame Refactoring & Theme Support

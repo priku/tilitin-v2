@@ -11,10 +11,8 @@ import javafx.stage.Window;
 
 import kirjanpito.util.AppSettings;
 
-import java.util.function.Consumer;
-
 /**
- * JavaFX asetukset-dialogi.
+ * JavaFX yleiset asetukset -dialogi.
  */
 public class SettingsDialogFX {
     
@@ -22,7 +20,6 @@ public class SettingsDialogFX {
     private CheckBox autoSaveCheck;
     private CheckBox showVatColumnCheck;
     private Spinner<Integer> backupIntervalSpinner;
-    private ComboBox<String> themeCombo;
     
     private AppSettings settings;
     
@@ -32,7 +29,7 @@ public class SettingsDialogFX {
         dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initOwner(owner);
-        dialog.setTitle("Asetukset");
+        dialog.setTitle("Yleiset asetukset");
         dialog.setResizable(false);
         
         createContent();
@@ -45,7 +42,7 @@ public class SettingsDialogFX {
         
         // General settings
         TitledPane generalPane = new TitledPane();
-        generalPane.setText("Yleiset");
+        generalPane.setText("Kirjaus");
         generalPane.setCollapsible(false);
         
         VBox generalBox = new VBox(10);
@@ -79,25 +76,6 @@ public class SettingsDialogFX {
         backupBox.getChildren().add(intervalBox);
         backupPane.setContent(backupBox);
         
-        // Appearance
-        TitledPane appearancePane = new TitledPane();
-        appearancePane.setText("Ulkoasu");
-        appearancePane.setCollapsible(false);
-        
-        VBox appearanceBox = new VBox(10);
-        appearanceBox.setPadding(new Insets(10));
-        
-        HBox themeBox = new HBox(10);
-        themeBox.setAlignment(Pos.CENTER_LEFT);
-        Label themeLabel = new Label("Teema:");
-        themeCombo = new ComboBox<>();
-        themeCombo.getItems().addAll("Vaalea", "Tumma", "Järjestelmä");
-        themeCombo.setValue(settings.getString("theme", "Vaalea"));
-        themeBox.getChildren().addAll(themeLabel, themeCombo);
-        
-        appearanceBox.getChildren().add(themeBox);
-        appearancePane.setContent(appearanceBox);
-        
         // Buttons
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -113,9 +91,9 @@ public class SettingsDialogFX {
         
         buttonBox.getChildren().addAll(cancelBtn, saveBtn);
         
-        root.getChildren().addAll(generalPane, backupPane, appearancePane, buttonBox);
+        root.getChildren().addAll(generalPane, backupPane, buttonBox);
         
-        Scene scene = new Scene(root, 450, 350);
+        Scene scene = new Scene(root, 450, 280);
         dialog.setScene(scene);
     }
     
@@ -123,31 +101,9 @@ public class SettingsDialogFX {
         settings.set("autoSave", autoSaveCheck.isSelected());
         settings.set("showVatColumn", showVatColumnCheck.isSelected());
         settings.set("backupInterval", backupIntervalSpinner.getValue());
-        String newTheme = themeCombo.getValue();
-        String oldTheme = settings.getString("theme", "Vaalea");
-        settings.set("theme", newTheme);
         
         settings.save();
-        
-        // Jos teema muuttui, ilmoita pääikkunalle
-        if (!newTheme.equals(oldTheme)) {
-            // Tämä vaatii pääikkunan referenssin - toteutetaan callback
-            onThemeChanged(newTheme);
-        }
-        
         dialog.close();
-    }
-    
-    private Consumer<String> onThemeChangedCallback;
-    
-    public void setOnThemeChanged(Consumer<String> callback) {
-        this.onThemeChangedCallback = callback;
-    }
-    
-    private void onThemeChanged(String theme) {
-        if (onThemeChangedCallback != null) {
-            onThemeChangedCallback.accept(theme);
-        }
     }
     
     public void show() {

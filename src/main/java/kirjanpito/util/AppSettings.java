@@ -46,6 +46,15 @@ public class AppSettings {
 	public String getFilename() {
 		return file.getAbsolutePath();
 	}
+	
+	/**
+	 * Palauttaa asetustiedoston.
+	 *
+	 * @return asetustiedosto
+	 */
+	public File getFile() {
+		return file;
+	}
 
 	/**
 	 * Lukee asetukset tiedostosta <code>file</code>.

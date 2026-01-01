@@ -99,6 +99,10 @@ public class MainController implements Initializable {
     private List<Account> accounts;
     private int documentCount = 0;
     
+    // Document type selection
+    private int currentDocumentTypeIndex = 0;
+    private List<DocumentType> documentTypes;
+    
     // UI data
     private ObservableList<EntryRowModel> entries;
     private DecimalFormat currencyFormat;
@@ -639,8 +643,9 @@ public class MainController implements Initializable {
         if (hasDocument) {
             // Päivämäärä
             if (currentDocument.getDate() != null) {
-                LocalDate localDate = currentDocument.getDate().toInstant()
-                    .atZone(ZoneId.systemDefault()).toLocalDate();
+                // java.sql.Date doesn't support toInstant(), use getTime() instead
+                java.util.Date date = currentDocument.getDate();
+                LocalDate localDate = new java.sql.Date(date.getTime()).toLocalDate();
                 datePicker.setValue(localDate);
             }
             
@@ -1303,7 +1308,16 @@ public class MainController implements Initializable {
             
             DocumentTypeDialogFX dialog = new DocumentTypeDialogFX(stage, dataSource);
             dialog.setItems(types);
-            dialog.setOnSave(v -> setStatus("Tositelajit tallennettu"));
+            dialog.setOnSave(v -> {
+                setStatus("Tositelajit tallennettu");
+                // Päivitä registry ja valikko
+                try {
+                    registry.fetchDocumentTypes();
+                    updateDocumentTypeMenu();
+                } catch (Exception ex) {
+                    System.err.println("Virhe päivitettäessä tositelajeja: " + ex.getMessage());
+                }
+            });
             dialog.show();
             
         } catch (Exception e) {
@@ -1350,17 +1364,39 @@ public class MainController implements Initializable {
     @FXML
     private void handleSettings() {
         SettingsDialogFX dialog = new SettingsDialogFX(stage);
-        dialog.setOnThemeChanged(theme -> {
-            // Sovella teema heti kun se vaihdetaan
-            applyTheme();
-        });
         dialog.show();
     }
     
     @FXML
     private void handleAppearance() {
-        // JavaFX-versiossa Ulkoasu on sama kuin Asetukset
-        handleSettings();
+        kirjanpito.ui.javafx.dialogs.AppearanceDialogFX dialog = 
+            new kirjanpito.ui.javafx.dialogs.AppearanceDialogFX(stage);
+        dialog.setOnThemeChanged(theme -> applyTheme());
+        dialog.show();
+    }
+    
+    @FXML
+    private void handleKeyboardShortcuts() {
+        KeyboardShortcutsDialogFX dialog = new KeyboardShortcutsDialogFX(stage);
+        dialog.show();
+    }
+    
+    @FXML
+    private void handlePrintSettings() {
+        PrintSettingsDialogFX dialog = new PrintSettingsDialogFX(stage);
+        dialog.show();
+    }
+    
+    @FXML
+    private void handleExportSettings() {
+        SettingsExportImportFX exportImport = new SettingsExportImportFX(stage);
+        exportImport.exportSettings();
+    }
+    
+    @FXML
+    private void handleImportSettings() {
+        SettingsExportImportFX exportImport = new SettingsExportImportFX(stage);
+        exportImport.importSettings();
     }
     
     @FXML
@@ -1772,16 +1808,12 @@ public class MainController implements Initializable {
         }
     }
     
-    /** Shows PrintPreviewFrame for the given print model and print. */
+    /** Shows JavaFX PrintPreviewStageFX for the given print model and print. */
     private void showPrintPreview(PrintModel printModel, kirjanpito.reports.Print print) {
-        print.setSettings(registry.getSettings());
-        PrintPreviewModel previewModel = new PrintPreviewModel();
-        PrintPreviewFrame frame = new PrintPreviewFrame(null, previewModel);
-        frame.create();
-        previewModel.setPrintModel(printModel);
-        previewModel.setPrint(print);
-        frame.updatePrint();
-        frame.setVisible(true);
+        Platform.runLater(() -> {
+            print.setSettings(registry.getSettings());
+            PrintPreviewStageFX.showPreview(stage, printModel, print);
+        });
     }
     
     @FXML
@@ -2308,6 +2340,15 @@ public class MainController implements Initializable {
             registry = new Registry();
             registry.setDataSource(dataSource);
             
+            // Lataa registry data
+            try {
+                registry.fetchDocumentTypes();
+                registry.fetchEntryTemplates();
+            } catch (DataAccessException e) {
+                System.err.println("Virhe ladattaessa registry dataa: " + e.getMessage());
+                e.printStackTrace();
+            }
+            
             // Tallenna viimeisimpien tietokantojen listaan
             String dbUrl = "jdbc:sqlite:" + file.getAbsolutePath().replace(File.separatorChar, '/');
             AppSettings settings = AppSettings.getInstance();
@@ -2383,8 +2424,9 @@ public class MainController implements Initializable {
                 updateUI();
                 updatePeriodLabel();
                 
-                // Päivitä vientimallivalikko
+                // Päivitä valikot
                 updateEntryTemplateMenu();
+                updateDocumentTypeMenu();
             } else {
                 setStatus("Ei tilikautta");
             }
@@ -2613,6 +2655,137 @@ public class MainController implements Initializable {
         
         // Lisää vakioitemet takaisin
         entryTemplateMenu.getItems().addAll(lastItems);
+    }
+    
+    /**
+     * Päivittää tositelajivalikon dynaamisesti.
+     */
+    private void updateDocumentTypeMenu() {
+        if (docTypeMenu == null || registry == null) {
+            return;
+        }
+        
+        docTypeMenu.getItems().clear();
+        
+        try {
+            documentTypes = registry.getDocumentTypes();
+            
+            if (documentTypes != null && !documentTypes.isEmpty()) {
+                char[] accelerators = {'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'};
+                int index = 0;
+                
+                for (DocumentType docType : documentTypes) {
+                    CheckMenuItem item = new CheckMenuItem(docType.getName());
+                    final int docTypeIndex = index;
+                    item.setOnAction(e -> selectDocumentType(docTypeIndex));
+                    
+                    // Merkitään valittu tositelaji
+                    item.setSelected(index == currentDocumentTypeIndex);
+                    
+                    // Alt+Q, Alt+W, jne. pikanäppäimet ensimmäisille 10:lle
+                    if (docType.getNumber() >= 1 && docType.getNumber() <= 10) {
+                        KeyCode keyCode = KeyCode.valueOf(String.valueOf(accelerators[docType.getNumber() - 1]));
+                        item.setAccelerator(new KeyCodeCombination(keyCode, KeyCombination.ALT_DOWN));
+                    }
+                    
+                    docTypeMenu.getItems().add(item);
+                    index++;
+                }
+            }
+            
+            if (docTypeMenu.getItems().isEmpty()) {
+                MenuItem emptyItem = new MenuItem("Ei tositelajeja");
+                emptyItem.setDisable(true);
+                docTypeMenu.getItems().add(emptyItem);
+            }
+            
+            // Lisää erotin ja Muokkaa-komento
+            docTypeMenu.getItems().add(new SeparatorMenuItem());
+            MenuItem editItem = new MenuItem("Muokkaa tositelajeja...");
+            editItem.setOnAction(e -> handleDocumentTypes());
+            docTypeMenu.getItems().add(editItem);
+            
+        } catch (Exception e) {
+            System.err.println("Virhe ladattaessa tositelajeja: " + e.getMessage());
+            MenuItem errorItem = new MenuItem("Virhe ladattaessa tositelajeja");
+            errorItem.setDisable(true);
+            docTypeMenu.getItems().add(errorItem);
+        }
+    }
+    
+    /**
+     * Valitsee tositelajin ja lataa sen tositteet.
+     */
+    private void selectDocumentType(int index) {
+        if (documentTypes == null || index < 0 || index >= documentTypes.size()) return;
+        
+        // Tallenna nykyinen tosite ensin
+        handleSave();
+        
+        currentDocumentTypeIndex = index;
+        DocumentType selectedType = documentTypes.get(index);
+        
+        // Päivitä valintamerkit menussa
+        updateDocumentTypeMenuSelection();
+        
+        // Lataa valitun tositelajin tositteet
+        loadDocumentsForType(selectedType.getNumber());
+        
+        setStatus("Tositelaji: " + selectedType.getName());
+    }
+    
+    /**
+     * Päivittää tositelajivalikon valintamerkit.
+     */
+    private void updateDocumentTypeMenuSelection() {
+        if (docTypeMenu == null) return;
+        
+        int index = 0;
+        for (MenuItem item : docTypeMenu.getItems()) {
+            if (item instanceof CheckMenuItem) {
+                ((CheckMenuItem) item).setSelected(index == currentDocumentTypeIndex);
+                index++;
+            }
+        }
+    }
+    
+    /**
+     * Lataa tietyn tositelajin tositteet.
+     */
+    private void loadDocumentsForType(int docTypeNumber) {
+        if (dataSource == null || currentPeriod == null) return;
+        
+        Session session = null;
+        try {
+            session = dataSource.openSession();
+            
+            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
+            documentCount = documentDAO.getCountByPeriodId(currentPeriod.getId(), docTypeNumber);
+            documents = documentDAO.getByPeriodId(currentPeriod.getId(), docTypeNumber);
+            
+            System.out.println("Ladattu " + documents.size() + " tositetta tositelajille " + docTypeNumber);
+            
+            // Siirry ensimmäiseen tositteeseen
+            if (!documents.isEmpty()) {
+                currentDocumentIndex = 0;
+                loadDocument(documents.get(0));
+            } else {
+                currentDocumentIndex = -1;
+                currentDocument = null;
+                currentEntries = null;
+                entries.clear();
+            }
+            
+            updateUI();
+            
+        } catch (Exception e) {
+            System.err.println("Virhe ladattaessa tositteita: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
     
     /**

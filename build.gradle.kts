@@ -1,10 +1,7 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     kotlin("jvm") version "2.1.0"
-    id("org.jetbrains.compose") version "1.7.3"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
-    id("org.openjfx.javafxplugin") version "0.1.0"  // JavaFX plugin
+    id("org.openjfx.javafxplugin") version "0.1.0"
+    application
 }
 
 group = "fi.priku"
@@ -34,20 +31,17 @@ val javafxPlatform = when {
     else -> "linux"
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    // JavaFX dependencies (explicit, for compatibility with Compose)
+    // JavaFX dependencies
     implementation("org.openjfx:javafx-controls:21:$javafxPlatform")
     implementation("org.openjfx:javafx-fxml:21:$javafxPlatform")
     implementation("org.openjfx:javafx-swing:21:$javafxPlatform")
     implementation("org.openjfx:javafx-base:21:$javafxPlatform")
     implementation("org.openjfx:javafx-graphics:21:$javafxPlatform")
-    
-    // Compose Desktop
-    implementation(compose.desktop.currentOs)
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.material)
-    implementation(compose.ui)
     
     // Kotlin
     implementation(kotlin("stdlib"))
@@ -88,38 +82,23 @@ sourceSets {
     }
 }
 
+// Main application configuration - JavaFX version
+application {
+    mainClass.set("kirjanpito.ui.javafx.JavaFXApp")
+    applicationDefaultJvmArgs = listOf(
+        "-Xmx1024m",
+        "-Xms256m"
+    )
+}
+
 // Handle duplicate resources from Java source directory
 tasks.processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from("src/main/java") {
         include("**/*.png", "**/*.ico", "**/*.gif")
     }
-}
-
-compose.desktop {
-    application {
-        mainClass = "kirjanpito.ui.Kirjanpito"
-        
-        // JVM memory settings for running the application
-        jvmArgs += listOf("-Xmx1024m", "-Xms256m")
-        
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Tilitin"
-            packageVersion = "2.2.5"
-            description = "Ilmainen suomalainen kirjanpito-ohjelma"
-            vendor = "Tilitin"
-            
-            windows {
-                menuGroup = "Tilitin"
-                upgradeUuid = "18159785-d967-4CD2-8885-77BFA97CFA9F"
-                iconFile.set(project.file("src/main/java/kirjanpito/ui/resources/tilitin-icon.ico"))
-            }
-            
-            linux {
-                iconFile.set(project.file("src/main/java/kirjanpito/ui/resources/tilitin-icon.png"))
-            }
-        }
+    from(projectDir) {
+        include("LISENSSIT.html")
     }
 }
 
@@ -133,28 +112,33 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 tasks.jar {
     manifest {
         attributes(
-            "Main-Class" to "kirjanpito.ui.Kirjanpito",
+            "Main-Class" to "kirjanpito.ui.javafx.JavaFXApp",
             "Implementation-Title" to "Tilitin",
             "Implementation-Version" to project.version
         )
     }
 }
 
-// Copy LISENSSIT.html to build
-tasks.processResources {
-    from(projectDir) {
-        include("LISENSSIT.html")
+// Configure run task with JavaFX module path
+tasks.named<JavaExec>("run") {
+    doFirst {
+        val javafxJars = classpath.files.filter { it.name.contains("javafx") }
+        val modulePath = javafxJars.joinToString(File.pathSeparator) { it.absolutePath }
+        jvmArgs = listOf(
+            "-Xmx1024m",
+            "--module-path", modulePath,
+            "--add-modules", "javafx.controls,javafx.fxml,javafx.swing"
+        )
     }
 }
 
 // Task to run JavaFX test application
-tasks.register<JavaExec>("runJavaFXTest") {
+tasks.register<JavaExec>("runTest") {
     group = "application"
     description = "Run JavaFX test application"
     mainClass.set("kirjanpito.ui.javafx.JavaFXTest")
     classpath = sourceSets["main"].runtimeClasspath
     
-    // JavaFX requires module path
     doFirst {
         val javafxJars = classpath.files.filter { it.name.contains("javafx") }
         val modulePath = javafxJars.joinToString(File.pathSeparator) { it.absolutePath }
@@ -166,21 +150,38 @@ tasks.register<JavaExec>("runJavaFXTest") {
     }
 }
 
-// Task to run JavaFX main application
-tasks.register<JavaExec>("runJavaFX") {
+// Task to run old Swing application (legacy)
+tasks.register<JavaExec>("runSwing") {
     group = "application"
-    description = "Run Tilitin JavaFX application"
-    mainClass.set("kirjanpito.ui.javafx.JavaFXApp")
+    description = "Run Tilitin Swing application (legacy)"
+    mainClass.set("kirjanpito.ui.Kirjanpito")
     classpath = sourceSets["main"].runtimeClasspath
+    jvmArgs = listOf("-Xmx1024m", "-Xms256m")
+}
+
+// Fat JAR task for distribution
+tasks.register<Jar>("fatJar") {
+    group = "build"
+    description = "Creates a fat JAR with all dependencies"
+    archiveClassifier.set("all")
     
-    // JavaFX requires module path
-    doFirst {
-        val javafxJars = classpath.files.filter { it.name.contains("javafx") }
-        val modulePath = javafxJars.joinToString(File.pathSeparator) { it.absolutePath }
-        jvmArgs = listOf(
-            "-Xmx1024m",
-            "--module-path", modulePath,
-            "--add-modules", "javafx.controls,javafx.fxml,javafx.swing"
+    manifest {
+        attributes(
+            "Main-Class" to "kirjanpito.ui.javafx.JavaFXApp",
+            "Implementation-Title" to "Tilitin",
+            "Implementation-Version" to project.version
         )
+    }
+    
+    from(sourceSets.main.get().output)
+    
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get()
+            .filter { it.name.endsWith("jar") }
+            .map { zipTree(it) }
+    }) {
+        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
