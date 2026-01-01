@@ -1,6 +1,6 @@
 # Tilitin - Käyttäjän opas
 
-**Versio 2.2** | Ilmainen kirjanpito-ohjelma pk-yrityksille ja yhdistyksille
+**Versio 2.1** | Ilmainen kirjanpito-ohjelma pk-yrityksille ja yhdistyksille
 
 ---
 
@@ -13,11 +13,12 @@
 5. [Kirjanpidon perustoiminnot](#kirjanpidon-perustoiminnot)
 6. [Raportit ja tulosteet](#raportit-ja-tulosteet)
 7. [ALV-hallinta](#alv-hallinta)
-8. [PDF-liitteet](#pdf-liitteet) ⭐ **UUSI v2.2**
+8. [PDF-liitteet](#pdf-liitteet)
 9. [Varmuuskopiointi](#varmuuskopiointi)
 10. [Asetukset ja konfiguraatio](#asetukset-ja-konfiguraatio)
 11. [Näppäinkomennot](#näppäinkomennot)
-12. [Usein kysytyt kysymykset](#usein-kysytyt-kysymykset)
+12. [Tietokantayhteensopivuus](#tietokantayhteensopivuus) ⚠️ **Tärkeää**
+13. [Usein kysytyt kysymykset](#usein-kysytyt-kysymykset)
 
 ---
 
@@ -922,6 +923,46 @@ Sijainnit:
 | **Ctrl+E** | Vie raportti (CSV/PDF) |
 | **+** / **-** | Zoomaa sisään/ulos |
 | **Ctrl+0** | Palauta zoom |
+
+---
+
+## Tietokantayhteensopivuus
+
+### Versiohistoria
+
+Tilitin käyttää tietokantaskeemaa, joka päivittyy automaattisesti kun uusia ominaisuuksia lisätään:
+
+| Tietokantaversio | Tilitin-versio | Muutokset |
+|------------------|----------------|-----------|
+| 13 | 1.6.1 (Helineva) | Alkuperäinen versio |
+| 14 | 2.0+ | ALV-prosenttisarake (`vat_percentage`) |
+
+### ⚠️ Tärkeää yhteensopivuudesta
+
+**Tilitin 2.1** päivittää tietokannan automaattisesti versioon 14 kun avaat vanhan tietokannan ensimmäistä kertaa. Tämä mahdollistaa:
+
+- ✅ **Vapaamuotoiset ALV-prosentit** (esim. 25,5%, 14%, 10%)
+- ✅ **Tulevat ALV-muutokset** ilman ohjelmapäivitystä
+
+**Yhteensopivuus:**
+
+| Suunta | Toimii | Selitys |
+|--------|--------|---------|
+| Vanha → Tilitin 2.1 | ✅ Kyllä | Päivittyy automaattisesti, ei tiedonmenetystä |
+| Tilitin 2.1 → Vanha | ❌ Ei | Vanha versio ei ymmärrä uutta skeemaa |
+
+### Käytännön ohjeet
+
+1. **Ennen päivitystä:** Ota varmuuskopio tietokannasta (Tiedosto → Varmuuskopioi)
+2. **Päivityksen jälkeen:** Tietokanta toimii vain Tilitin 2.0+ versioissa
+3. **Paluu vanhaan:** Ei mahdollista automaattisesti - käytä varmuuskopiota
+
+### PDF-liitteet ja yhteensopivuus
+
+PDF-liitteet tallennetaan **tiedostoina** tietokannan viereen (ei tietokantaan). Tämä säilyttää:
+- ✅ Tiedoston koon pienempänä
+- ✅ Helpon varmuuskopioinnin
+- ✅ Yhteensopivuuden vanhempien versioiden kanssa (ne eivät näe liitteitä, mutta eivät häiriinny niistä)
 
 ---
 
