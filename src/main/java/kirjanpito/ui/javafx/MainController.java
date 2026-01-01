@@ -1383,9 +1383,91 @@ public class MainController implements Initializable {
             return;
         }
         
-        // TODO: Implement createEntryTemplateFromDocument logic
-        // This requires DocumentModel which is not yet integrated
-        showNotImplemented("Vientimallin luominen tositteesta");
+        if (entries == null || entries.isEmpty()) {
+            showError("Virhe", "Tositteessa ei ole vientejä.");
+            return;
+        }
+        
+        try {
+            int templateNumber = createEntryTemplateFromCurrentDocument();
+            
+            if (templateNumber > 0) {
+                String message = String.format("Vientimalli luotu numerolla %d", templateNumber);
+                if (templateNumber >= 1 && templateNumber < 10) {
+                    message += String.format(" (Alt+%d)", templateNumber);
+                }
+                showInfo("Vientimalli luotu", message);
+                updateEntryTemplateMenu();
+            }
+        } catch (DataAccessException e) {
+            showError("Virhe", "Vientimallin luominen epäonnistui: " + e.getMessage());
+        }
+    }
+    
+    private int createEntryTemplateFromCurrentDocument() throws DataAccessException {
+        if (entries == null || entries.isEmpty()) {
+            return -1;
+        }
+        
+        // Find next available template number
+        int number = 1;
+        boolean match = true;
+        List<kirjanpito.db.EntryTemplate> existingTemplates = registry.getEntryTemplates();
+        
+        while (match) {
+            match = false;
+            for (kirjanpito.db.EntryTemplate t : existingTemplates) {
+                if (t.getNumber() == number) {
+                    number++;
+                    match = true;
+                    break;
+                }
+            }
+        }
+        
+        // Get template name from first entry description
+        String name = entries.get(0).getDescription();
+        if (name == null || name.trim().isEmpty()) {
+            name = "Malli " + number;
+        }
+        
+        Session sess = null;
+        try {
+            sess = dataSource.openSession();
+            kirjanpito.db.EntryTemplateDAO dao = dataSource.getEntryTemplateDAO(sess);
+            
+            int rowNum = 0;
+            for (EntryRowModel row : entries) {
+                if (row.getAccount() == null) continue;
+                
+                kirjanpito.db.EntryTemplate template = new kirjanpito.db.EntryTemplate();
+                template.setNumber(number);
+                template.setName(name);
+                template.setAccountId(row.getAccount().getId());
+                template.setDebit(row.getDebit() != null && row.getDebit().compareTo(java.math.BigDecimal.ZERO) > 0);
+                template.setDescription(row.getDescription());
+                template.setRowNumber(rowNum++);
+                
+                // Set amount - use debit or credit
+                java.math.BigDecimal amount = row.getDebit();
+                if (amount == null || amount.compareTo(java.math.BigDecimal.ZERO) == 0) {
+                    amount = row.getCredit();
+                }
+                template.setAmount(amount != null ? amount : java.math.BigDecimal.ZERO);
+                
+                dao.save(template);
+            }
+            
+            sess.commit();
+            registry.fetchEntryTemplates(sess);
+        } catch (DataAccessException e) {
+            if (sess != null) sess.rollback();
+            throw e;
+        } finally {
+            if (sess != null) sess.close();
+        }
+        
+        return number;
     }
     
     @FXML
@@ -1411,7 +1493,130 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleVatDocument() {
-        showNotImplemented("ALV-tilien päättäminen");
+        if (registry == null || registry.getPeriod() == null) {
+            showError("Virhe", "Avaa ensin tilikausi.");
+            return;
+        }
+        
+        // Save current document first
+        handleSave();
+        
+        try {
+            boolean result = createVatClosingDocument();
+            
+            if (!result) {
+                showError("Virhe", "ALV-velkatiliä (vatCode=1) ei ole määritetty tilikarttaan.");
+            } else {
+                setStatus("ALV-tilien päättämistosite luotu");
+            }
+        } catch (DataAccessException e) {
+            showError("Virhe", "ALV-tositteen luominen epäonnistui: " + e.getMessage());
+        }
+    }
+    
+    private boolean createVatClosingDocument() throws DataAccessException {
+        // Calculate VAT account balances
+        final java.util.Map<Integer, java.math.BigDecimal> vatBalances = new java.util.HashMap<>();
+        Period period = registry.getPeriod();
+        Session sess = null;
+        
+        try {
+            sess = dataSource.openSession();
+            
+            // Get all entries and calculate VAT account balances
+            dataSource.getEntryDAO(sess).getByPeriodId(period.getId(), 
+                kirjanpito.db.EntryDAO.ORDER_BY_DOCUMENT_NUMBER,
+                new kirjanpito.db.DTOCallback<Entry>() {
+                    public void process(Entry entry) {
+                        Account account = registry.getAccountById(entry.getAccountId());
+                        if (account != null && (account.getVatCode() == 2 || account.getVatCode() == 3)) {
+                            java.math.BigDecimal balance = vatBalances.getOrDefault(account.getId(), java.math.BigDecimal.ZERO);
+                            java.math.BigDecimal amount = entry.getAmount();
+                            if (entry.isDebit()) {
+                                balance = balance.add(amount);
+                            } else {
+                                balance = balance.subtract(amount);
+                            }
+                            vatBalances.put(account.getId(), balance);
+                        }
+                    }
+                });
+            
+            // Find VAT debt account (vatCode = 1)
+            Account debtAccount = null;
+            for (Account account : registry.getAccounts()) {
+                if (account.getVatCode() == 1) {
+                    debtAccount = account;
+                    break;
+                }
+            }
+            
+            if (debtAccount == null) {
+                return false;
+            }
+            
+            // Create new document via handleNewDocument logic
+            DocumentDAO documentDAO = dataSource.getDocumentDAO(sess);
+            Document newDoc = documentDAO.create(currentPeriod.getId(), 1, 999999);
+            sess.commit();
+            
+            // Switch to the new document
+            documents.add(newDoc);
+            documentCount = documents.size();
+            currentDocumentIndex = documents.size() - 1;
+            currentDocument = newDoc;
+            
+            // Clear entries
+            entries.clear();
+            
+            // Add entries for each VAT account with non-zero balance
+            java.math.BigDecimal totalDebt = java.math.BigDecimal.ZERO;
+            int rowNum = 1;
+            
+            for (Account account : registry.getAccounts()) {
+                java.math.BigDecimal balance = vatBalances.get(account.getId());
+                if (balance != null && balance.compareTo(java.math.BigDecimal.ZERO) != 0) {
+                    totalDebt = totalDebt.add(balance);
+                    
+                    EntryRowModel row = new EntryRowModel();
+                    row.setRowNumber(rowNum++);
+                    row.setAccount(account);
+                    row.setDescription("");
+                    
+                    if (balance.compareTo(java.math.BigDecimal.ZERO) < 0) {
+                        row.setCredit(balance.negate());
+                    } else {
+                        row.setDebit(balance);
+                    }
+                    
+                    entries.add(row);
+                }
+            }
+            
+            // Add debt account entry
+            if (totalDebt.compareTo(java.math.BigDecimal.ZERO) != 0) {
+                EntryRowModel debtRow = new EntryRowModel();
+                debtRow.setRowNumber(rowNum);
+                debtRow.setAccount(debtAccount);
+                debtRow.setDescription("");
+                
+                if (totalDebt.compareTo(java.math.BigDecimal.ZERO) < 0) {
+                    debtRow.setDebit(totalDebt.negate());
+                } else {
+                    debtRow.setCredit(totalDebt);
+                }
+                
+                entries.add(debtRow);
+            }
+            
+            // Update UI
+            loadDocument(currentDocument);
+            
+        } finally {
+            if (sess != null) sess.close();
+        }
+        
+        return true;
     }
     
     @FXML
@@ -1566,17 +1771,95 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleSetIgnoreFlag() {
-        showNotImplemented("Ohita vienti ALV-laskelmassa");
+        // Get selected entry rows
+        var selectedItems = entryTable.getSelectionModel().getSelectedItems();
+        
+        if (selectedItems == null || selectedItems.isEmpty()) {
+            setStatus("Valitse ensin vienti");
+            return;
+        }
+        
+        // Determine initial flag state from first selected row
+        EntryRowModel firstRow = selectedItems.get(0);
+        Entry firstEntry = firstRow.getEntry();
+        boolean newIgnoreFlag = firstEntry == null || !firstEntry.getFlag(0);
+        
+        int updatedCount = 0;
+        
+        for (EntryRowModel row : selectedItems) {
+            if (row.getAccount() == null) continue;
+            
+            Account account = row.getAccount();
+            Entry entry = row.getEntry();
+            
+            // Only apply to VAT accounts (vatCode 2 or 3)
+            if (account.getVatCode() == 2 || account.getVatCode() == 3) {
+                if (entry == null) {
+                    // Create entry if needed
+                    entry = new Entry();
+                    row.setEntry(entry);
+                }
+                entry.setFlag(0, newIgnoreFlag);
+                row.setModified(true);
+                updatedCount++;
+            } else {
+                // Non-VAT accounts: clear flag
+                if (entry != null) {
+                    entry.setFlag(0, false);
+                }
+            }
+        }
+        
+        entryTable.refresh();
+        
+        if (updatedCount > 0) {
+            String status = newIgnoreFlag 
+                ? "ALV-laskelmasta ohitettu " + updatedCount + " vientiä"
+                : "ALV-laskelmaan palautettu " + updatedCount + " vientiä";
+            setStatus(status);
+        } else {
+            setStatus("Valitut viennit eivät ole ALV-tilejä");
+        }
     }
     
     @FXML
     private void handleBalanceComparison() {
-        showNotImplemented("Tilien saldojen vertailu");
+        if (registry == null || registry.getPeriod() == null) {
+            showError("Virhe", "Avaa ensin tilikausi.");
+            return;
+        }
+        
+        try {
+            kirjanpito.models.StatisticsModel statsModel = new kirjanpito.models.StatisticsModel(registry);
+            BalanceComparisonDialogFX dialog = new BalanceComparisonDialogFX(stage, statsModel);
+            dialog.show();
+        } catch (Exception e) {
+            showError("Virhe", "Saldovertailun avaaminen epäonnistui: " + e.getMessage());
+        }
     }
     
     @FXML
     private void handleNumberShift() {
-        showNotImplemented("Muuta tositenumeroita");
+        if (registry == null || registry.getPeriod() == null) {
+            showError("Virhe", "Avaa ensin tilikausi.");
+            return;
+        }
+        
+        try {
+            DocumentNumberShiftDialogFX dialog = new DocumentNumberShiftDialogFX(stage, registry);
+            
+            // Get current document number as start, or 1
+            int startNum = currentDocument != null ? currentDocument.getNumber() : 1;
+            dialog.fetchDocuments(startNum, 999999);
+            
+            if (dialog.showAndWait()) {
+                // Reload documents after renumbering
+                loadAllData();
+                setStatus("Tositenumerot muutettu");
+            }
+        } catch (DataAccessException e) {
+            showError("Virhe", "Tositteiden haku epäonnistui: " + e.getMessage());
+        }
     }
     
     @FXML
@@ -1680,7 +1963,8 @@ public class MainController implements Initializable {
     
     @FXML
     private void handleDebug() {
-        showNotImplemented("Virheenjäljitystietoja");
+        DebugInfoDialogFX dialog = new DebugInfoDialogFX(stage, registry);
+        dialog.show();
     }
     
     // ========== Database operations ==========
