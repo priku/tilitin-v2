@@ -71,7 +71,7 @@ public class SplashScreen extends JWindow {
         centerPanel.add(subtitleLabel, BorderLayout.NORTH);
         
         String version = Kirjanpito.APP_VERSION;
-        if (version == null) version = "2.0.0";
+        if (version == null) version = "3.0.0";
         JLabel versionLabel = new JLabel("Versio " + version, SwingConstants.CENTER);
         versionLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         versionLabel.setForeground(new Color(180, 180, 180));

@@ -7,7 +7,48 @@ ja tämä projekti noudattaa [Semantic Versioning](https://semver.org/spec/v2.0.
 
 ---
 
-## [2.2.5] - 2026-01-01
+## [3.0.0] - 2026-01-01
+
+### 🎉 Tilitin 3.0 - JavaFX Major Release
+
+**Tila:** ✅ Julkaistu
+**Toteutusaika:** 2025-12 → 2026-01
+
+Tilitin 3.0 on merkittävä päivitys, joka siirtää sovelluksen moderniin JavaFX-käyttöliittymään.
+
+### 🚀 Uutta
+
+- **Täysin uusi JavaFX-käyttöliittymä**
+  - Moderni, responsiivinen design
+  - Tumma ja vaalea teema
+  - Skaalautuva fonttikoko
+
+- **27 uutta JavaFX-dialogia**
+  - Kaikki toiminnot siirretty JavaFX:ään
+  - Parannettu käytettävyys ja ulkoasu
+
+- **Asetukset-valikko**
+  - Eriytetty omaksi valikokseen
+  - Pikanäppäimet-näkymä
+  - Tulostusasetukset
+  - Asetusten vienti/tuonti
+
+- **PrintPreviewStageFX** - JavaFX tulosteiden esikatselu
+- **CSV-tuonti** - Pankkitiliotteen tuonti
+
+### Muutettu
+
+- Java 21 vaaditaan
+- Gradle Kotlin DSL
+- Parannettu suorituskyky
+
+### Poistettu
+
+- Compose Desktop -kokeilu (korvattu JavaFX:llä)
+
+---
+
+## [2.2.5] - 2026-01-01 (kehitysversio)
 
 ### 🚀 Asetukset-valikko & Uudet asetustyökalut
 

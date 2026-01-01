@@ -43,7 +43,7 @@ public class Kirjanpito implements Runnable {
 	 */
 	private static String getAppVersion() {
 		String version = Kirjanpito.class.getPackage().getImplementationVersion();
-		return version != null ? version : "2.2.3";
+		return version != null ? version : "3.0.0";
 	}
 	public static final String LOGGER_NAME = "kirjanpito";
 

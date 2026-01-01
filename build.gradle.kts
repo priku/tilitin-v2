@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "fi.priku"
-version = "2.2.5"
+version = "3.0.0"
 
 java {
     toolchain {

@@ -18,7 +18,7 @@ public class AboutDialogFX {
 
     private Stage dialog;
 
-    private static final String VERSION = "2.1.5";
+    private static final String VERSION = "3.0.0";
     private static final String BUILD_DATE = "2026-01-01";
 
     public AboutDialogFX(Window owner) {
