@@ -1,10 +1,16 @@
 # Puuttuvat Toiminnallisuudet - JavaFX-versio
 
+**Päivitetty:** 2026-01-01
+**Katso myös:** [JAVAFX-VS-SWING-COMPARISON.md](JAVAFX-VS-SWING-COMPARISON.md) - Yksityiskohtainen vertailu
+
 ## 📊 Yleiskuvaus
 
-**Toteutettu:** 26 handleria (60%)  
-**Puuttuu:** 17 handleria (40%)  
-**Puuttuvia dialogeja:** 25 dialogia
+**Toteutettu:** 26 handleria (60%)
+**Puuttuu:** 17 handleria (40%)
+**Toteutettuja dialogeja:** 9/35 (26%)
+**Puuttuvia dialogeja:** 26
+**Entry Table UX:** ✅ VALMIS (Phase 1 completed)
+**Kokonaisvalmiusaste:** ~65-70%
 
 ## ✅ Toteutetut Toiminnallisuudet
 
@@ -18,15 +24,17 @@
 - ✅ Liitteiden hallinta
 - ✅ Tulostaminen
 
-### Dialogit (8/33)
-- ✅ SettingsDialogFX - Asetukset
-- ✅ HelpDialogFX - Ohje
-- ✅ AttachmentsDialogFX - Liitteet
-- ✅ ReportDialogFX - Perusraportit (Päiväkirja, Pääkirja, Tuloslaskelma, Tase)
-- ✅ DocumentTypeDialogFX - Tositelajit
-- ✅ COADialogFX - Tilikartta
+### Dialogit (9/35)
+
 - ✅ AccountSelectionDialogFX - Tilinvalinta
-- ✅ EntryTemplateDialogFX - Vientimallit (juuri toteutettu)
+- ✅ DocumentTypeSelectionDialogFX - Tositelajivalinta
+- ✅ SettingsDialogFX - Asetukset
+- ✅ AccountEditorDialogFX - Tilikartan muokkaus
+- ✅ DocumentTypeEditorDialogFX - Tositelajien muokkaus
+- ✅ PeriodEditorDialogFX - Tilikausien muokkaus
+- ✅ EntryTemplateDialogFX - Vientimallien hallinta
+- ✅ ReportEditorDialogFX - Raporttirakenteen muokkaus
+- ✅ StartingBalanceDialogFX - Alkusaldot
 
 ## ❌ Puuttuvat Toiminnallisuudet
 
@@ -46,11 +54,10 @@
    - **Kuvaus:** Luo vientimallin nykyisestä tositteesta. Vaatii DocumentModel-integraation.
 
 2. **Alkusaldot** (`handleStartingBalances`)
-   - **Tila:** Placeholder
+   - **Tila:** ✅ TOTEUTETTU
    - **Vaativuus:** Korkea
-   - **Arvio:** 4-6 tuntia
    - **Kuvaus:** Alkusaldojen muokkausdialogi. Tärkeä perustoiminto.
-   - **Puuttuva dialogi:** StartingBalanceDialogFX
+   - **Dialogi:** StartingBalanceDialogFX ✅
 
 3. **ALV-merkintä** (`handleVatDocument`)
    - **Tila:** Placeholder
@@ -212,20 +219,73 @@
 
 ## 📋 Priorisointi
 
-### 🔴 Korkea prioriteetti (Kriittiset perustoiminnot)
-1. **StartingBalanceDialogFX** - Alkusaldot
-   - **Syy:** Tärkeä perustoiminto
-   - **Arvio:** 4-6 tuntia
-   - **Status:** ⏳ Seuraavaksi
+## ✅ TOTEUTETTU - Entry Table UX (2026-01-01)
 
-2. **Vientimallin luominen tositteesta** (`handleCreateEntryTemplate`)
-   - **Syy:** Hyödyllinen toiminto
-   - **Arvio:** 2-4 tuntia
-   - **Status:** ⏳ Vaatii DocumentModel-integraation
+**Entry Table Smart Navigation** ✅ DONE
 
-### 🟡 Keskiprioriteetti (Hyödylliset toiminnot)
-3. **BackupSettingsDialogFX** - Varmuuskopiointiasetukset
-   - **Arvio:** 4-6 tuntia
+- Tila: ✅ Toteutettu
+- Toteutus: [EntryTableNavigationHandler.kt](src/main/kotlin/kirjanpito/ui/javafx/EntryTableNavigationHandler.kt)
+- Tab-näppäin älykäs siirtyminen sarakkeiden välillä
+- Tab viimeisellä rivillä luo uuden rivin tai uuden tositteen
+- Shift+Tab käänteinen navigointi
+- Up-nuoli ylimmältä riviltä siirtyy päivämääräkenttään
+
+**Debet/Credit Toggle (Asterisk)** ✅ DONE
+
+- Tila: ✅ Toteutettu
+- Toteutus: EntryTableNavigationHandler.kt + EntryRowModel.kt
+- Asterisk (*) -näppäin vaihtaa debet/credit -tilaa
+- Toimii debet- ja kredit-sarakkeissa
+
+**Description Auto-complete** ✅ DONE
+
+- Tila: ✅ Toteutettu
+- Toteutus: [DescriptionTableCell.kt](src/main/kotlin/kirjanpito/ui/javafx/cells/DescriptionTableCell.kt)
+- Ehdottaa aiemmin käytettyjä selityksiä (2+ merkkiä)
+- Käyttää TreeMapAutoCompleteSupport-luokkaa
+- F12 / Ctrl+Backspace poistaa pilkulla erotetun päätteen
+
+**Keyboard Shortcuts** ✅ DONE
+
+- Enter: Aloita editointi / Lisää vienti
+- Ctrl+Enter: Luo uusi tosite
+- Ctrl+Backspace: Poista selitteen pääte
+- Tab/Shift+Tab: Älykäs navigointi
+
+**Context Menu**
+
+- Tila: ❌ Ei toteutettu
+- Vaativuus: MATALA
+- Toiminnot: Lisää/Poista vienti, Kopioi, Liitä
+- Arvio: 3-4 tuntia
+
+---
+
+## 📋 Priorisointi Uudelleen
+
+### ✅ VALMIS (Entry Table UX - Päivittäinen käyttö)
+
+1. **Entry Table Smart Navigation** (Tab-logiikka) ✅
+2. **Debet/Credit Toggle (*)** ✅
+3. **Description Auto-complete** ✅
+4. **Keyboard Shortcuts** ✅
+
+### 🔴 Korkea prioriteetti (Raportit - Kausi-loppu)
+
+1. **Raporttien generointidialogit** (6 kpl)
+   - General Journal, Account Statement, Account Summary
+   - VAT Report, Balance Comparison, Custom Reports
+   - Arvio: 20-30 tuntia
+   - Status: ⏳ Tarvitaan kauden päätöksessä
+
+### 🟡 Keskiprioriteetti (Dialogit ja Toiminnot)
+
+1. **Vientimallin luominen tositteesta** (`handleCreateEntryTemplate`)
+   - Arvio: 2-4 tuntia
+   - Status: ⏳ Vaatii DocumentModel-integraation
+
+2. **BackupSettingsDialogFX** - Varmuuskopiointiasetukset
+   - Arvio: 4-6 tuntia
    - **Status:** ⏳
 
 4. **RestoreBackupDialogFX** - Palauta varmuuskopiosta

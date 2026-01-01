@@ -193,4 +193,46 @@ class EntryRowModel(
             }
         }
     }
+    
+    /**
+     * Vaihda debet ja kredit keskenään.
+     * Jos debetissä on arvo, siirretään se kreditiin ja päinvastoin.
+     */
+    fun toggleDebitCredit() {
+        val d = debit.get()
+        val c = credit.get()
+        
+        when {
+            d != null && d.compareTo(BigDecimal.ZERO) != 0 -> {
+                // Siirry debet → kredit
+                credit.set(d)
+                debit.set(null)
+                originalEntry?.let {
+                    it.setDebit(false)
+                    it.setAmount(d)
+                }
+            }
+            c != null && c.compareTo(BigDecimal.ZERO) != 0 -> {
+                // Siirry kredit → debet
+                debit.set(c)
+                credit.set(null)
+                originalEntry?.let {
+                    it.setDebit(true)
+                    it.setAmount(c)
+                }
+            }
+            else -> {
+                // Ei arvoa, ei vaihdeta
+            }
+        }
+        modified = true
+    }
+    
+    /**
+     * Tarkista onko vienti debet-puolella.
+     */
+    fun isDebit(): Boolean {
+        val d = debit.get()
+        return d != null && d.compareTo(BigDecimal.ZERO) != 0
+    }
 }

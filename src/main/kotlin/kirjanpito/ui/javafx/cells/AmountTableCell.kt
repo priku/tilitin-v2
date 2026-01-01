@@ -86,8 +86,25 @@ class AmountTableCell(
             setOnKeyPressed { e ->
                 when (e.code) {
                     KeyCode.ESCAPE -> cancelEdit()
-                    KeyCode.TAB -> commitAmount()
+                    KeyCode.TAB -> {
+                        commitAmount()
+                        // Tab handling delegated to EntryTableNavigationHandler
+                    }
+                    KeyCode.MULTIPLY -> {
+                        // Asterisk key - allow parent handler to process
+                        // Don't consume - let it bubble up
+                    }
                     else -> {}
+                }
+            }
+            
+            // Handle asterisk typed as character
+            setOnKeyTyped { e ->
+                if (e.character == "*") {
+                    // Don't add asterisk to text field
+                    e.consume()
+                    // Commit current value and let navigation handler toggle
+                    commitAmount()
                 }
             }
             

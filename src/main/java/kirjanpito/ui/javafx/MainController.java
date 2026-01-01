@@ -20,7 +20,10 @@ import kirjanpito.db.sqlite.SQLiteDataSource;
 import kirjanpito.db.DataAccessException;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
+import kirjanpito.ui.javafx.EntryTableNavigationHandler;
 import kirjanpito.util.AppSettings;
+import kirjanpito.util.AutoCompleteSupport;
+import kirjanpito.util.TreeMapAutoCompleteSupport;
 import kirjanpito.util.RecentDatabases;
 import kirjanpito.util.Registry;
 
@@ -100,6 +103,12 @@ public class MainController implements Initializable {
     
     // File chooser
     private FileChooser fileChooser;
+    
+    // Entry table navigation handler
+    private EntryTableNavigationHandler navigationHandler;
+    
+    // Auto-complete support for descriptions
+    private AutoCompleteSupport autoCompleteSupport;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -250,12 +259,26 @@ public class MainController implements Initializable {
         });
         accountCol.setEditable(true);
         
-        // Description column (editable)
+        // Description column (editable with auto-complete)
         descriptionCol.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
-        descriptionCol.setCellFactory(col -> new DescriptionTableCell());
+        descriptionCol.setCellFactory(col -> new DescriptionTableCell(
+            autoCompleteSupport,
+            rowIndex -> {
+                // Hae tili-id rivin perusteella
+                if (rowIndex >= 0 && rowIndex < entries.size()) {
+                    Account acc = entries.get(rowIndex).getAccount();
+                    return acc != null ? acc.getId() : -1;
+                }
+                return -1;
+            }
+        ));
         descriptionCol.setOnEditCommit(event -> {
             EntryRowModel row = event.getRowValue();
             row.setDescription(event.getNewValue());
+            // Lisää auto-complete-tukeen
+            if (autoCompleteSupport != null && row.getEntry() != null) {
+                autoCompleteSupport.addEntry(row.getEntry());
+            }
         });
         descriptionCol.setEditable(true);
         
@@ -301,13 +324,65 @@ public class MainController implements Initializable {
             }
         });
         
-        // F9 = Account selection dialog
+        // F9 = Account selection dialog (additional handler)
         entryTable.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.F9) {
                 openAccountSelectionDialog();
                 event.consume();
             }
         });
+        
+        // Set up smart navigation handler
+        setupEntryTableNavigation();
+    }
+    
+    /**
+     * Asenna Entry Table smart navigation.
+     * Käsittelee Tab/Shift+Tab, asterisk (*) debet/kredit-vaihtoon, jne.
+     */
+    private void setupEntryTableNavigation() {
+        navigationHandler = new EntryTableNavigationHandler(
+            entryTable,
+            accountCol,
+            descriptionCol,
+            debitCol,
+            creditCol,
+            new EntryTableNavigationHandler.EntryTableCallback() {
+                @Override
+                public void addEntry() {
+                    handleAddEntry();
+                }
+                
+                @Override
+                public void createDocument() {
+                    handleNewDocument();
+                }
+                
+                @Override
+                public void focusDateField() {
+                    if (datePicker != null) {
+                        datePicker.requestFocus();
+                    }
+                }
+                
+                @Override
+                public void updateTotals() {
+                    MainController.this.updateTotals();
+                }
+                
+                @Override
+                public void setStatus(String message) {
+                    MainController.this.setStatus(message);
+                }
+                
+                @Override
+                public java.util.List<String> getDescriptionHistory() {
+                    // TODO: Implement description history from database
+                    return java.util.Collections.emptyList();
+                }
+            }
+        );
+        navigationHandler.install();
     }
     
     private void openAccountSelectionDialog() {
@@ -1433,6 +1508,21 @@ public class MainController implements Initializable {
     private void loadAllData() {
         if (dataSource == null) return;
         
+        // Alusta auto-complete
+        autoCompleteSupport = new TreeMapAutoCompleteSupport();
+        
+        // Päivitä description-sarakkeen cell factory auto-completella
+        descriptionCol.setCellFactory(col -> new DescriptionTableCell(
+            autoCompleteSupport,
+            rowIndex -> {
+                if (rowIndex >= 0 && rowIndex < entries.size()) {
+                    Account acc = entries.get(rowIndex).getAccount();
+                    return acc != null ? acc.getId() : -1;
+                }
+                return -1;
+            }
+        ));
+        
         Session session = null;
         try {
             session = dataSource.openSession();
@@ -1498,6 +1588,13 @@ public class MainController implements Initializable {
             EntryDAO entryDAO = dataSource.getEntryDAO(session);
             currentEntries = entryDAO.getByDocumentId(doc.getId());
             System.out.println("Tosite " + doc.getNumber() + ": " + currentEntries.size() + " vientiä");
+            
+            // Lisää viennit auto-complete tukeen
+            if (autoCompleteSupport != null) {
+                for (Entry entry : currentEntries) {
+                    autoCompleteSupport.addEntry(entry);
+                }
+            }
             
             // Päivitä UI
             updateUI();
