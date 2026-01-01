@@ -242,7 +242,6 @@ jobs:
           --vendor "${{ env.APP_VENDOR }}" `
           --description "${{ env.APP_DESCRIPTION }}" `
           --type app-image `
-          --win-console `
           --dest dist
 
         Write-Host "✅ Windows app-image created"
@@ -253,10 +252,23 @@ jobs:
       run: choco install innosetup -y
 
     - name: Build Inno Setup installer
+      env:
+        VERSION: ${{ needs.build-and-release.outputs.version }}
       run: |
-        echo "Building Inno Setup installer..."
-        .\build-inno-installer.bat
-      shell: cmd
+        $VERSION = "${{ needs.build-and-release.outputs.version }}"
+        $ISCC = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+        
+        Write-Host "Building Inno Setup installer for version $VERSION"
+        
+        # Create output directory
+        New-Item -ItemType Directory -Force -Path "dist\installer" | Out-Null
+        
+        # Run Inno Setup with version parameter
+        & $ISCC "/DMyAppVersion=$VERSION" "installer\tilitin.iss"
+        
+        Write-Host "✅ Installer created"
+        Get-ChildItem -Path "dist\installer" | Select-Object Name, Length
+      shell: pwsh
 
     - name: Upload Windows installer to release
       uses: softprops/action-gh-release@v2
@@ -266,11 +278,11 @@ jobs:
           dist/installer/*.exe
 
   # =============================================================================
-  # Job 4: macOS package (.dmg)
+  # Job 4: macOS package (.dmg) - Intel
   # =============================================================================
   macos-package:
-    name: 🍎 macOS Package
-    runs-on: macos-latest
+    name: 🍎 macOS Package (Intel)
+    runs-on: macos-13
     if: startsWith(github.ref, 'refs/tags/v')
     needs: build-and-release
 
@@ -334,6 +346,76 @@ jobs:
         tag_name: ${{ github.ref_name }}
         files: |
           dist/*.dmg
+
+  # =============================================================================
+  # Job 4b: macOS package (.dmg) - Apple Silicon
+  # =============================================================================
+  macos-package-arm64:
+    name: 🍎 macOS Package (Apple Silicon)
+    runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: tilitin-jar
+        path: build/libs/
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Build macOS app-image (ARM64)
+      run: |
+        VERSION="${{ needs.build-and-release.outputs.version }}"
+        JAR_FILE=$(ls build/libs/*-all.jar | head -1)
+
+        echo "Building macOS ARM64 app-image for version $VERSION"
+        echo "Using JAR: $JAR_FILE"
+
+        jpackage \
+          --input build/libs \
+          --main-jar $(basename "$JAR_FILE") \
+          --main-class kirjanpito.ui.javafx.JavaFXApp \
+          --name Tilitin \
+          --app-version "$VERSION" \
+          --vendor "${{ env.APP_VENDOR }}" \
+          --description "${{ env.APP_DESCRIPTION }}" \
+          --icon src/main/resources/tilitin.icns \
+          --type app-image \
+          --mac-package-identifier fi.priku.tilitin \
+          --dest dist
+
+        echo "✅ macOS ARM64 app-image created"
+        ls -la dist/
+
+    - name: Sign macOS app (ad-hoc)
+      run: |
+        xattr -d com.apple.FinderInfo dist/Tilitin.app 2>/dev/null || true
+        xattr -d com.apple.fileprovider.fpfs#P dist/Tilitin.app 2>/dev/null || true
+        codesign --force --deep --sign - dist/Tilitin.app
+        echo "✅ App signed (ad-hoc)"
+
+    - name: Create DMG (ARM64)
+      run: |
+        VERSION="${{ needs.build-and-release.outputs.version }}"
+        hdiutil create -volname "Tilitin" -srcfolder dist/Tilitin.app -ov -format UDZO "dist/Tilitin-$VERSION-arm64.dmg"
+        echo "✅ ARM64 DMG created"
+        ls -lh dist/*.dmg
+
+    - name: Upload macOS ARM64 package to release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        files: |
+          dist/*-arm64.dmg
 
   # =============================================================================
   # Job 5: Package dependencies (GPL compliance)

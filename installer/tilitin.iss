@@ -1,12 +1,16 @@
 ; Tilitin 2.0 - Inno Setup Script
 ; Modern Windows installer for Tilitin accounting software
 
+; Version is set via command line /D or defaults to 2.1.0
+#ifndef MyAppVersion
+  #define MyAppVersion "2.1.0"
+#endif
+
 #define MyAppName "Tilitin"
-#define MyAppVersion "2.2.1"
 #define MyAppPublisher "Tilitin Project"
-#define MyAppURL "https://github.com/priku/tilitin-modernized"
-#define MyAppExeName "Tilitin 2.2.1.exe"
-#define MyAppDescription "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille - CSV-tuonti"
+#define MyAppURL "https://github.com/priku/tilitin-v2"
+#define MyAppExeName "Tilitin.exe"
+#define MyAppDescription "Ilmainen kirjanpito-ohjelma yrityksille ja yhdistyksille"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -61,7 +65,8 @@ Name: "startmenuicon"; Description: "{cm:CreateStartMenuEntry}"; GroupDescriptio
 
 [Files]
 ; Main application files (from jPackage output)
-Source: "..\dist\windows\Tilitin {#MyAppVersion}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Try multiple possible paths from jPackage
+Source: "..\dist\Tilitin\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

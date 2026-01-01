@@ -6,19 +6,37 @@ echo   Tilitin - Modern Installer Builder
 echo ============================================
 echo.
 
-REM Hae versio pom.xml:stä
-for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+REM Hae versio build.gradle.kts:stä (Gradle-projekti)
+for /f "tokens=3 delims= " %%v in ('findstr /r "^version.*=" build.gradle.kts') do (
+    set "VERSION=%%~v"
+    REM Poista lainausmerkit
+    set "VERSION=!VERSION:"=!"
+)
 echo Versio: %VERSION%
 
-REM Check if jPackage output exists
-if not exist "dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe" (
+REM Check if jPackage output exists - try both with and without version in path
+set "JPACKAGE_PATH="
+if exist "dist\Tilitin\Tilitin.exe" (
+    set "JPACKAGE_PATH=dist\Tilitin"
+) else if exist "dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe" (
+    set "JPACKAGE_PATH=dist\windows\Tilitin %VERSION%"
+) else if exist "dist\Tilitin %VERSION%\Tilitin %VERSION%.exe" (
+    set "JPACKAGE_PATH=dist\Tilitin %VERSION%"
+)
+
+if "!JPACKAGE_PATH!"=="" (
     echo [ERROR] jPackage output not found!
-    echo Expected: dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe
-    echo Please run build-windows.bat first.
+    echo Searched in:
+    echo   - dist\Tilitin\Tilitin.exe
+    echo   - dist\windows\Tilitin %VERSION%\Tilitin %VERSION%.exe
+    echo   - dist\Tilitin %VERSION%\Tilitin %VERSION%.exe
+    echo Please run jpackage first.
     echo.
     if "%CI%"=="" pause
     exit /b 1
 )
+
+echo [INFO] Found jPackage output: !JPACKAGE_PATH!
 
 REM Find Inno Setup compiler
 set "ISCC="
@@ -57,7 +75,12 @@ if %errorlevel% neq 0 (
 )
 
 REM Hae versio pom.xml:stä
-for /f "tokens=3 delims=<>" %%v in ('findstr /r "<version>.*</version>" pom.xml ^| findstr /n . ^| findstr "^1:"') do set VERSION=%%v
+REM Hae versio build.gradle.kts:stä (Gradle-projekti)
+for /f "tokens=3 delims= " %%v in ('findstr /r "^version.*=" build.gradle.kts') do (
+    set "VERSION=%%~v"
+    REM Poista lainausmerkit
+    set "VERSION=!VERSION:"=!"
+)
 
 echo.
 echo ============================================
