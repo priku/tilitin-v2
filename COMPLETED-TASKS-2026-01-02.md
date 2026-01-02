@@ -200,4 +200,41 @@ Katso `MODERNIZATION-NEXT-STEPS.md` tiedosto suositeltuille seuraaville askelill
 
 ---
 
+### 3. DocumentMenuBuilder migroitu Kotliniin ✅ (2026-01-02)
+
+**Lähdetiedosto:** `src/main/java/kirjanpito/ui/DocumentMenuBuilder.java` (poistettu)  
+**Kohdetiedosto:** `src/main/kotlin/kirjanpito/ui/DocumentMenuBuilder.kt`
+
+**Kuvaus:**
+Valikkorivin rakentaja migroitu Java → Kotlin. Tämä on ensimmäinen DocumentFrame-refaktoroinnin osa. Luokka rakentaa kaikki DocumentFrame:n valikkorivin valikot ja menu-itemit.
+
+**Mittarit:**
+- **Rivimäärä:** ~466 riviä Java → ~605 riviä Kotlin
+- **Monimutkaisuus:** Keskisuuri (7 valikkoa, useita menu-itemeitä)
+- **Riippuvuudet:** SwingUtils, Swing-komponentit
+
+**Ominaisuudet:**
+- Tiedosto-valikko
+- Muokkaa-valikko
+- Siirry-valikko
+- Tositelaji-valikko
+- Tulosteet-valikko
+- Työkalut-valikko
+- Ohje-valikko
+- MenuListeners-data class kuuntelijoiden hallintaan
+
+**Yhteensopivuus:**
+- DocumentFrame toimii ilman muutoksia
+- Java-koodi voi kutsua Kotlin-versiota suoraan
+- MenuListeners-luokka yhteensopiva Java-koodin kanssa
+
+**Muutokset:**
+- Kotlin property-syntaksi
+- `lateinit var` null-safetyä varten
+- `.apply {}` -scope-funktio UI-komponenttien luomiseen
+- `'T'.code` mnemonic-arvoille (Char → Int konversio)
+- MenuListeners luokka Kotlinissa (class, ei data class, koska mutable properties)
+
+---
+
 **Viimeksi päivitetty:** 2026-01-02

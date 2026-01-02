@@ -21,11 +21,15 @@ Formaatti perustuu [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) -sta
     - Käyttää BaseDialogFX-pohjaa
     - Tilinvalintadialogi (F9) nyt Kotlinissa
     - Yhteensopiva Java-koodin kanssa (@JvmStatic)
-  - PrintSettingsDialogFX migroitu Java → Kotlin ⭐ UUSI
+  - PrintSettingsDialogFX migroitu Java → Kotlin
     - Käyttää BaseDialogFX-pohjaa
     - Tulostusasetukset-dialogi nyt Kotlinissa
     - MainController toimii ilman muutoksia
-  - Kotlin-prosentti: ~8.2% → ~10% (9 dialogia Kotlinissa)
+  - DocumentMenuBuilder migroitu Java → Kotlin ⭐ UUSI
+    - Valikkorivin rakentaja nyt Kotlinissa
+    - Ensimmäinen DocumentFrame-refaktoroinnin osa
+    - DocumentFrame toimii ilman muutoksia
+  - Kotlin-prosentti: ~8.2% → ~10.5% (9 dialogia + manager-luokka Kotlinissa)
 
 ---
 

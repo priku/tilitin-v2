@@ -87,52 +87,59 @@ Onneksi suurin osa toiminnallisuudesta on jo eroteltu eri manager-luokkiin:
 
 **Yleisperiaate:** Jatketaan samaa linjaa kuin managerit - erotellaan toiminnallisuutta pieniin osiin.
 
-#### Vaihe 1: UI Builderit (2-3h)
+#### Vaihe 1: Analysoi Nykyinen Tila (1h)
 
-**Luodaan erillisiä builder-luokkia UI-komponenttien luomiseen:**
+**Tarkista mitä on jo tehty:**
 
-1. **DocumentMenuBarBuilder.kt**
-   - `buildMenuBar()` - Menubar
-   - `buildFileMenu()`, `buildEditMenu()`, `buildDocumentMenu()`, jne.
-   - Vastuu: Menu-komponenttien luominen
-   - Koko: ~200-300 riviä
+1. ✅ **DocumentMenuBuilder.java** - JO OLEMASSA
+   - Tarkista käytetäänkö oikein
+   - Voi olla jo refaktoroitu osittain
 
-2. **DocumentToolBarBuilder.kt**
-   - `buildToolBar()` - Toolbar
-   - Vastuu: Toolbar-komponenttien luominen
-   - Koko: ~100-150 riviä
+2. ✅ **DocumentUIUpdater.java** - JO OLEMASSA
+   - Tarkista käytetäänkö oikein
+   - Voi olla jo refaktoroitu osittain
 
-3. **DocumentFormBuilder.kt**
-   - `buildTextFieldPanel()` - Kentät
-   - `buildTotalRow()` - Summarivi
-   - `buildSearchBar()` - Hakupalkki
-   - `buildStatusBar()` - Statusbar
-   - Koko: ~200-300 riviä
+3. ✅ **DocumentUIBuilder.java** - JO OLEMASSA
+   - Tarkista käytetäänkö oikein
+   - Voi olla jo refaktoroitu osittain
+
+4. ✅ **DocumentToolbarBuilder.java** - JO OLEMASSA
+   - Tarkista käytetäänkö oikein
+   - Voi olla jo refaktoroitu osittain
+
+**Tehtävä:** Analysoi mitä vielä puuttuu ja mitä voidaan parantaa.
+
+#### Vaihe 2: Migroi Managerit Kotliniin (6-8h)
+
+**Migroidaan olemassa olevat manager-luokat Kotliniin:**
+
+1. **DocumentMenuBuilder.kt** (2h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
+   - Käytä Kotlin-ominaisuuksia
+
+2. **DocumentUIUpdater.kt** (2h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
+   - Käytä Kotlin-ominaisuuksia
+
+3. **DocumentUIBuilder.kt** (2h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
+   - Käytä Kotlin-ominaisuuksia
+
+4. **DocumentToolbarBuilder.kt** (1-2h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
+   - Käytä Kotlin-ominaisuuksia
 
 **Hyödyt:**
-- UI-logiikka erillään business-logiikasta
-- Testattavuus parantuu
-- Koodin ymmärrettävyys parantuu
-- Kotlinissa helpompi koodata
+- Kotlin-ominaisuuksien käyttö
+- Parempi null-safety
+- Lyhyempi syntaksi
+- Parempi ylläpidettävyys
 
-#### Vaihe 2: UI Updaterit (2-3h)
-
-**Luodaan erillinen luokka UI-komponenttien päivittämiseen:**
-
-4. **DocumentUIUpdater.kt**
-   - `updateTitle()`, `updatePeriod()`, `updatePosition()`
-   - `updateDocument()`, `updateTotalRow()`
-   - `updateEntryTemplates()`, `updateDocumentTypes()`
-   - `updateRecentDatabasesMenu()`, `updateBackupStatusLabel()`
-   - `setComponentsEnabled()`
-   - Koko: ~300-400 riviä
-
-**Hyödyt:**
-- Update-logiikka keskitetty
-- Helpompi debugata
-- Yksinkertaisempi testata
-
-#### Vaihe 3: Action Handlers (2-3h)
+#### Vaihe 3: Dialog Coordinator (2-3h)
 
 **Luodaan erillinen luokka tapahtumien käsittelyyn:**
 
@@ -147,7 +154,7 @@ Onneksi suurin osa toiminnallisuudesta on jo eroteltu eri manager-luokkiin:
 - Helpompi laajentaa
 - Testattavuus parantuu
 
-#### Vaihe 4: Dialog Coordinator (1-2h)
+#### Vaihe 4: Final Simplification (3-4h)
 
 **Luodaan erillinen luokka dialogien koordinoimiseen:**
 
@@ -160,7 +167,7 @@ Onneksi suurin osa toiminnallisuudesta on jo eroteltu eri manager-luokkiin:
 - Dialog-logiikka keskitetty
 - Helpompi ylläpitää
 
-#### Vaihe 5: DocumentFrame Simplification (3-4h)
+#### Vaihe 5: DocumentFrame Migraatio (OPTIONAL, 8-10h)
 
 **Kun kaikki on eroteltu, DocumentFrame yksinkertaistuu:**
 
@@ -186,68 +193,98 @@ Onneksi suurin osa toiminnallisuudesta on jo eroteltu eri manager-luokkiin:
 
 ## 📋 Suositeltu Toteutusjärjestys
 
-### Sprint 1: UI Builderit (1 viikko, ~10h)
+### Sprint 1: Nykyisen Tilanteen Analyysi (1 viikko, ~5h)
 
-1. **DocumentMenuBarBuilder.kt** (3h)
-   - Migroi `createMenuBar()` ja menu-metodit
-   - Testaa että menut toimivat
+1. **Analysoi DocumentMenuBuilder.java** (1h)
+   - Miten se käytetään?
+   - Mitä voidaan parantaa?
+   - Voidaanko migroida Kotliniin?
 
-2. **DocumentToolBarBuilder.kt** (2h)
-   - Migroi `createToolBar()`
-   - Testaa että toolbar toimii
+2. **Analysoi DocumentUIUpdater.java** (1h)
+   - Miten se käytetään?
+   - Mitä voidaan parantaa?
+   - Voidaanko migroida Kotliniin?
 
-3. **DocumentFormBuilder.kt** (5h)
-   - Migroi `createTextFieldPanel()`, `createTotalRow()`, `createSearchBar()`, `createStatusBar()`
-   - Testaa että komponentit toimivat
+3. **Analysoi DocumentUIBuilder.java** (1h)
+   - Miten se käytetään?
+   - Mitä voidaan parantaa?
+   - Voidaanko migroida Kotliniin?
+
+4. **Analysoi DocumentToolbarBuilder.java** (1h)
+   - Miten se käytetään?
+   - Mitä voidaan parantaa?
+   - Voidaanko migroida Kotliniin?
+
+5. **Dokumentoi Nykyinen Tila** (1h)
+   - Mitä on jo tehty?
+   - Mitä vielä puuttuu?
+   - Mikä on seuraava askel?
 
 **Tulokset:**
-- ~500-750 riviä migroitu Kotliniin
-- DocumentFrame.java:sta poistettu ~500 riviä
-- Testattavuus parantunut
+- Selkeä kuva nykyisestä tilasta
+- Priorisoidut tehtävät
+- Refaktoroinnin suunnitelma
 
-### Sprint 2: UI Updaterit (1 viikko, ~5h)
+### Sprint 2: Managerien Migraatio Kotliniin (2 viikkoa, ~10h)
 
-4. **DocumentUIUpdater.kt** (5h)
-   - Migroi kaikki update-metodit
+1. ✅ **DocumentMenuBuilder.kt** (2h) - VALMIS 2026-01-02
+   - ✅ Migroitu Java → Kotlin
+   - ✅ Parannettu koodin laatua
+   - ✅ DocumentFrame toimii ilman muutoksia
+
+2. **DocumentUIUpdater.kt** (2h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
    - Testaa että päivitykset toimivat
 
+3. **DocumentUIBuilder.kt** (3h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
+   - Testaa että komponentit toimivat
+
+4. **DocumentToolbarBuilder.kt** (2h)
+   - Migroi Java → Kotlin
+   - Paranna koodin laatua
+   - Testaa että toolbar toimii
+
 **Tulokset:**
-- ~300 riviä migroitu Kotliniin
-- DocumentFrame.java:sta poistettu ~300 riviä
-- Update-logiikka keskitetty
+- ~800-1000 riviä migroitu Kotliniin
+- Managerit nyt Kotlinissa
+- Parempi koodin laatu
 
-### Sprint 3: Action Handlers (1 viikko, ~5h)
+### Sprint 3: Dialog Coordinator (1 viikko, ~3h)
 
-5. **DocumentActionHandler.kt** (5h)
-   - Migroi tapahtumakäsittely
-   - Testaa että toiminnot toimivat
-
-**Tulokset:**
-- ~300 riviä migroitu Kotliniin
-- DocumentFrame.java:sta poistettu ~300 riviä
-- Tapahtumakäsittely keskitetty
-
-### Sprint 4: Dialog Coordinator (1 viikko, ~3h)
-
-6. **DocumentDialogCoordinator.kt** (3h)
+5. **DocumentDialogCoordinator.kt** (3h)
    - Migroi dialog-kutsut
    - Testaa että dialogit toimivat
 
 **Tulokset:**
 - ~200 riviä migroitu Kotliniin
-- DocumentFrame.java:sta poistettu ~200 riviä
+- Dialog-logiikka keskitetty
 
-### Sprint 5: Final Cleanup (1 viikko, ~5h)
+### Sprint 4: Final Simplification (1 viikko, ~5h)
 
-7. **DocumentFrame Simplification** (5h)
+6. **DocumentFrame Simplification** (5h)
    - Poista migroidut metodit
    - Yksinkertaista DocumentFrame
    - Testaa että kaikki toimii
 
 **Tulokset:**
-- DocumentFrame.java: ~2200 riviä → ~300-500 riviä
-- Kaikki UI-logiikka Kotlinissa
+- DocumentFrame.java: ~2000 riviä → ~800-1000 riviä (arvio)
+- Suurin osa UI-logiikasta Kotlinissa
 - Selkeämpi rakenne
+
+### Sprint 5: DocumentFrame Migraatio (OPTIONAL, 2 viikkoa, ~10h)
+
+7. **DocumentFrame.kt** (10h) - OPTIONAL
+   - Migroi koko DocumentFrame Kotliniin
+   - Suuri projekti
+   - Vaatii huolellista testausta
+
+**Tulokset:**
+- DocumentFrame.kt: ~800-1000 riviä Kotlinissa
+- 100% Kotlin UI-kerros
+- Suurin osa koodikannasta Kotlinissa
 
 ---
 
@@ -335,4 +372,4 @@ Tämä antaa nopean tuloksen ja parantaa koodin laatua!
 
 ---
 
-**Kysymys:** Haluatko että aloitan DocumentMenuBarBuilder.kt:n luomisen?
+**Kysymys:** Haluatko että aloitan nykyisen tilan analysoinnin ja managerien migraation Kotliniin?

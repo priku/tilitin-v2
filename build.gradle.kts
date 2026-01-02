@@ -46,6 +46,8 @@ dependencies {
     
     // Kotlin
     implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.8.1")
     
     // Database drivers
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
