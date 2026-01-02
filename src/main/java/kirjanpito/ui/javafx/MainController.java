@@ -1401,8 +1401,11 @@ public class MainController implements Initializable {
     private void handleAppearance() {
         kirjanpito.ui.javafx.dialogs.AppearanceDialogFX dialog = 
             new kirjanpito.ui.javafx.dialogs.AppearanceDialogFX(stage);
-        dialog.setOnThemeChanged(theme -> applyTheme());
-        dialog.show();
+        dialog.setOnThemeChanged(theme -> {
+            applyTheme();
+            return kotlin.Unit.INSTANCE;
+        });
+        dialog.showAndWait();
     }
     
     @FXML

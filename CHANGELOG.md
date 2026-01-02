@@ -25,11 +25,15 @@ Formaatti perustuu [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) -sta
     - Käyttää BaseDialogFX-pohjaa
     - Tulostusasetukset-dialogi nyt Kotlinissa
     - MainController toimii ilman muutoksia
-  - DocumentMenuBuilder migroitu Java → Kotlin ⭐ UUSI
+  - DocumentMenuBuilder migroitu Java → Kotlin
     - Valikkorivin rakentaja nyt Kotlinissa
     - Ensimmäinen DocumentFrame-refaktoroinnin osa
     - DocumentFrame toimii ilman muutoksia
-  - Kotlin-prosentti: ~8.2% → ~10.5% (9 dialogia + manager-luokka Kotlinissa)
+  - AppearanceDialogFX migroitu Java → Kotlin ⭐ UUSI
+    - Käyttää BaseDialogFX-pohjaa
+    - Ulkoasu-dialogi (teema + fontti) nyt Kotlinissa
+    - MainController päivitetty
+  - Kotlin-prosentti: ~8.2% → ~10.5% (10 dialogia + manager-luokka Kotlinissa)
 
 ---
 

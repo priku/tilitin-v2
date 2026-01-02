@@ -125,14 +125,15 @@ Tilinvalintadialogi (F9) migroitu Java → Kotlin. Näyttää tilikartan ja mahd
 6. ✅ **CSVImportDialog** - CSV-tuonti
 7. ✅ **ReportDialog** - Raportit
 8. ✅ **AccountSelectionDialogFX** - Tilinvalinta (F9)
-9. ✅ **PrintSettingsDialogFX** - Tulostusasetukset ⭐ UUSI
+9. ✅ **PrintSettingsDialogFX** - Tulostusasetukset
+10. ✅ **AppearanceDialogFX** - Ulkoasu (teema + fontti) ⭐ UUSI
 
-**Yhteensä:** 9 dialogia Kotlinissa
+**Yhteensä:** 10 dialogia Kotlinissa
 
 ### Dialog-migraation Edistyminen
 
-- **Kotlin-prosentti:** ~8.2% → ~10% (arvio)
-- **Migroidut dialogit:** 9 / ~31 JavaFX-dialogia
+- **Kotlin-prosentti:** ~8.2% → ~10.5% (arvio)
+- **Migroidut dialogit:** 10 / ~31 JavaFX-dialogia
 - **BaseDialog-pohja:** ✅ Valmis
 
 ---
@@ -234,6 +235,41 @@ Valikkorivin rakentaja migroitu Java → Kotlin. Tämä on ensimmäinen Document
 - `.apply {}` -scope-funktio UI-komponenttien luomiseen
 - `'T'.code` mnemonic-arvoille (Char → Int konversio)
 - MenuListeners luokka Kotlinissa (class, ei data class, koska mutable properties)
+
+---
+
+### 4. AppearanceDialogFX migroitu Kotliniin ✅ (2026-01-02)
+
+**Lähdetiedosto:** `src/main/java/kirjanpito/ui/javafx/dialogs/AppearanceDialogFX.java` (poistettu)  
+**Kohdetiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AppearanceDialogFX.kt`
+
+**Kuvaus:**
+Ulkoasu-dialogi migroitu Java → Kotlin. Mahdollistaa teeman ja fonttikoon vaihdon. Näyttää esikatselun fonttikoon muutoksista.
+
+**Mittarit:**
+- **Rivimäärä:** ~151 riviä Java → ~158 riviä Kotlin
+- **Monimutkaisuus:** Keskisuuri - teema + fontti + esikatselu
+- **Riippuvuudet:** AppSettings
+
+**Ominaisuudet:**
+- Käyttää BaseDialogFX-pohjaa
+- Teeman valinta (Vaalea, Tumma, Järjestelmä)
+- Fonttikoon valinta (8-24 pt) Spinner-komponentilla
+- Esikatselu fonttikoon muutoksista
+- Teema vaihtuu heti, fonttikoko uudelleenkäynnistyksen jälkeen
+- Callback teeman muutokselle
+
+**Yhteensopivuus:**
+- MainController päivitetty käyttämään Kotlin-versiota
+- Lambda-korjaus Java-yhteensopivuudelle (kotlin.Unit.INSTANCE)
+- `showAndWait()` käytössä
+
+**Muutokset:**
+- Käyttää BaseDialogFX-pohjaa
+- Kotlin property-syntaksi
+- SpinnerValueFactory.IntegerSpinnerValueFactory fonttikoolle
+- Null-safety parannukset
+- String interpolation esikatselussa
 
 ---
 

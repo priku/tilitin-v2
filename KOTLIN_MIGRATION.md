@@ -270,7 +270,7 @@ All SQLite DAO implementations have been migrated to Kotlin:
 - Consistent dialog behavior
 - Easier maintenance
 
-#### Migrated JavaFX Dialogs (9 total)
+#### Migrated JavaFX Dialogs (10 total)
 
 | Dialog | Description | Status |
 |--------|-------------|--------|
@@ -283,6 +283,7 @@ All SQLite DAO implementations have been migrated to Kotlin:
 | ReportDialog | Report viewer (PDF/HTML export) | ✅ |
 | AccountSelectionDialogFX | Account selection (F9) | ✅ |
 | PrintSettingsDialogFX | Print settings | ✅ |
+| AppearanceDialogFX | Appearance (theme + font) | ✅ |
 
 #### JavaFX UI Components (7 total)
 

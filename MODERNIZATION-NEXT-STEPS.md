@@ -57,11 +57,18 @@
   - ✅ Lisäasetukset (ruudukko, sivunumerot)
   - ✅ MainController toimii ilman muutoksia
 
-#### 2.3 AppearanceDialogFX (2-3h)
-- **Koko:** ~300-400 riviä
-- **Monimutkaisuus:** Keskisuuri - teema + fontti
-- **Riippuvuudet:** Keskisuuri
-- **Arvio:** 2-3 tuntia
+#### 2.3 AppearanceDialogFX (2-3h) ✅ VALMIS
+- **Status:** ✅ Tehty 2026-01-02
+- **Tiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AppearanceDialogFX.kt`
+- **Koko:** ~151 riviä Java → ~158 riviä Kotlin
+- **Monimutkaisuus:** Keskisuuri - teema + fontti + esikatselu
+- **Ominaisuudet:**
+  - ✅ Käyttää BaseDialogFX-pohjaa
+  - ✅ Teeman valinta (Vaalea, Tumma, Järjestelmä)
+  - ✅ Fonttikoon valinta (8-24 pt)
+  - ✅ Esikatselu fonttikoon muutoksista
+  - ✅ Callback teeman muutokselle
+  - ✅ MainController päivitetty
 
 **Yhteensä:** 4-7 tuntia  
 **Kotlin-prosentti:** 8.2% → ~10-11%
@@ -174,15 +181,18 @@
 - ✅ Yhteensopiva Java-koodin kanssa
 
 **Seuraava vaihe:**
-- ⏳ AppearanceDialogFX migraatio (2-3h) - SUOSITELTU SEURAAVAKSI
+- ⏳ SettingsDialogFX migraatio (3-4h) - Keskisuuri dialogi
+- ⏳ DocumentUIUpdater migraatio (2h) - Manager-luokka
+- ⏳ Laajenna testikattavuutta - COAHeadingDAOTest, ReportStructureDAOTest
 
 ---
 
 ## 📈 Modernisaation Mittarit
 
 ### Nykyinen tila (2026-01-02):
-- **Kotlin:** ~10% (9 dialogia + BaseDialogFX-pohja)
-- **Migroidut dialogit:** 9 / ~31 JavaFX-dialogia
+- **Kotlin:** ~10.5% (10 dialogia + BaseDialogFX-pohja + DocumentMenuBuilder)
+- **Migroidut dialogit:** 10 / ~31 JavaFX-dialogia
+- **Migroidut managerit:** 1 / ~14 manager-luokkaa
 - **Testit:** 58 testiä
 - **Legacy-koodi:** ~40 tiedostoa
 
