@@ -54,6 +54,9 @@ jobs:
         fi
         echo "==================================="
 
+    - name: Run tests
+      run: ./gradlew test
+    
     - name: Build with Gradle
       run: ./gradlew clean fatJar
 
