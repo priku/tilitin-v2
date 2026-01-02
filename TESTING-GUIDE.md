@@ -61,16 +61,24 @@ Avaa HTML-raportti selaimessa nähdäksesi:
 
 ## ✅ Nykyiset testit
 
-### DAO-testit (22 testiä)
-- **AccountDAOTest** - Tilit
-- **EntryDAOTest** - Viennit
-- **DocumentDAOTest** - Tositteet
-- **PeriodDAOTest** - Tilikaudet
+### DAO-testit (42 testiä)
+- **AccountDAOTest** - Tilit (5 testiä)
+- **AttachmentDAOTest** - PDF-liitteet (6 testiä)
+- **DocumentDAOTest** - Tositteet (5 testiä)
+- **DocumentTypeDAOTest** - Tositetyypit (5 testiä)
+- **EntryDAOTest** - Viennit (6 testiä)
+- **EntryTemplateDAOTest** - Vientipohjat (5 testiä)
+- **PeriodDAOTest** - Tilikaudet (5 testiä)
+- **SettingsDAOTest** - Asetukset (5 testiä)
+
+### Model-testit (12 testiä)
+- **DocumentModelTest** - Dokumenttimalli (5 testiä)
+- **PropertiesModelTest** - Ominaisuudet-malli (7 testiä)
 
 ### Integraatiotestit (4 testiä)
 - **DocumentWorkflowTest** - Dokumenttityönkulku
 
-**Yhteensä: 26 testiä**
+**Yhteensä: 58 testiä**
 
 ---
 
@@ -115,11 +123,12 @@ fun `test create and retrieve entry`() {
 ## 📈 Testikattavuus
 
 ### Nykyinen kattavuus
-- **DAO-taso:** ~40-50%
-- **Kokonaisuus:** ~5-10%
+- **DAO-taso:** ~60-70% (8/10 DAO:ta testattu)
+- **Model-taso:** ~20-30% (2/10+ modelia testattu)
+- **Kokonaisuus:** ~10-15%
 
 ### Tavoite
-- **DAO-taso:** 80%+
+- **DAO-taso:** 100% (kaikki DAO:t testattu)
 - **Model-taso:** 60%+
 - **Kokonaisuus:** 30%+
 
@@ -127,16 +136,22 @@ fun `test create and retrieve entry`() {
 
 ## 🎯 Seuraavat vaiheet
 
-### 1. Lisää DAO-testejä
-- SettingsDAOTest
-- EntryTemplateDAOTest
-- DocumentTypeDAOTest
-- AttachmentDAOTest
+### 1. Lisää DAO-testejä (2 jäljellä)
+- COAHeadingDAOTest
+- ReportStructureDAOTest
 
-### 2. Model-testit
-- DocumentModelTest
-- PropertiesModelTest
+### 2. Model-testit (8+ jäljellä)
 - StartingBalanceModelTest
+- EntryTemplateModelTest
+- ReportModelTest
+- CSVImportModelTest
+- BackupModelTest
+- jne.
+
+### 3. Integraatiotestit
+- CSV Import workflow
+- Report generation workflow
+- Backup/Restore workflow
 
 ### 3. Integraatiotestit
 - CSV Import workflow

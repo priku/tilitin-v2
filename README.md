@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/priku/tilitin-v2/workflows/Advanced%20Build%20&%20Release/badge.svg)](https://github.com/priku/tilitin-v2/actions)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net/)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-blue.svg)](https://kotlinlang.org/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.2.0-blue.svg)](https://kotlinlang.org/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-21-green.svg)](https://openjfx.io/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg)](COPYING)
 

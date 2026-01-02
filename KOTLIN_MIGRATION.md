@@ -245,11 +245,60 @@ All SQLite DAO implementations have been migrated to Kotlin:
 - Updated SQLiteDataSource.java to use Kotlin DAOs directly
 - Removed all "Legacy Java implementation" comments
 
-### Phase 4: Dialog Refactoring (FUTURE)
+### Phase 4: Dialog Refactoring (IN PROGRESS)
 
-- [ ] Create BaseDialog abstract class in Kotlin
-- [ ] Convert simple dialogs to Kotlin
-- [ ] Implement common dialog patterns
+#### BaseDialogFX Foundation (COMPLETED ✓)
+
+**Created:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/BaseDialogFX.kt`
+
+- ✅ Abstract base class for all JavaFX dialogs
+- ✅ OK/Cancel button management
+- ✅ Common layout and styling
+- ✅ `show()` and `showAndWait()` methods
+- ✅ Easy to extend with `createContent()` abstract method
+
+**Benefits:**
+- Reduces code duplication
+- Consistent dialog behavior
+- Easier maintenance
+
+#### Dialog Migrations (IN PROGRESS)
+
+**Migrated Dialogs:**
+1. ✅ AboutDialogFX - Application info dialog
+2. ✅ HelpDialogFX - Help dialog
+3. ✅ PropertiesDialogFX - Settings dialog
+4. ✅ DebugInfoDialogFX - Debug information
+5. ✅ KeyboardShortcutsDialogFX - Keyboard shortcuts
+6. ✅ CSVImportDialog - CSV import
+7. ✅ ReportDialog - Reports
+8. ✅ AccountSelectionDialogFX - Account selection (F9) ⭐ NEW
+
+**Total:** 8 dialogs migrated to Kotlin (~9.5% of codebase)
+
+**Usage Pattern:**
+```kotlin
+class MyDialog(owner: Window?) : BaseDialogFX(owner, "Title", 500.0, 400.0) {
+    override fun createContent(): Parent {
+        // Create dialog content
+        return VBox(10.0).apply {
+            children.add(Label("Content"))
+        }
+    }
+    
+    override fun onOK(): Boolean {
+        // Validate and return true to close
+        return true
+    }
+}
+```
+
+**Remaining Dialogs to Migrate:**
+- [ ] PrintSettingsDialogFX
+- [ ] AppearanceDialogFX
+- [ ] SettingsDialogFX
+- [ ] DocumentTypeDialogFX
+- [ ] And ~20+ other dialogs
 
 ### Phase 5: DocumentFrame Refactoring (FUTURE)
 

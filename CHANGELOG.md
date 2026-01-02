@@ -6,6 +6,70 @@ Formaatti perustuu [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) -sta
 
 ---
 
+## [2.2.1] - 2026-01-02 (work in progress)
+
+### Tekniset parannukset
+
+- **BaseDialogFX-pohja luotu** ⭐ UUSI
+  - Yhtenäinen malli kaikille JavaFX-dialogeille
+  - Vähentää toistoa ja parantaa ylläpidettävyyttä
+  - OK/Cancel -nappien hallinta
+  - Yhtenäinen layout ja tyyli
+
+- **Kotlin-migraatio jatkuu**
+  - AccountSelectionDialogFX migroitu Java → Kotlin ⭐ UUSI
+    - Käyttää BaseDialogFX-pohjaa
+    - Tilinvalintadialogi (F9) nyt Kotlinissa
+    - Yhteensopiva Java-koodin kanssa (@JvmStatic)
+  - Kotlin-prosentti: ~8.2% → ~9.5% (8 dialogia Kotlinissa)
+
+---
+
+## [2.2.0] - 2026-01-02
+
+### Uudet ominaisuudet
+
+- **Täysin uusi JavaFX-käyttöliittymä**
+  - Moderni, responsiivinen design
+  - Tumma ja vaalea teema
+  - Skaalautuva fonttikoko
+
+- **31 JavaFX-dialogia** (24 Java DialogFX + 7 Kotlin)
+  - Kaikki toiminnot siirretty JavaFX:ään
+  - Parannettu käytettävyys ja ulkoasu
+  - 100% JavaFX - ei Swing-dialogeja jäljellä
+
+### Tekniset parannukset
+
+- **Kotlin-migraatio jatkuu**
+  - AboutDialogFX migroitu Java → Kotlin
+  - HelpDialogFX migroitu Java → Kotlin
+  - PropertiesDialogFX migroitu Java → Kotlin
+  - DebugInfoDialogFX migroitu Java → Kotlin
+  - KeyboardShortcutsDialogFX migroitu Java → Kotlin
+  - CSVImportDialog Kotlinissa
+  - ReportDialog Kotlinissa
+  - Kotlin-prosentti: ~8.2% (7 dialogia Kotlinissa)
+
+- **Testaus-infrastruktuuri laajennettu**
+  - JUnit 5 integroitu
+  - TestFX lisätty JavaFX-testaukseen
+  - Kattavat DAO-testit:
+    - AccountDAOTest (5 testiä)
+    - AttachmentDAOTest (6 testiä)
+    - DocumentDAOTest (5 testiä)
+    - DocumentTypeDAOTest (5 testiä)
+    - EntryDAOTest (6 testiä)
+    - EntryTemplateDAOTest (5 testiä)
+    - PeriodDAOTest (5 testiä)
+    - SettingsDAOTest (5 testiä)
+  - Model-testit:
+    - PropertiesModelTest (7 testiä)
+    - DocumentModelTest (5 testiä)
+  - Integration-testit:
+    - DocumentWorkflowTest
+  - Testikattavuus merkittävästi parantunut
+
 ## [2.1.1] - 2026-01-02
 
 ### Uudet ominaisuudet

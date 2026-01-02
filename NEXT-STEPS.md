@@ -145,10 +145,10 @@ Fix any bugs discovered during Priority 2 testing.
 
 | Priority | Task | Time | Status |
 |----------|------|------|--------|
-| 1 | Fix Documentation | 1-2h | ⏳ Pending |
+| 1 | Fix Documentation | 1-2h | ✅ Completed |
 | 2 | Manual Testing | 2-4h | ⏳ Pending |
 | 3 | Bug Fixes | Variable | ⏳ Pending |
-| 4 | Release Prep | 30min | ⏳ Pending |
+| 4 | Release Prep | 30min | ✅ Completed |
 | 5 | Optional Cleanup | Future | ⏳ Future |
 
 **Total to release-ready:** ~4-7 hours + bug fix time
@@ -160,9 +160,11 @@ Fix any bugs discovered during Priority 2 testing.
 - ✅ **All 31 dialogs exist and are used**
 - ✅ **JavaFX modernization: 100% complete**
 - ✅ **Build infrastructure: Ready**
-- ⚠️ **Documentation: Needs updates**
-- ⏳ **Testing: Not yet done**
-- ⏳ **Release: Pending testing**
+- ✅ **Documentation: Updated and accurate**
+- ✅ **Test infrastructure: 58 tests (42 DAO + 12 Model + 4 Integration)**
+- ✅ **Release prep: Version 2.2.0 ready**
+- ⏳ **Manual Testing: Pending (use MANUAL-TESTING-CHECKLIST.md)**
+- ⏳ **Release: Pending manual testing**
 
 ---
 

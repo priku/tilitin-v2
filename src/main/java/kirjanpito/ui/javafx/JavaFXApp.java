@@ -78,10 +78,16 @@ public class JavaFXApp extends Application {
     
     private void loadAppIcon() {
         try {
-            InputStream iconStream = getClass().getResourceAsStream("/tilitin-48x48.png");
-            if (iconStream != null) {
-                primaryStage.getIcons().add(new Image(iconStream));
+            // Load multiple icon sizes for different contexts (taskbar, title bar, etc.)
+            String[] iconSizes = {"/tilitin-24x24.png", "/tilitin-32x32.png", "/tilitin-48x48.png"};
+            for (String iconPath : iconSizes) {
+                InputStream iconStream = getClass().getResourceAsStream(iconPath);
+                System.out.println("Loading icon " + iconPath + ": " + (iconStream != null ? "OK" : "NOT FOUND"));
+                if (iconStream != null) {
+                    primaryStage.getIcons().add(new Image(iconStream));
+                }
             }
+            System.out.println("Total icons loaded: " + primaryStage.getIcons().size());
         } catch (Exception e) {
             System.err.println("Ikonia ei voitu ladata: " + e.getMessage());
         }

@@ -6,6 +6,8 @@ import javafx.print.PrinterJob
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.layout.*
+import javafx.scene.paint.Color
+import javafx.scene.shape.SVGPath
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Modality
@@ -58,10 +60,37 @@ class ReportDialog private constructor(
         dialog.title = reportType.displayName
         dialog.minWidth = 900.0
         dialog.minHeight = 700.0
+        
+        // Load app icon
+        loadAppIcon()
 
         createContent()
         generateReport()
         setupAccountLinkHandler()
+    }
+    
+    private fun loadAppIcon() {
+        listOf("/tilitin-24x24.png", "/tilitin-32x32.png", "/tilitin-48x48.png").forEach { iconPath ->
+            javaClass.getResourceAsStream(iconPath)?.let { stream ->
+                dialog.icons.add(javafx.scene.image.Image(stream))
+            }
+        }
+    }
+    
+    private fun showAlert(type: Alert.AlertType, header: String, content: String) {
+        Alert(type).apply {
+            title = "Tilitin"
+            headerText = header
+            contentText = content
+            // Add icon to alert dialog
+            (dialogPane.scene.window as? javafx.stage.Stage)?.let { stage ->
+                listOf("/tilitin-24x24.png", "/tilitin-32x32.png", "/tilitin-48x48.png").forEach { iconPath ->
+                    javaClass.getResourceAsStream(iconPath)?.let { stream ->
+                        stage.icons.add(javafx.scene.image.Image(stream))
+                    }
+                }
+            }
+        }.showAndWait()
     }
 
     private fun setupAccountLinkHandler() {
@@ -95,18 +124,18 @@ class ReportDialog private constructor(
             """.trimIndent()
         }
 
-        val printBtn = Button("🖨 Tulosta").apply {
+        val printBtn = Button("Tulosta").apply {
             style = BUTTON_STYLE
             setOnAction { print() }
         }
 
-        val exportPdfBtn = Button("📄 Vie PDF").apply {
-            style = BUTTON_STYLE
+        val exportPdfBtn = Button("Vie PDF").apply {
+            style = BUTTON_STYLE_SECONDARY
             setOnAction { exportToPdf() }
         }
 
-        val exportHtmlBtn = Button("🌐 Vie HTML").apply {
-            style = BUTTON_STYLE
+        val exportHtmlBtn = Button("Vie HTML").apply {
+            style = BUTTON_STYLE_SECONDARY
             setOnAction { exportToHtml() }
         }
 
@@ -117,23 +146,18 @@ class ReportDialog private constructor(
 
         periodCombo = ComboBox<Period>().apply {
             items.addAll(allPeriods)
+            
+            // Use converter for both display and dropdown
+            converter = object : javafx.util.StringConverter<Period>() {
+                override fun toString(period: Period?): String {
+                    return if (period == null) "" 
+                           else "${DATE_FORMAT.format(period.startDate)} – ${DATE_FORMAT.format(period.endDate)}"
+                }
+                override fun fromString(string: String?): Period? = null
+            }
+            
             value = currentPeriod
-            setCellFactory {
-                object : ListCell<Period>() {
-                    override fun updateItem(item: Period?, empty: Boolean) {
-                        super.updateItem(item, empty)
-                        text = if (empty || item == null) null 
-                               else "${DATE_FORMAT.format(item.startDate)} – ${DATE_FORMAT.format(item.endDate)}"
-                    }
-                }
-            }
-            buttonCell = object : ListCell<Period>() {
-                override fun updateItem(item: Period?, empty: Boolean) {
-                    super.updateItem(item, empty)
-                    text = if (empty || item == null) null 
-                           else "${DATE_FORMAT.format(item.startDate)} – ${DATE_FORMAT.format(item.endDate)}"
-                }
-            }
+            
             setOnAction {
                 currentPeriod = value
                 generateReport()
@@ -576,9 +600,9 @@ class ReportDialog private constructor(
         fc.showSaveDialog(dialog)?.let { file ->
             try {
                 generatePdf(file)
-                Alert(Alert.AlertType.INFORMATION, "PDF tallennettu: ${file.name}").showAndWait()
+                showAlert(Alert.AlertType.INFORMATION, "PDF tallennettu", file.name)
             } catch (e: Exception) {
-                Alert(Alert.AlertType.ERROR, "Virhe PDF:n luonnissa: ${e.message}").showAndWait()
+                showAlert(Alert.AlertType.ERROR, "Virhe PDF:n luonnissa", e.message ?: "Tuntematon virhe")
             }
         }
     }
@@ -811,9 +835,9 @@ class ReportDialog private constructor(
         fc.showSaveDialog(dialog)?.let { file ->
             try {
                 file.writeText(htmlContent, Charsets.UTF_8)
-                Alert(Alert.AlertType.INFORMATION, "Raportti tallennettu: ${file.name}").showAndWait()
+                showAlert(Alert.AlertType.INFORMATION, "HTML-raportti tallennettu", file.name)
             } catch (e: Exception) {
-                Alert(Alert.AlertType.ERROR, "Virhe: ${e.message}").showAndWait()
+                showAlert(Alert.AlertType.ERROR, "Virhe HTML:n tallennuksessa", e.message ?: "Tuntematon virhe")
             }
         }
     }
@@ -834,6 +858,14 @@ class ReportDialog private constructor(
 
         private const val BUTTON_STYLE = """
             -fx-background-color: #0d6efd;
+            -fx-text-fill: white;
+            -fx-padding: 8 16;
+            -fx-background-radius: 4;
+            -fx-cursor: hand;
+        """
+        
+        private const val BUTTON_STYLE_SECONDARY = """
+            -fx-background-color: #6c757d;
             -fx-text-fill: white;
             -fx-padding: 8 16;
             -fx-background-radius: 4;

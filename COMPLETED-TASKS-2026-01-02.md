@@ -1,0 +1,168 @@
+# Tehdyt Työt - Tilitin Modernisaatio
+
+**Päivämäärä:** 2026-01-02  
+**Versio:** 2.2.0 → 2.2.1 (work in progress)
+
+---
+
+## 🎉 Viimeisimmät Tehdyt Työt
+
+### 1. BaseDialogFX-pohja luotu ✅ (2026-01-02)
+
+**Tiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/BaseDialogFX.kt`
+
+**Kuvaus:**
+Luo yhtenäisen mallin kaikille JavaFX-dialogeille. Vähentää toistoa ja parantaa koodin laatua.
+
+**Ominaisuudet:**
+- Yhteinen dialogi-pohja
+- OK/Cancel -nappien hallinta (valinnainen)
+- `show()` ja `showAndWait()` -metodit
+- Yhtenäinen tyyli ja layout
+- Helppo laajennettavuus
+
+**Hyödyt:**
+- Kaikki uudet dialogit käyttävät samaa mallia
+- Helpompi ylläpito
+- Vähemmän boilerplate-koodia
+- Järjestelmällisempi rakenne
+
+**Käyttö:**
+```kotlin
+class MyDialog(owner: Window?) : BaseDialogFX(owner, "My Dialog", 500.0, 400.0) {
+    override fun createContent(): Parent {
+        return VBox(10.0).apply {
+            padding = Insets(16.0)
+            children.add(Label("Hello"))
+        }
+    }
+    
+    override fun onOK(): Boolean {
+        // Validate and return true if OK, false to keep dialog open
+        return true
+    }
+}
+```
+
+---
+
+### 2. AccountSelectionDialogFX migroitu Kotliniin ✅ (2026-01-02)
+
+**Lähdetiedosto:** `src/main/java/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.java`  
+**Kohdetiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.kt`
+
+**Kuvaus:**
+Tilinvalintadialogi (F9) migroitu Java → Kotlin. Näyttää tilikartan ja mahdollistaa tilin valinnan hakusanalla.
+
+**Mittarit:**
+- **Rivimäärä:** ~256 riviä Java → ~262 riviä Kotlin
+- **Monimutkaisuus:** Keskisuuri (lista + valinta + suodatus)
+- **Riippuvuudet:** AccountDAO, Account
+
+**Ominaisuudet:**
+- Käyttää BaseDialogFX-pohjaa
+- Suodatus tilinumeron ja nimen mukaan
+- Suosikki-suodatin
+- Kaksoisnapsautus valintaan
+- Enter-näppäin valintaan
+- Escape-näppäin sulkemiseen
+
+**Yhteensopivuus:**
+- `@JvmStatic` annotaatio `showAndSelect()` -metodille
+- MainController toimii ilman muutoksia
+- Java-koodi voi kutsua Kotlin-versiota suoraan
+
+**Muutokset:**
+- Käyttää BaseDialogFX-pohjaa
+- Kotlin property-syntaksi Account-ominaisuuksille
+- `FilteredList` suodatukselle
+- Null-safety parannukset
+
+---
+
+## 📊 Kotlin-migraation Tilanne
+
+### Migroidut JavaFX-dialogit (Kotlinissa)
+
+1. ✅ **AboutDialogFX** - Tietoja-ikkuna
+2. ✅ **HelpDialogFX** - Ohje-ikkuna
+3. ✅ **PropertiesDialogFX** - Asetusikkuna
+4. ✅ **DebugInfoDialogFX** - Debug-tiedot
+5. ✅ **KeyboardShortcutsDialogFX** - Pikanäppäimet
+6. ✅ **CSVImportDialog** - CSV-tuonti
+7. ✅ **ReportDialog** - Raportit
+8. ✅ **AccountSelectionDialogFX** - Tilinvalinta (F9) ⭐ UUSI
+
+**Yhteensä:** 8 dialogia Kotlinissa
+
+### Dialog-migraation Edistyminen
+
+- **Kotlin-prosentti:** ~8.2% → ~9.5% (arvio)
+- **Migroidut dialogit:** 8 / ~31 JavaFX-dialogia
+- **BaseDialog-pohja:** ✅ Valmis
+
+---
+
+## 🔧 Tekniset Parannukset
+
+### 1. BaseDialogFX-pohja
+
+**Sijainti:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/BaseDialogFX.kt`
+
+**Ominaisuudet:**
+- Abstrakti `createContent()` -metodi
+- OK/Cancel -nappien hallinta
+- `onOK()` ja `onCancel()` -callbackit
+- Yhtenäinen layout ja tyyli
+- Helposti laajennettavissa
+
+**Hyödyt:**
+- Vähentää toistoa
+- Parantaa ylläpidettävyyttä
+- Yhtenäinen käyttäytyminen
+
+### 2. AccountSelectionDialogFX Kotlin-migraatio
+
+**Parannukset:**
+- Käyttää BaseDialogFX-pohjaa
+- Null-safety parannukset
+- Kotlin property-syntaksi
+- Järkevämpi koodin rakenne
+
+**Yhteensopivuus:**
+- `@JvmStatic` Java-yhteensopivuudelle
+- MainController toimii ilman muutoksia
+
+---
+
+## 📝 Tiedostot
+
+### Luodut tiedostot:
+- `src/main/kotlin/kirjanpito/ui/javafx/dialogs/BaseDialogFX.kt` - Yhteinen dialogi-pohja
+- `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.kt` - Migroitu dialogi
+
+### Poistetut tiedostot:
+- `src/main/java/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.java` - Poistetaan myöhemmin (jos halutaan)
+
+---
+
+## ✅ Testaus
+
+- ✅ Koodi kääntyy onnistuneesti
+- ✅ Kaikki testit menevät läpi
+- ✅ MainController toimii ilman muutoksia
+- ⏳ Sovelluksen käynnistys testattava (manuaalinen testi)
+
+---
+
+## 🎯 Seuraavat Askeleet
+
+Katso `MODERNIZATION-NEXT-STEPS.md` tiedosto suositeltuille seuraaville askelille:
+
+1. **PrintSettingsDialogFX migraatio** (1-2h) - Yksinkertainen asetusdialogi
+2. **AppearanceDialogFX migraatio** (2-3h) - Teema- ja fonttiasetukset
+3. **Laajenna testikattavuutta** - COAHeadingDAOTest, ReportStructureDAOTest
+
+---
+
+**Viimeksi päivitetty:** 2026-01-02
