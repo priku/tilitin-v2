@@ -189,6 +189,14 @@ tasks.register<JavaExec>("runSwing") {
     jvmArgs = listOf("-Xmx1024m", "-Xms256m")
 }
 
+// Task to fix database - create 2024 period and move documents
+tasks.register<JavaExec>("fixDatabase") {
+    group = "application"
+    description = "Fix database: create 2024 period and move documents there"
+    mainClass.set("kirjanpito.util.DatabaseFixer")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
 // Fat JAR task for distribution
 tasks.register<Jar>("fatJar") {
     group = "build"

@@ -201,7 +201,21 @@ class ReportDialog private constructor(
         try {
             val docDao = dataSource.getDocumentDAO(session)
             val entryDao = dataSource.getEntryDAO(session)
+            
+            // DEBUG: Tulostetaan tilikauden tiedot
+            println("📊 generateJournal - period.id=${period.id}")
+            println("📊 period.startDate=${period.startDate}, period.endDate=${period.endDate}")
+            
             val docs = docDao.getByPeriodId(period.id, 1)
+            
+            // DEBUG: Tulostetaan haettujen tositteiden tiedot
+            println("📊 Haettiin ${docs.size} tositetta period_id=${period.id}")
+            if (docs.isNotEmpty()) {
+                val firstDoc = docs.first()
+                val lastDoc = docs.last()
+                println("📊 Ensimmäinen tosite: nro=${firstDoc.number}, pvm=${firstDoc.date}")
+                println("📊 Viimeinen tosite: nro=${lastDoc.number}, pvm=${lastDoc.date}")
+            }
 
             append("""
                 <table class="report-table">

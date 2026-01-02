@@ -1,6 +1,7 @@
 package kirjanpito.db.sql
 
 import kirjanpito.db.*
+import java.sql.Date
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -9,7 +10,7 @@ import java.sql.SQLException
  * Kotlin implementation of SQLPeriodDAO.
  * 
  * Abstract base class for database-specific Period DAO implementations.
- * Provides CRUD operations using Kotlin idioms and extension functions.
+ * Provides CRUD operations using Kotlin idioms.
  * 
  * Subclasses must implement:
  * - getSelectAllQuery()
@@ -20,54 +21,75 @@ import java.sql.SQLException
  * - getGeneratedKey()
  * 
  * @author Tommi Helineva (original Java)
- * @author Kotlin migration by Claude
+ * @author Kotlin migration
  */
 abstract class SQLPeriodDAOKt : PeriodDAO {
     
     /**
      * Hakee tietokannasta kaikkien tilikausien tiedot aikajärjestyksessä.
+     * Returns a mutable ArrayList for compatibility with Java code that modifies the list.
      */
-    override fun getAll(): List<Period> = withDataAccess {
-        getSelectAllQuery().use { stmt ->
-            stmt.executeQuery().use { rs ->
-                buildList {
+    @Throws(DataAccessException::class)
+    override fun getAll(): List<Period> {
+        try {
+            getSelectAllQuery().use { stmt ->
+                stmt.executeQuery().use { rs ->
+                    val periods = ArrayList<Period>()
                     while (rs.next()) {
-                        add(createObject(rs))
+                        periods.add(createObject(rs))
                     }
+                    return periods
                 }
             }
+        } catch (e: SQLException) {
+            throw DataAccessException(e.message, e)
         }
     }
     
     /**
      * Hakee tietokannasta nykyisen tilikauden tiedot.
      */
-    override fun getCurrent(): Period? = withDataAccess {
-        getSelectCurrentQuery().use { stmt ->
-            stmt.executeQuery().use { rs ->
-                if (rs.next()) createObject(rs) else null
+    @Throws(DataAccessException::class)
+    override fun getCurrent(): Period? {
+        try {
+            getSelectCurrentQuery().use { stmt ->
+                stmt.executeQuery().use { rs ->
+                    return if (rs.next()) createObject(rs) else null
+                }
             }
+        } catch (e: SQLException) {
+            throw DataAccessException(e.message, e)
         }
     }
     
     /**
      * Tallentaa tilikauden tiedot tietokantaan.
      */
-    override fun save(period: Period): Unit = withDataAccess {
-        if (period.id == 0) {
-            executeInsertQuery(period)
-        } else {
-            executeUpdateQuery(period)
+    @Throws(DataAccessException::class)
+    override fun save(period: Period) {
+        try {
+            if (period.id == 0) {
+                executeInsertQuery(period)
+            } else {
+                executeUpdateQuery(period)
+            }
+        } catch (e: SQLException) {
+            throw DataAccessException(e.message, e)
         }
     }
     
     /**
      * Poistaa tilikauden tiedot tietokannasta.
      */
-    override fun delete(periodId: Int): Unit = withDataAccess {
-        getDeleteQuery().use { stmt ->
-            stmt.setInt(1, periodId)
-            stmt.executeUpdate()
+    @Throws(DataAccessException::class)
+    override fun delete(periodId: Int) {
+        try {
+            getDeleteQuery().use { stmt ->
+                stmt.setInt(1, periodId)
+                stmt.executeUpdate()
+            }
+        } catch (e: SQLException) {
+            throw DataAccessException(e.message, e)
         }
     }
     
@@ -94,7 +116,7 @@ abstract class SQLPeriodDAOKt : PeriodDAO {
     protected abstract fun getGeneratedKey(): Int
     
     // ========================================================================
-    // Protected Methods - Can be overridden for database-specific behavior
+    // Protected Methods
     // ========================================================================
     
     /**
@@ -102,15 +124,22 @@ abstract class SQLPeriodDAOKt : PeriodDAO {
      */
     @Throws(SQLException::class)
     protected open fun createObject(rs: ResultSet): Period {
-        return rs.toPeriodData().toPeriod()
+        return Period().apply {
+            id = rs.getInt("id")
+            startDate = Date(rs.getLong("start_date"))
+            endDate = Date(rs.getLong("end_date"))
+            isLocked = rs.getInt("locked") != 0
+        }
     }
     
     /**
      * Asettaa valmistellun kyselyn parametreiksi olion tiedot.
      */
     @Throws(SQLException::class)
-    protected open fun setValuesToStatement(stmt: PreparedStatement, obj: Period) {
-        stmt.setPeriodValues(obj.toPeriodData())
+    protected open fun setValuesToStatement(stmt: PreparedStatement, period: Period) {
+        stmt.setLong(1, period.startDate.time)
+        stmt.setLong(2, period.endDate.time)
+        stmt.setInt(3, if (period.isLocked) 1 else 0)
     }
     
     // ========================================================================
@@ -121,22 +150,22 @@ abstract class SQLPeriodDAOKt : PeriodDAO {
      * Lisää tilikauden tiedot tietokantaan.
      */
     @Throws(SQLException::class)
-    private fun executeInsertQuery(obj: Period) {
+    private fun executeInsertQuery(period: Period) {
         getInsertQuery().use { stmt ->
-            setValuesToStatement(stmt, obj)
+            setValuesToStatement(stmt, period)
             stmt.executeUpdate()
         }
-        obj.id = getGeneratedKey()
+        period.id = getGeneratedKey()
     }
     
     /**
      * Päivittää tilikauden tiedot tietokantaan.
      */
     @Throws(SQLException::class)
-    private fun executeUpdateQuery(obj: Period) {
+    private fun executeUpdateQuery(period: Period) {
         getUpdateQuery().use { stmt ->
-            setValuesToStatement(stmt, obj)
-            stmt.setInt(4, obj.id)
+            setValuesToStatement(stmt, period)
+            stmt.setInt(4, period.id)
             stmt.executeUpdate()
         }
     }
