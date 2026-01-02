@@ -24,6 +24,7 @@ import kirjanpito.ui.PrintPreviewFrame;
 import kirjanpito.ui.javafx.cells.*;
 import kirjanpito.ui.javafx.dialogs.*;
 import kirjanpito.ui.javafx.EntryTableNavigationHandler;
+import kirjanpito.ui.javafx.DocumentAsyncOperations;
 import kirjanpito.util.AppSettings;
 import kirjanpito.util.AutoCompleteSupport;
 import kirjanpito.util.TreeMapAutoCompleteSupport;
@@ -824,86 +825,74 @@ public class MainController implements Initializable {
         
         setStatus("Tallennetaan...");
         
-        Session session = null;
-        try {
-            session = dataSource.openSession();
-            
-            // 1. Tallenna tositteen tiedot (päivämäärä)
-            if (datePicker.getValue() != null) {
-                java.util.Date date = java.util.Date.from(
-                    datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-                currentDocument.setDate(date);
+        // 1. Päivitä tositteen päivämäärä
+        if (datePicker.getValue() != null) {
+            java.util.Date date = java.util.Date.from(
+                datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            currentDocument.setDate(date);
+        }
+        
+        // 2. Valmistele viennit tallennukseen
+        java.util.List<Entry> entriesToSave = new java.util.ArrayList<>();
+        java.util.List<Entry> entriesToDelete = new java.util.ArrayList<>();
+        
+        // Kerää tallennettavat viennit
+        for (EntryRowModel row : entries) {
+            if (row.isEmpty()) {
+                continue;
             }
             
-            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
-            documentDAO.save(currentDocument);
+            row.updateEntry();
+            Entry entry = row.getEntry();
             
-            // 2. Tallenna viennit
-            EntryDAO entryDAO = dataSource.getEntryDAO(session);
-            
-            int savedCount = 0;
-            int deletedCount = 0;
-            
-            for (EntryRowModel row : entries) {
-                // Ohita tyhjät rivit
-                if (row.isEmpty()) {
-                    continue;
-                }
-                
-                // Päivitä Entry-olio
-                row.updateEntry();
-                Entry entry = row.getEntry();
-                
-                // Aseta dokumentin id jos uusi
-                if (entry.getDocumentId() == 0) {
-                    entry.setDocumentId(currentDocument.getId());
-                }
-                
-                // Tallenna
-                if (entry.getAccountId() > 0 && entry.getAmount() != null) {
-                    entryDAO.save(entry);
-                    savedCount++;
-                    row.setModified(false);
-                }
+            if (entry.getDocumentId() == 0) {
+                entry.setDocumentId(currentDocument.getId());
             }
             
-            // 3. Poista poistetut viennit
-            // (vertaa currentEntries vs entries)
-            if (currentEntries != null) {
-                for (Entry oldEntry : currentEntries) {
-                    boolean found = false;
-                    for (EntryRowModel row : entries) {
-                        if (row.getEntry() != null && row.getEntry().getId() == oldEntry.getId()) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found && oldEntry.getId() > 0) {
-                        entryDAO.delete(oldEntry.getId());
-                        deletedCount++;
-                    }
-                }
-            }
-            
-            session.commit();
-            
-            // Päivitä currentEntries
-            currentEntries = entryDAO.getByDocumentId(currentDocument.getId());
-            
-            setStatus("Tallennettu: " + savedCount + " vientiä" + 
-                     (deletedCount > 0 ? ", poistettu " + deletedCount : ""));
-            
-        } catch (Exception e) {
-            if (session != null) {
-                try { session.rollback(); } catch (Exception re) {}
-            }
-            showError("Tallennusvirhe", e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
+            if (entry.getAccountId() > 0 && entry.getAmount() != null) {
+                entriesToSave.add(entry);
+                row.setModified(false);
             }
         }
+        
+        // Kerää poistettavat viennit
+        if (currentEntries != null) {
+            for (Entry oldEntry : currentEntries) {
+                boolean found = false;
+                for (EntryRowModel row : entries) {
+                    if (row.getEntry() != null && row.getEntry().getId() == oldEntry.getId()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found && oldEntry.getId() > 0) {
+                    entriesToDelete.add(oldEntry);
+                }
+            }
+        }
+        
+        // 3. Tallenna async-versiolla
+        DocumentAsyncOperations.saveDocumentAsync(
+            dataSource,
+            currentDocument,
+            entriesToSave,
+            entriesToDelete,
+            () -> {
+                // Success callback - runs on JavaFX thread
+                int savedCount = entriesToSave.size();
+                int deletedCount = entriesToDelete.size();
+                setStatus("Tallennettu: " + savedCount + " vientiä" + 
+                         (deletedCount > 0 ? ", poistettu " + deletedCount : ""));
+                
+                // Reload entries to refresh currentEntries
+                loadDocument(currentDocument);
+            },
+            errorMsg -> {
+                // Error callback - runs on JavaFX thread
+                showError("Tallennusvirhe", errorMsg);
+                setStatus("Tallennus epäonnistui");
+            }
+        );
     }
     
     @FXML
@@ -2596,35 +2585,35 @@ public class MainController implements Initializable {
     private void loadDocument(Document doc) {
         if (dataSource == null || doc == null) return;
         
-        Session session = null;
-        try {
-            session = dataSource.openSession();
-            
-            currentDocument = doc;
-            
-            // Lataa viennit
-            EntryDAO entryDAO = dataSource.getEntryDAO(session);
-            currentEntries = entryDAO.getByDocumentId(doc.getId());
-            System.out.println("Tosite " + doc.getNumber() + ": " + currentEntries.size() + " vientiä");
-            
-            // Lisää viennit auto-complete tukeen
-            if (autoCompleteSupport != null) {
-                for (Entry entry : currentEntries) {
-                    autoCompleteSupport.addEntry(entry);
+        currentDocument = doc;
+        setStatus("Ladataan tositetta...");
+        
+        // Use async version to keep UI responsive
+        DocumentAsyncOperations.loadDocumentAsync(
+            dataSource,
+            doc,
+            entries -> {
+                // This runs on JavaFX thread
+                currentEntries = entries;
+                System.out.println("Tosite " + doc.getNumber() + ": " + currentEntries.size() + " vientiä");
+                
+                // Lisää viennit auto-complete tukeen
+                if (autoCompleteSupport != null) {
+                    for (Entry entry : currentEntries) {
+                        autoCompleteSupport.addEntry(entry);
+                    }
                 }
+                
+                // Päivitä UI
+                updateUI();
+                setStatus("Tosite " + doc.getNumber() + " ladattu");
+            },
+            errorMsg -> {
+                System.err.println("Virhe ladattaessa tositetta: " + errorMsg);
+                setStatus("Virhe ladattaessa tositetta");
+                showError("Virhe", errorMsg);
             }
-            
-            // Päivitä UI
-            updateUI();
-            
-        } catch (Exception e) {
-            System.err.println("Virhe ladattaessa tositetta: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        );
     }
     
     private void updatePeriodLabel() {

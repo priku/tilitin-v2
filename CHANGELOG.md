@@ -29,10 +29,15 @@ Formaatti perustuu [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) -sta
     - Valikkorivin rakentaja nyt Kotlinissa
     - Ensimmäinen DocumentFrame-refaktoroinnin osa
     - DocumentFrame toimii ilman muutoksia
-  - AppearanceDialogFX migroitu Java → Kotlin ⭐ UUSI
+  - AppearanceDialogFX migroitu Java → Kotlin
     - Käyttää BaseDialogFX-pohjaa
     - Ulkoasu-dialogi (teema + fontti) nyt Kotlinissa
     - MainController päivitetty
+  - UI-testit lisätty ⭐ UUSI
+    - Dialog-testit: AboutDialogFX, HelpDialogFX, AppearanceDialogFX, PrintSettingsDialogFX
+    - Table-testit: EntryRowModel, EntryTableNavigation
+    - TestFX-kirjasto käytössä
+    - Yhteensä: 13 UI-testiä
   - Kotlin-prosentti: ~8.2% → ~10.5% (10 dialogia + manager-luokka Kotlinissa)
 
 ---
