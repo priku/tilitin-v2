@@ -3,13 +3,21 @@
 ## Overview
 This document describes the Kotlin migration strategy for Tilitin 2.1, focusing on modernizing the codebase while maintaining full Java interoperability.
 
-## Status
-**Phase 1: Foundation - COMPLETED ✓**
-**Phase 2: Model Classes - COMPLETED ✓**
-**Phase 2.5: DAO Foundation - COMPLETED ✓**
-**Phase 3: AccountDAO Migration - COMPLETED ✓**
-**Phase 4: All SQLite DAO Migration - COMPLETED ✓**
-**Phase 5: Cleanup & Session Interface - COMPLETED ✓**
+## Current Status (2026-01-02)
+
+### 📊 Statistics
+| Type | Count | Percentage |
+|------|-------|------------|
+| Kotlin files (.kt) | **56** | ~20% |
+| Java files (.java) | **231** | ~80% |
+
+### Completed Phases
+- **Phase 1: Foundation** ✅
+- **Phase 2: Model Classes** ✅
+- **Phase 3: DAO Foundation** ✅
+- **Phase 4: All SQLite DAO Migration** ✅
+- **Phase 5: Cleanup & Session Interface** ✅
+- **Phase 6: JavaFX Dialogs (partial)** ✅
 
 ## What Has Been Done
 
@@ -245,7 +253,7 @@ All SQLite DAO implementations have been migrated to Kotlin:
 - Updated SQLiteDataSource.java to use Kotlin DAOs directly
 - Removed all "Legacy Java implementation" comments
 
-### Phase 4: Dialog Refactoring (IN PROGRESS)
+### Phase 6: JavaFX Dialog Refactoring (IN PROGRESS)
 
 #### BaseDialogFX Foundation (COMPLETED ✓)
 
@@ -255,26 +263,38 @@ All SQLite DAO implementations have been migrated to Kotlin:
 - ✅ OK/Cancel button management
 - ✅ Common layout and styling
 - ✅ `show()` and `showAndWait()` methods
-- ✅ Easy to extend with `createContent()` abstract method
+- ✅ App icon loading for all dialogs
 
 **Benefits:**
 - Reduces code duplication
 - Consistent dialog behavior
 - Easier maintenance
 
-#### Dialog Migrations (IN PROGRESS)
+#### Migrated JavaFX Dialogs (9 total)
 
-**Migrated Dialogs:**
-1. ✅ AboutDialogFX - Application info dialog
-2. ✅ HelpDialogFX - Help dialog
-3. ✅ PropertiesDialogFX - Settings dialog
-4. ✅ DebugInfoDialogFX - Debug information
-5. ✅ KeyboardShortcutsDialogFX - Keyboard shortcuts
-6. ✅ CSVImportDialog - CSV import
-7. ✅ ReportDialog - Reports
-8. ✅ AccountSelectionDialogFX - Account selection (F9) ⭐ NEW
+| Dialog | Description | Status |
+|--------|-------------|--------|
+| AboutDialogFX | Application info | ✅ |
+| HelpDialogFX | Help documentation | ✅ |
+| PropertiesDialogFX | Settings | ✅ |
+| DebugInfoDialogFX | Debug information | ✅ |
+| KeyboardShortcutsDialogFX | Keyboard shortcuts | ✅ |
+| CSVImportDialog | CSV import wizard | ✅ |
+| ReportDialog | Report viewer (PDF/HTML export) | ✅ |
+| AccountSelectionDialogFX | Account selection (F9) | ✅ |
+| PrintSettingsDialogFX | Print settings | ✅ |
 
-**Total:** 8 dialogs migrated to Kotlin (~9.5% of codebase)
+#### JavaFX UI Components (7 total)
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| AccountTableCell | Account cell renderer | ✅ |
+| AmountTableCell | Amount cell renderer | ✅ |
+| DescriptionTableCell | Description cell | ✅ |
+| EntryRowModel | Entry table model | ✅ |
+| EntryTemplateRowModel | Template table model | ✅ |
+| StartingBalanceRowModel | Starting balance model | ✅ |
+| EntryTableNavigationHandler | Table keyboard nav | ✅ |
 
 **Usage Pattern:**
 ```kotlin
@@ -364,7 +384,26 @@ panel.addWithConstraints(
 - Created [src/main/kotlin/kirjanpito/ui/ValidationUtils.kt](src/main/kotlin/kirjanpito/ui/ValidationUtils.kt)
 - Created [src/main/kotlin/kirjanpito/ui/DialogUtils.kt](src/main/kotlin/kirjanpito/ui/DialogUtils.kt)
 
+## What Remains (Java)
+
+### UI Layer (~80% of remaining work)
+- **DocumentFrame.java** (~2200 lines) - Main application window
+- **MainController.java** - JavaFX main controller
+- **COADialog, AccountModel, EntryTemplateModel** - Various dialogs and models
+
+### Reports
+- AccountSummary, GeneralJournal, GeneralLedger, BalanceSheet, IncomeStatement
+
+### Other
+- Swing dialogs (will be replaced by JavaFX versions)
+- Some utility classes
+
 ## Next Steps
+
+1. **Continue JavaFX dialog migration** - AppearanceDialogFX, NewDatabaseDialogFX
+2. **Migrate more UI components** - Table models, cell editors
+3. **Consider DocumentFrame refactoring** - Large file, may need to split first
+4. **Add more tests** - COAHeadingDAO, ReportStructureDAO tests
 1. Identify first Java class to refactor to Kotlin
 2. Create Kotlin equivalent maintaining API compatibility
 3. Update references gradually

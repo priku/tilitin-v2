@@ -17,11 +17,15 @@ Formaatti perustuu [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) -sta
   - Yhtenäinen layout ja tyyli
 
 - **Kotlin-migraatio jatkuu**
-  - AccountSelectionDialogFX migroitu Java → Kotlin ⭐ UUSI
+  - AccountSelectionDialogFX migroitu Java → Kotlin
     - Käyttää BaseDialogFX-pohjaa
     - Tilinvalintadialogi (F9) nyt Kotlinissa
     - Yhteensopiva Java-koodin kanssa (@JvmStatic)
-  - Kotlin-prosentti: ~8.2% → ~9.5% (8 dialogia Kotlinissa)
+  - PrintSettingsDialogFX migroitu Java → Kotlin ⭐ UUSI
+    - Käyttää BaseDialogFX-pohjaa
+    - Tulostusasetukset-dialogi nyt Kotlinissa
+    - MainController toimii ilman muutoksia
+  - Kotlin-prosentti: ~8.2% → ~10% (9 dialogia Kotlinissa)
 
 ---
 

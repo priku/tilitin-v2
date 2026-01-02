@@ -45,11 +45,17 @@
   - ✅ Enter-näppäin valintaan
   - ✅ Yhteensopiva Java-koodin kanssa (@JvmStatic)
 
-#### 2.2 PrintSettingsDialogFX (1-2h)
-- **Koko:** ~200-300 riviä
+#### 2.2 PrintSettingsDialogFX (1-2h) ✅ VALMIS
+- **Status:** ✅ Tehty 2026-01-02
+- **Tiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/PrintSettingsDialogFX.kt`
+- **Koko:** ~163 riviä Java → ~177 riviä Kotlin
 - **Monimutkaisuus:** Pieni - asetukset
-- **Riippuvuudet:** Vähän
-- **Arvio:** 1-2 tuntia
+- **Ominaisuudet:**
+  - ✅ Käyttää BaseDialogFX-pohjaa
+  - ✅ Paperin koko ja orientaatio
+  - ✅ Marginaalit Spinner-komponenteilla
+  - ✅ Lisäasetukset (ruudukko, sivunumerot)
+  - ✅ MainController toimii ilman muutoksia
 
 #### 2.3 AppearanceDialogFX (2-3h)
 - **Koko:** ~300-400 riviä
@@ -168,15 +174,15 @@
 - ✅ Yhteensopiva Java-koodin kanssa
 
 **Seuraava vaihe:**
-- ⏳ PrintSettingsDialogFX migraatio (1-2h) - SUOSITELTU SEURAAVAKSI
+- ⏳ AppearanceDialogFX migraatio (2-3h) - SUOSITELTU SEURAAVAKSI
 
 ---
 
 ## 📈 Modernisaation Mittarit
 
 ### Nykyinen tila (2026-01-02):
-- **Kotlin:** ~9.5% (8 dialogia + BaseDialogFX-pohja)
-- **Migroidut dialogit:** 8 / ~31 JavaFX-dialogia
+- **Kotlin:** ~10% (9 dialogia + BaseDialogFX-pohja)
+- **Migroidut dialogit:** 9 / ~31 JavaFX-dialogia
 - **Testit:** 58 testiä
 - **Legacy-koodi:** ~40 tiedostoa
 

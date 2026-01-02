@@ -46,7 +46,40 @@ class MyDialog(owner: Window?) : BaseDialogFX(owner, "My Dialog", 500.0, 400.0) 
 
 ---
 
-### 2. AccountSelectionDialogFX migroitu Kotliniin ✅ (2026-01-02)
+### 2. PrintSettingsDialogFX migroitu Kotliniin ✅ (2026-01-02)
+
+**Lähdetiedosto:** `src/main/java/kirjanpito/ui/javafx/dialogs/PrintSettingsDialogFX.java` (poistettu)  
+**Kohdetiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/PrintSettingsDialogFX.kt`
+
+**Kuvaus:**
+Tulostusasetukset-dialogi migroitu Java → Kotlin. Yksinkertainen asetusdialogi paperin koon, orientaation, marginaalien ja lisäasetusten hallintaan.
+
+**Mittarit:**
+- **Rivimäärä:** ~163 riviä Java → ~177 riviä Kotlin
+- **Monimutkaisuus:** Pieni (asetukset)
+- **Riippuvuudet:** AppSettings
+
+**Ominaisuudet:**
+- Käyttää BaseDialogFX-pohjaa
+- Paperin koko (A4, A5, Letter, Legal)
+- Orientaatio (Pysty, Vaaka)
+- Marginaalit (ylä, ala, vasen, oikea) Spinner-komponenteilla
+- Lisäasetukset (ruudukko, sivunumerot)
+- Asetukset tallennetaan AppSettings:iin
+
+**Yhteensopivuus:**
+- MainController toimii ilman muutoksia
+- Java-koodi voi kutsua Kotlin-versiota suoraan
+
+**Muutokset:**
+- Käyttää BaseDialogFX-pohjaa
+- Kotlin property-syntaksi
+- SpinnerValueFactory.IntegerSpinnerValueFactory marginaaleille
+- Null-safety parannukset
+
+---
+
+### 3. AccountSelectionDialogFX migroitu Kotliniin ✅ (2026-01-02)
 
 **Lähdetiedosto:** `src/main/java/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.java`  
 **Kohdetiedosto:** `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.kt`
@@ -91,14 +124,15 @@ Tilinvalintadialogi (F9) migroitu Java → Kotlin. Näyttää tilikartan ja mahd
 5. ✅ **KeyboardShortcutsDialogFX** - Pikanäppäimet
 6. ✅ **CSVImportDialog** - CSV-tuonti
 7. ✅ **ReportDialog** - Raportit
-8. ✅ **AccountSelectionDialogFX** - Tilinvalinta (F9) ⭐ UUSI
+8. ✅ **AccountSelectionDialogFX** - Tilinvalinta (F9)
+9. ✅ **PrintSettingsDialogFX** - Tulostusasetukset ⭐ UUSI
 
-**Yhteensä:** 8 dialogia Kotlinissa
+**Yhteensä:** 9 dialogia Kotlinissa
 
 ### Dialog-migraation Edistyminen
 
-- **Kotlin-prosentti:** ~8.2% → ~9.5% (arvio)
-- **Migroidut dialogit:** 8 / ~31 JavaFX-dialogia
+- **Kotlin-prosentti:** ~8.2% → ~10% (arvio)
+- **Migroidut dialogit:** 9 / ~31 JavaFX-dialogia
 - **BaseDialog-pohja:** ✅ Valmis
 
 ---
@@ -139,10 +173,11 @@ Tilinvalintadialogi (F9) migroitu Java → Kotlin. Näyttää tilikartan ja mahd
 
 ### Luodut tiedostot:
 - `src/main/kotlin/kirjanpito/ui/javafx/dialogs/BaseDialogFX.kt` - Yhteinen dialogi-pohja
-- `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.kt` - Migroitu dialogi
+- `src/main/kotlin/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.kt` - Tilinvalinta-dialogi
+- `src/main/kotlin/kirjanpito/ui/javafx/dialogs/PrintSettingsDialogFX.kt` - Tulostusasetukset-dialogi
 
 ### Poistetut tiedostot:
-- `src/main/java/kirjanpito/ui/javafx/dialogs/AccountSelectionDialogFX.java` - Poistetaan myöhemmin (jos halutaan)
+- `src/main/java/kirjanpito/ui/javafx/dialogs/PrintSettingsDialogFX.java` - Poistettu migraation jälkeen
 
 ---
 
