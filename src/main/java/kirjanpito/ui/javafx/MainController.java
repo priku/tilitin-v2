@@ -2902,42 +2902,45 @@ public class MainController implements Initializable {
     }
     
     /**
-     * Lataa tietyn tositelajin tositteet.
+     * Lataa tietyn tositelajin tositteet taustasäikeessä (coroutine).
      */
     private void loadDocumentsForType(int docTypeNumber) {
         if (dataSource == null || currentPeriod == null) return;
         
-        Session session = null;
-        try {
-            session = dataSource.openSession();
-            
-            DocumentDAO documentDAO = dataSource.getDocumentDAO(session);
-            documentCount = documentDAO.getCountByPeriodId(currentPeriod.getId(), docTypeNumber);
-            documents = documentDAO.getByPeriodId(currentPeriod.getId(), docTypeNumber);
-            
-            System.out.println("Ladattu " + documents.size() + " tositetta tositelajille " + docTypeNumber);
-            
-            // Siirry ensimmäiseen tositteeseen
-            if (!documents.isEmpty()) {
-                currentDocumentIndex = 0;
-                loadDocument(documents.get(0));
-            } else {
-                currentDocumentIndex = -1;
-                currentDocument = null;
-                currentEntries = null;
-                entries.clear();
+        setStatus("Ladataan tositteita...");
+        
+        // Käytä coroutine-pohjaista latausta
+        DatabaseOperations.loadDocumentsJava(
+            dataSource,
+            currentPeriod.getId(),
+            docTypeNumber,
+            loadedDocs -> {
+                // Tämä suoritetaan JavaFX-säikeessä
+                documents = loadedDocs;
+                documentCount = loadedDocs.size();
+                
+                System.out.println("Ladattu " + documents.size() + " tositetta tositelajille " + docTypeNumber);
+                
+                // Siirry ensimmäiseen tositteeseen
+                if (!documents.isEmpty()) {
+                    currentDocumentIndex = 0;
+                    loadDocument(documents.get(0));
+                } else {
+                    currentDocumentIndex = -1;
+                    currentDocument = null;
+                    currentEntries = null;
+                    entries.clear();
+                }
+                
+                updateUI();
+                setStatus("Valmiina");
+            },
+            error -> {
+                System.err.println("Virhe ladattaessa tositteita: " + error.getMessage());
+                error.printStackTrace();
+                setStatus("Virhe ladattaessa tositteita");
             }
-            
-            updateUI();
-            
-        } catch (Exception e) {
-            System.err.println("Virhe ladattaessa tositteita: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        );
     }
     
     /**
