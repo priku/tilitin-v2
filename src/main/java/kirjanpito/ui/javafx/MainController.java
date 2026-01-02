@@ -1703,17 +1703,29 @@ public class MainController implements Initializable {
     // Report handlers
     @FXML
     private void handleJournalReport() {
-        if (!checkReportPrereqs()) return;
-        List<Period> allPeriods = getAllPeriods();
-        kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
-            stage, 
-            kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.JOURNAL, 
-            dataSource, currentPeriod, accounts, allPeriods,
-            account -> {
-                openLedgerForAccount(account);
-                return kotlin.Unit.INSTANCE;
-            }
-        ).show();
+        System.out.println("📊 handleJournalReport kutsuttu");
+        if (!checkReportPrereqs()) {
+            System.out.println("❌ checkReportPrereqs palautti false");
+            return;
+        }
+        System.out.println("✅ checkReportPrereqs OK, luodaan raportti...");
+        try {
+            List<Period> allPeriods = getAllPeriods();
+            System.out.println("📋 Tilikaudet: " + allPeriods.size() + " kpl");
+            kirjanpito.ui.javafx.dialogs.ReportDialog.Companion.create(
+                stage, 
+                kirjanpito.ui.javafx.dialogs.ReportDialog.ReportType.JOURNAL, 
+                dataSource, currentPeriod, accounts, allPeriods,
+                account -> {
+                    openLedgerForAccount(account);
+                    return kotlin.Unit.INSTANCE;
+                }
+            ).show();
+            System.out.println("✅ ReportDialog.show() kutsuttu");
+        } catch (Exception e) {
+            System.err.println("❌ Virhe raportissa: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @FXML

@@ -107,8 +107,8 @@ sourceSets {
 application {
     mainClass.set("kirjanpito.ui.javafx.JavaFXApp")
     applicationDefaultJvmArgs = listOf(
-        "-Xmx1024m",
-        "-Xms256m"
+        "-Xmx2048m",
+        "-Xms512m"
     )
 }
 

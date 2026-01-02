@@ -131,11 +131,12 @@
     -fx-max-width: 36;
     -fx-max-height: 36;
     -fx-padding: 0;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #334155;
+    -fx-text-fill: #334155 !important;
     -fx-background-color: #f1f5f9;
     -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-cursor: hand;
@@ -143,15 +144,18 @@
 
 .nav-button:hover {
     -fx-background-color: #e2e8f0;
+    -fx-text-fill: #1e293b !important;
 }
 
 .nav-button:pressed {
     -fx-background-color: #cbd5e1;
+    -fx-text-fill: #0f172a !important;
 }
 
 .nav-button:disabled {
-    -fx-text-fill: #94a3b8;
+    -fx-text-fill: #94a3b8 !important;
     -fx-background-color: #f8fafc;
+    -fx-opacity: 0.6;
 }
 
 /* ===== TABLE VIEW ===== */

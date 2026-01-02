@@ -67,10 +67,42 @@ public class AppSettings {
 		if (file.exists()) {
 			logger.fine("Luetaan asetukset tiedostosta " + file.getAbsolutePath());
 
-			try {
-				FileInputStream input = new FileInputStream(file);
+			// Tarkista tiedoston koko ennen latausta
+			long fileSize = file.length();
+			if (fileSize > 10 * 1024 * 1024) { // 10 MB raja
+				logger.log(Level.SEVERE, String.format(
+					"Asetustiedosto on liian suuri (%d tavua / %.2f MB). Tiedosto on korruptoitunut. Luodaan uusi tyhjä tiedosto.", 
+					fileSize, fileSize / (1024.0 * 1024.0)));
+				
+				// Varmuuskopioi korruptoitunut tiedosto
+				File backupFile = new File(file.getAbsolutePath() + ".corrupted." + System.currentTimeMillis());
+				try {
+					java.nio.file.Files.copy(file.toPath(), backupFile.toPath(), 
+						java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+					logger.log(Level.INFO, "Korruptoitunut tiedosto varmuuskopioitu: " + backupFile.getAbsolutePath());
+				} catch (IOException e) {
+					logger.log(Level.WARNING, "Varmuuskopiointi epäonnistui", e);
+				}
+				
+				// Poista korruptoitunut tiedosto ja luo uusi tyhjä
+				try {
+					file.delete();
+					logger.log(Level.INFO, "Korruptoitunut tiedosto poistettu. Luodaan uusi tyhjä tiedosto.");
+				} catch (Exception e) {
+					logger.log(Level.WARNING, "Tiedoston poistaminen epäonnistui", e);
+				}
+				
+				// Jatka ilman asetuksia - uusi tyhjä tiedosto luodaan automaattisesti tallennuksen yhteydessä
+				return;
+			}
+
+			try (FileInputStream input = new FileInputStream(file)) {
 				config.load(input);
-				input.close();
+			}
+			catch (OutOfMemoryError e) {
+				logger.log(Level.SEVERE, "Muisti loppui asetustiedostoa lukiessa. Tiedosto saattaa olla korruptoitunut.", e);
+				// Tyhjennä config ja jatka ilman asetuksia
+				config.clear();
 			}
 			catch (IOException e) {
 				logger.log(Level.WARNING, "Asetuksien lukeminen epäonnistui", e);

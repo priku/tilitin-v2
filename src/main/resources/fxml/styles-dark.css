@@ -146,11 +146,12 @@
     -fx-max-width: 36;
     -fx-max-height: 36;
     -fx-padding: 0;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #e2e8f0;
+    -fx-text-fill: #e2e8f0 !important;
     -fx-background-color: #334155;
     -fx-border-color: #475569;
+    -fx-border-width: 1;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
     -fx-cursor: hand;
@@ -158,15 +159,18 @@
 
 .nav-button:hover {
     -fx-background-color: #475569;
+    -fx-text-fill: #f1f5f9 !important;
 }
 
 .nav-button:pressed {
     -fx-background-color: #64748b;
+    -fx-text-fill: #ffffff !important;
 }
 
 .nav-button:disabled {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #64748b !important;
     -fx-background-color: #1e293b;
+    -fx-opacity: 0.6;
 }
 
 .button.primary {
