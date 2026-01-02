@@ -7,8 +7,8 @@
 
 ## 📊 Yhteenveto
 
-**Yhteensä: 26 testiä**  
-**Status: ✅ 26/26 PASSED (100%)**
+**Yhteensä: 35 testiä**  
+**Status: ✅ 35/35 PASSED (100%)**
 
 ---
 
@@ -57,6 +57,27 @@
 - ✅ `test period date range` - Päivämäärävalidoinnit
 
 **Kattavuus:** PeriodDAO CRUD-operaatiot
+
+---
+
+### SettingsDAOTest (4 testiä)
+- ✅ `test save and retrieve settings` - Asetusten tallennus ja haku
+- ✅ `test update settings` - Asetusten päivitys
+- ✅ `test settings with properties` - Mukautettujen ominaisuuksien hallinta
+- ✅ `test settings current period id` - Nykyisen tilikauden asetus
+
+**Kattavuus:** SettingsDAO CRUD-operaatiot, properties-hallinta
+
+---
+
+### EntryTemplateDAOTest (5 testiä)
+- ✅ `test create and retrieve entry template` - Vientimallin luonti ja haku
+- ✅ `test update entry template` - Vientimallin päivitys
+- ✅ `test delete entry template` - Vientimallin poisto
+- ✅ `test get all entry templates` - Kaikkien vientimallien haku
+- ✅ `test entry template with credit side` - Kredit-puolen vientimalli
+
+**Kattavuus:** EntryTemplateDAO CRUD-operaatiot, debet/kredit-logiikka
 
 ---
 
@@ -113,20 +134,20 @@ src/test/kotlin/kirjanpito/db/
 
 | Mittari | Arvo |
 |---------|------|
-| **Yksikkötestit** | 22 testiä |
-| **Integraatiotestit** | 4 testiä |
-| **Yhteensä** | 26 testiä |
-| **Pass rate** | 100% (26/26) |
-| **Testikattavuus (DAO)** | ~40-50% |
-| **Testikattavuus (kokonaisuus)** | ~5-10% |
+| **Yksikkötestit** | 30 testiä |
+| **Integraatiotestit** | 5 testiä |
+| **Yhteensä** | 35 testiä |
+| **Pass rate** | 100% (35/35) |
+| **Testikattavuus (DAO)** | ~50-60% |
+| **Testikattavuus (kokonaisuus)** | ~8-12% |
 
 ---
 
 ## 🚀 Seuraavat vaiheet
 
 ### Prioriteetti 1: Laajenna DAO-testejä
-- [ ] SettingsDAOTest
-- [ ] EntryTemplateDAOTest
+- [x] SettingsDAOTest ✅
+- [x] EntryTemplateDAOTest ✅
 - [ ] DocumentTypeDAOTest
 - [ ] AttachmentDAOTest
 
@@ -150,14 +171,15 @@ src/test/kotlin/kirjanpito/db/
 ## ✅ Yhteenveto
 
 **Onnistuneesti luotu:**
-- ✅ 26 testiä (22 yksikkötestiä + 4 integraatiotestiä)
+- ✅ 35 testiä (30 yksikkötestiä + 5 integraatiotestiä)
 - ✅ 100% pass rate
 - ✅ Kattava DAO-testikattavuus
 - ✅ Integraatiotestit dokumenttityönkululle
+- ✅ CI/CD integroitu (testit ajetaan automaattisesti)
 
 **Testikattavuus:**
-- DAO-taso: ~40-50%
-- Kokonaisuus: ~5-10% (hyvä alku!)
+- DAO-taso: ~50-60%
+- Kokonaisuus: ~8-12% (hyvä edistyminen!)
 
 **Seuraava askel:**
 Laajenna testikattavuutta lisäämällä SettingsDAO, EntryTemplateDAO ja Model-testit.
