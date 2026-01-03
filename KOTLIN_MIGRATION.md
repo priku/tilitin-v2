@@ -321,13 +321,28 @@ class MyDialog(owner: Window?) : BaseDialogFX(owner, "Title", 500.0, 400.0) {
 - [ ] DocumentTypeDialogFX
 - [ ] And ~20+ other dialogs
 
-### Phase 5: DocumentFrame Refactoring (FUTURE)
+### Phase 5: DocumentFrame Helper Migration (IN PROGRESS)
 
-1. **DocumentFrame** (3262 lines) - Break down into smaller Kotlin classes
-   - [ ] Extract menu builders
-   - [ ] Extract toolbar builders
-   - [ ] Extract event handlers
-   - [ ] Extract table management
+DocumentFrame.java has been refactored with helper classes extracted (2,226 lines).
+Now migrating these helpers from Java to Kotlin:
+
+**Helper Classes Migration Status:**
+- [x] **DocumentMenuBuilder.kt** (already in Kotlin)
+- [x] **DocumentToolbarBuilder.kt** - MIGRATED 2026-01-03
+  - Converted ToolbarListeners to Kotlin data class
+  - Uses `apply {}` for cleaner UI construction
+  - 115 lines Java → ~140 lines Kotlin (more readable)
+- [ ] **DocumentUIBuilder.java** → .kt (316 lines)
+- [ ] **DocumentNavigator.java** → .kt (320 lines)
+- [ ] **DocumentDataSourceManager.java** → .kt (292 lines)
+- [ ] **DocumentValidator.java** → .kt (320 lines)
+- [ ] **DocumentUIUpdater.java** → .kt (406 lines)
+- [ ] **DocumentEntryManager.java** → .kt (535 lines)
+- [ ] **DocumentTableManager.java** → .kt (534 lines)
+
+**Future Extractions:**
+- [ ] Extract DocumentDialogCoordinator.kt from DocumentFrame
+- [ ] Extract DocumentReportCoordinator.kt from DocumentFrame
 
 ### Phase 6: Advanced Features (FUTURE)
 

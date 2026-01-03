@@ -478,15 +478,16 @@ public class DocumentFrame extends JFrame implements AccountSelectionListener,
 	protected void createToolBar() {
 		toolbarBuilder = new DocumentToolbarBuilder();
 		
-		// Konfiguroi kuuntelijat
-		DocumentToolbarBuilder.ToolbarListeners listeners = new DocumentToolbarBuilder.ToolbarListeners();
-		listeners.prevDocListener = prevDocListener;
-		listeners.nextDocListener = nextDocListener;
-		listeners.newDocListener = newDocListener;
-		listeners.addEntryListener = addEntryListener;
-		listeners.removeEntryListener = removeEntryListener;
-		listeners.findDocumentByNumberListener = findDocumentByNumberListener;
-		listeners.searchListener = searchListener;
+		// Konfiguroi kuuntelijat (Kotlin data class)
+		DocumentToolbarBuilder.ToolbarListeners listeners = new DocumentToolbarBuilder.ToolbarListeners(
+			prevDocListener,
+			nextDocListener,
+			newDocListener,
+			addEntryListener,
+			removeEntryListener,
+			findDocumentByNumberListener,
+			searchListener
+		);
 		
 		// Rakenna työkalurivi ja lisää ikkunaan
 		JToolBar toolBar = toolbarBuilder.build(listeners);
