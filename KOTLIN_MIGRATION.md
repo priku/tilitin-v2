@@ -332,7 +332,11 @@ Now migrating these helpers from Java to Kotlin:
   - Converted ToolbarListeners to Kotlin data class
   - Uses `apply {}` for cleaner UI construction
   - 115 lines Java → ~140 lines Kotlin (more readable)
-- [ ] **DocumentUIBuilder.java** → .kt (316 lines)
+- [x] **DocumentUIBuilder.kt** - MIGRATED 2026-01-03
+  - Converted UICallbacks interface to Kotlin
+  - UIComponents class with `@JvmField` for Java interop
+  - Extensive use of `apply {}` and `object : Adapter()` patterns
+  - 316 lines Java → ~318 lines Kotlin (cleaner, more idiomatic)
 - [ ] **DocumentNavigator.java** → .kt (320 lines)
 - [ ] **DocumentDataSourceManager.java** → .kt (292 lines)
 - [ ] **DocumentValidator.java** → .kt (320 lines)
