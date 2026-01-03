@@ -3,13 +3,19 @@
 ## Overview
 This document describes the Kotlin migration strategy for Tilitin 2.1, focusing on modernizing the codebase while maintaining full Java interoperability.
 
-## Current Status (2026-01-02)
+## Current Status (2026-01-03)
 
 ### 📊 Statistics
 | Type | Count | Percentage |
 |------|-------|------------|
-| Kotlin files (.kt) | **56** | ~20% |
-| Java files (.java) | **231** | ~80% |
+| Kotlin files (.kt) | **71** | ~24.5% |
+| Java files (.java) | **219** | ~75.5% |
+
+### JavaFX Dialogs Status
+| Type | Count | Percentage |
+|------|-------|------------|
+| Kotlin dialogs | **19** | ~59% |
+| Java dialogs | **13** | ~41% |
 
 ### Completed Phases
 - **Phase 1: Foundation** ✅
@@ -17,7 +23,29 @@ This document describes the Kotlin migration strategy for Tilitin 2.1, focusing 
 - **Phase 3: DAO Foundation** ✅
 - **Phase 4: All SQLite DAO Migration** ✅
 - **Phase 5: Cleanup & Session Interface** ✅
-- **Phase 6: JavaFX Dialogs (partial)** ✅
+- **Phase 6: JavaFX Dialogs** ✅ (59% complete)
+- **Phase 7: Async/Coroutines** ✅
+- **Phase 8: Dialog Migration Batch 2** ✅
+
+## Recent Changes (2026-01-03)
+
+### Coroutines Infrastructure
+- Added `kotlinx-coroutines-core:1.8.1`
+- Added `kotlinx-coroutines-javafx:1.8.1`
+- Created `CoroutineUtils.kt` - Application-wide scope, launchDB, launchUI helpers
+- Created `AsyncDAOExtensions.kt` - Async database operations
+- Created `DatabaseOperations.kt` - Java-compatible async helpers with Consumer interface
+- Created `DocumentAsyncOperations.kt` - Async document load/save/refresh
+
+### Dialog Migration (8 dialogs Java → Kotlin)
+- `SettingsDialogFX.kt` (109 lines)
+- `DataSourceInitializationDialogFX.kt` (120 lines)
+- `SettingsExportImportFX.kt` (125 lines)
+- `DocumentTypeDialogFX.kt` (192 lines)
+- `AccountSummaryOptionsDialogFX.kt` (216 lines)
+- `VATReportDialogFX.kt` (225 lines)
+- `StartingBalanceDialogFX.kt` (234 lines)
+- `BalanceComparisonDialogFX.kt` (238 lines)
 
 ## What Has Been Done
 
@@ -337,7 +365,12 @@ Now migrating these helpers from Java to Kotlin:
   - UIComponents class with `@JvmField` for Java interop
   - Extensive use of `apply {}` and `object : Adapter()` patterns
   - 316 lines Java → ~318 lines Kotlin (cleaner, more idiomatic)
-- [ ] **DocumentNavigator.java** → .kt (320 lines)
+- [x] **DocumentNavigator.kt** - MIGRATED 2026-01-03
+  - Converted NavigationCallbacks interface to Kotlin
+  - Better exception handling with Kotlin try-catch expressions
+  - Improved null-safety with `toIntOrNull()` instead of try-catch
+  - String templates for cleaner message formatting
+  - 320 lines Java → ~295 lines Kotlin (more concise)
 - [ ] **DocumentDataSourceManager.java** → .kt (292 lines)
 - [ ] **DocumentValidator.java** → .kt (320 lines)
 - [ ] **DocumentUIUpdater.java** → .kt (406 lines)
@@ -406,13 +439,60 @@ panel.addWithConstraints(
 
 ## What Remains (Java)
 
-### UI Layer (~80% of remaining work)
-- **DocumentFrame.java** (~2200 lines) - Main application window
-- **MainController.java** - JavaFX main controller
-- **COADialog, AccountModel, EntryTemplateModel** - Various dialogs and models
+### UI Layer (~75% of remaining work)
+- **MainController.java** (~1500 lines) - JavaFX main controller (needs refactoring)
+- **DocumentFrame.java** (~2200 lines) - Legacy Swing window
+
+### Remaining Java Dialogs (13)
+- GeneralJournalOptionsDialogFX (242 lines)
+- FinancialStatementOptionsDialogFX (268 lines)
+- EntryTemplateDialogFX (273 lines)
+- DocumentNumberShiftDialogFX (282 lines)
+- COADialogFX (293 lines)
+- AttachmentsDialogFX (336 lines)
+- VATChangeDialogFX (336 lines)
+- ReportEditorDialogFX (368 lines)
+- RestoreBackupDialogFX (380 lines)
+- BackupSettingsDialogFX (385 lines)
+- ReportDialogFX (416 lines)
+- DataExportDialogFX (421 lines)
+- AccountStatementOptionsDialogFX (428 lines)
 
 ### Reports
 - AccountSummary, GeneralJournal, GeneralLedger, BalanceSheet, IncomeStatement
+
+## Known Issues & Technical Debt
+
+### High Priority
+| Issue | File | Description |
+|-------|------|-------------|
+| Description history | MainController.java:557 | TODO: Implement from database |
+| MainController size | MainController.java | ~1500 lines, needs splitting |
+
+### Medium Priority
+| Issue | Description |
+|-------|-------------|
+| Deprecated API | `CONSTRAINED_RESIZE_POLICY` in TableView |
+| Test coverage | Only 17 test files, needs more integration tests |
+| No DI framework | Consider Koin for dependency injection |
+
+### Low Priority
+| Issue | Description |
+|-------|-------------|
+| Logging | Still using java.util.logging |
+| CI/CD | No GitHub Actions configured |
+
+## Technology Stack
+
+| Component | Version | Status |
+|-----------|---------|--------|
+| Java | 21 (LTS) | ✅ Current |
+| Kotlin | 2.2.0 | ✅ Latest |
+| JavaFX | 21 | ✅ Modern UI |
+| Gradle | 8.11 (Kotlin DSL) | ✅ Modern build |
+| Coroutines | 1.8.1 | ✅ Async support |
+| SQLite JDBC | 3.49.1 | ✅ Current |
+| PDFBox | 3.0.6 | ✅ Current |
 
 ### Other
 - Swing dialogs (will be replaced by JavaFX versions)
